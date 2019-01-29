@@ -11,6 +11,7 @@ import numpy as np
 import datetime as dt
 import VieSensor as snsr
 import csv
+import time as time
 import datetime as dt
 import math as math
 
@@ -43,44 +44,44 @@ def FuseVacancyTimestamps(timestamps):
     return overalldt
 
 
-# Declare global variables
+# Create the following variables once...
+output = pd.DataFrame(index=[0],columns=["runtimedt","overallprobadt","overallprobaval","wifidt","wifival","wifiproba","co2dt","co2val","co2proba","elecdt","elecval","elecproba"])
+sensors = CreateVirtualSensors("VIE-sensor-metadatabase.csv") # Read sensors from file, instantiate. If missing data, fill with dummy data ("") and move on to next sensor
+
+# Reinitialize the following variables every cycle
 probabilities = []
 timestamps = []
-sensors = CreateVirtualSensors("VIE-sensor-metadatabase.csv") # Read sensors from file, instantiate. If missing data, fill with dummy data ("") and move on to next sensor
-for sensor in sensors:
-    sensor.UpdateSnapshot()
-    sensor = sensor.PreprocessData() # Currently does nothing
 
-    if sensor.vacancyrelationship == 0 : # In case of sigmoid, check if needed parameters exist. If not, calculate them
-        p1_nanflag = math.isnan(sensor.param1)
-        p2_nanflag = math.isnan(sensor.param2)
-        if p1_nanflag | p2_nanflag : # if any parameters are nan, calculate them
-            sensor = sensor.BuildVacancyRelationship() # Does nothing for now. May need separate relationship builders for each function type. Need to test this program flow.
+while True:
+    for sensor in sensors:
+        sensor.UpdateSnapshot()
+        sensor = sensor.PreprocessData() # Currently does nothing
+
+        if sensor.vacancyrelationship == 0 : # In case of sigmoid, check if needed parameters exist. If not, calculate them
+            p1_nanflag = math.isnan(sensor.param1)
+            p2_nanflag = math.isnan(sensor.param2)
+            if p1_nanflag | p2_nanflag : # if any parameters are nan, calculate them
+                sensor = sensor.BuildVacancyRelationship() # Does nothing for now. May need separate relationship builders for each function type. Need to test this program flow.
     
-    sensor.PredictVacancyProbability()
-    timestamps.append(sensor.snapshottimestamp) # Capture datetime in a list
-    probabilities.append(sensor.vacancyprobability) # Capture datetime in a list
+        sensor.PredictVacancyProbability()
+        timestamps.append(sensor.snapshottimestamp) # Capture datetime in a list
+        probabilities.append(sensor.vacancyprobability) # Capture datetime in a list
 
-# fuse predictions for all sensors
-overallprobabilityvalue = FuseVacancyProbabilities(probabilities)
-overallprobabilitytimestamp = FuseVacancyTimestamps(timestamps)
+    # fuse predictions for all sensors
+    overallprobabilityvalue = FuseVacancyProbabilities(probabilities)
+    overallprobabilitytimestamp = FuseVacancyTimestamps(timestamps)
 
-# output final vacancy probability to csv
-# put into dataframe, then append
-
-output = pd.DataFrame(index=[0],columns=["runtimedt","overallprobadt","overallprobaval","wifidt","wifival","wifiproba","co2dt","co2val","co2proba","elecdt","elecval","elecproba"])
-wifi = sensors[0]
-co2 = sensors[1]
-elec = sensors[2]
-output.iloc[0] = [dt.datetime.now(), overallprobabilitytimestamp, overallprobabilityvalue, wifi.snapshottimestamp, wifi.snapshotvalue, wifi.vacancyprobability, co2.snapshottimestamp, co2.snapshotvalue, co2.vacancyprobability, elec.snapshottimestamp, elec.snapshotvalue, elec.vacancyprobability]
-output.to_csv("VacancyPredictionTestFile.csv", mode="a", header=False, index=False)
-
-
+    # output final vacancy probability to csv
+    # put info into dataframe, then append to csv
+    wifi = sensors[0]
+    co2 = sensors[1]
+    elec = sensors[2]
+    output.iloc[0] = [dt.datetime.now(), overallprobabilitytimestamp, overallprobabilityvalue, wifi.snapshottimestamp, wifi.snapshotvalue, wifi.vacancyprobability, co2.snapshottimestamp, co2.snapshotvalue, co2.vacancyprobability, elec.snapshottimestamp, elec.snapshotvalue, elec.vacancyprobability]
+    output.to_csv("VacancyPredictionTestFile.csv", mode="a", header=False, index=False)
+    sleepminutes = 5
+    time.sleep(sleepminutes*60)
 
 
-
-
-# TODO save to plot
 thisisastopgap = "stopgap"
 
 
