@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import PI_client as pc
+import PI_client_LMS as pc
 import matplotlib.pyplot as plt
 import sklearn as sk 
 import math
