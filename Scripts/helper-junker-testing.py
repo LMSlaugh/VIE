@@ -15,9 +15,10 @@ def PrepForHist(target):
     return testd
 
 client = pc.pi_client()
-points = ["AP.STUD-COMM-CTR_Total_Count", "SCC_Electricity_Demand_kBtu"]
-data = client.get_stream_by_point(points,start="2018-09-27", end="2018-10-26 3:00:00", calculation="recorded")
-data.columns = ["wifi","elec"]
+l, r = client.search_by_point("ap*wickson*total*")
+#print(l)
+points = ["AP.WICKSON_Total_Count"]
+data = client.get_stream_by_point(points, start="2018-01-01 12:00:00", end="*", calculation="recorded")
 
 mask_occ = (((data.index.hour > 7) & (data.index.hour < 23 )) & (data.index.dayofweek < 5))
 mask_vac = (((data.index.hour <= 7) | (data.index.hour >= 23 )) | (data.index.dayofweek >= 5))
@@ -30,8 +31,5 @@ data.loc[data[mask_occ].index,["vacant"]] = 0
 
 
 #Plot in histogram
-
-testd.head(20)
-
 
 thisisastop = 12

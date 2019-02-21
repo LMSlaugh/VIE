@@ -6,7 +6,13 @@
 # ----------------------------------------------------------------------------------------------------------
 import pandas as pd
 import numpy as np
+import requests as req
+
 
 def UpdateSnapshot(sensor):
+    # Authenticate
+    # Construct URL
     return sensor
 
+def GetHistoricalData(sensor):
+    return sensor

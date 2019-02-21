@@ -459,6 +459,8 @@ class pi_client(object):
             end_dic['Value'] = js['Value']
 
             df_end = pd.DataFrame.from_dict(end_dic, orient='index')
+            #df_end = self._utc_to_local(df_end, 'America/Los_Angeles')
+
 
             if label:
                 df_end.columns = [label]

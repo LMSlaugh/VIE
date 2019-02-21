@@ -7,15 +7,8 @@
 import pandas as pd
 import numpy as np
 
-def BuildVacancyRelationship(sensor):
+def UpdateSnapshot(sensor):
+    return sensor
 
-    # Some junk code...
-    # by function type
-    if sensor.vacancyrelationship==0: # sigmoid
-        pass
-    elif sensor.vacancyrelationship==1: # ???
-        pass
-    else:
-        pass # error out
-
+def GetHistoricalData(sensor):
     return sensor
