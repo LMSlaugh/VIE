@@ -6,9 +6,10 @@
 
 # ----------------------------------------------------------------------------------------------------------
 import pandas as pd
+import numpy as np
+import math as math
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-import math as math
 
 labs = 11 # figure label size
 legs = "medium"
@@ -172,62 +173,64 @@ def PlotOutputComparison(historicaldata, realtimedata):
     comparepredictionsfig.savefig("Figures\\overall-prediction-comparison-fig.png", format='png', bbox_inches='tight')
     return
 
-def PlotSigmoids(sensor):
-    historicalvacantdata = sensor.histdata
-    histdat = historicalvacantdata.iloc[:,0]
-    n_bins = math.floor(len(histdat)/10)
-    histdat = histdat.dropna()
-    n, bins, patches = plt.hist(histdat, n_bins, cumulative=True, align="left")
-    realsigmoidfig, axrs = plt.subplots(figsize=(10,5))
-    bins = bins[0:-1]
-    normed_freq = 1 - n / len(histdat)
-    axrs.plot(bins, normed_freq)
-    plt.ylim([0,1])
-    plt.xlim([0,bins[-1]])
-    axrs.xaxis.set_major_locator(plt.MaxNLocator(20))
-    axrs.xaxis.set_tick_params(labelsize=labs)
-    axrs.yaxis.set_tick_params(labelsize=labs)
-    axrs.set_title("Actual Vacancy Relationship for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
-    axrs.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
-    axrs.set_xlabel("Raw Sensor Value", fontsize=labs)
-    axrs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
-    realsigmoidfig.savefig("Figures\\sigmoid-real-" + sensor.sensorname + ".png", format='png', bbox_inches='tight')
+#def PlotSigmoids(sensor):
+    #historicalvacantdata = sensor.histdata
+    #histdat = historicalvacantdata.iloc[:,0]
+    #n_bins = math.floor(len(histdat)/10)
+    #histdat = histdat.dropna()
+    #n, bins, patches = plt.hist(histdat, n_bins, cumulative=True, align="left")
+    #bins = bins[0:-1]
+    #normed_freq = 1 - n / len(histdat)
     
-    data_r = pd.DataFrame(bins, columns=["x"])
-    y = []
-    for index, row in data_r.iterrows():
-        y_temp = 1 - 1/(1 + math.exp((sensor.vrparam1-row["x"])/sensor.vrparam2))
-        y.append(y_temp)
-    data_r["y"] = y
+    #realsigmoidfig, axrs = plt.subplots(figsize=(10,5))
+    #axrs.plot(bins, normed_freq)
+    #plt.ylim([0,1])
+    #plt.xlim([0,bins[-1]])
+    #axrs.xaxis.set_major_locator(plt.MaxNLocator(20))
+    #axrs.xaxis.set_tick_params(labelsize=labs)
+    #axrs.yaxis.set_tick_params(labelsize=labs)
+    #axrs.set_title("Actual Vacancy Relationship for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
+    #axrs.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
+    #axrs.set_xlabel("Raw Sensor Value", fontsize=labs)
+    #axrs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
+    #realsigmoidfig.savefig("Figures\\sigmoid-real-" + sensor.sensorname + ".png", format='png', bbox_inches='tight')
+    
+    #data_r = pd.DataFrame(bins, columns=["x"])
+    #data_r = pd.DataFrame(histdat, columns=["x"])
+    #y = []
+    #for index, row in data_r.iterrows():
+    #    y_temp = 1-1/(1+np.exp((sensor.vrparam1-row["x"])/sensor.vrparam2))
+    #    y.append(y_temp)
+    #data_r["y"] = y
 
-    gensigmoidfig, axgs = plt.subplots(figsize=(10,5))
-    axgs.plot(data_r["x"],data_r["y"])
-    plt.ylim([0,1])
-    plt.xlim([0,bins[-1]])
-    axgs.xaxis.set_major_locator(plt.MaxNLocator(20))
-    axgs.xaxis.set_tick_params(labelsize=labs)
-    axgs.yaxis.set_tick_params(labelsize=labs)
-    axgs.set_title("Generated Vacancy Relationship for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
-    axgs.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
-    axgs.set_xlabel("Raw Sensor Value", fontsize=labs)
-    axgs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
-    gensigmoidfig.savefig("Figures\\sigmoid-generated-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+    #gensigmoidfig, axgs = plt.subplots(figsize=(10,5))
+    #axgs.plot(data_r["x"],data_r["y"])
+    #plt.ylim([0,1])
+    #plt.xlim([0,bins[-1]])
+    #axgs.xaxis.set_major_locator(plt.MaxNLocator(20))
+    #axgs.xaxis.set_tick_params(labelsize=labs)
+    #axgs.yaxis.set_tick_params(labelsize=labs)
+    #axgs.set_title("Generated Vacancy Relationship for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
+    #axgs.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
+    #axgs.set_xlabel("Raw Sensor Value", fontsize=labs)
+    #axgs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
+    #gensigmoidfig.savefig("Figures\\sigmoid-generated-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
     
     # plot generated sigmoid on top of the real one
-    compsigmoidfig, axcs = plt.subplots(figsize=(20,10))
-    axcs.plot(data_r["x"], data_r["y"], label="Actual")
-    axcs.plot(bins, normed_freq, label="Generated")
-    plt.ylim([0,1])
-    plt.xlim([0,bins[-1]])
-    axcs.xaxis.set_major_locator(plt.MaxNLocator(20))
-    axcs.xaxis.set_tick_params(labelsize=labs)
-    axcs.yaxis.set_tick_params(labelsize=labs)
-    axcs.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
-    axcs.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
-    axcs.set_xlabel("Raw Sensor Value", fontsize=labs)
-    axcs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
-    compsigmoidfig.savefig("Figures\\sigmoid-comparison-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
-    return
+    #compsigmoidfig, axcs = plt.subplots(figsize=(20,10))
+    #axcs.plot(data_r["x"], data_r["y"], label="Actual")
+    #axcs.plot(bins, normed_freq, label="Generated")
+    #plt.ylim([0,1])
+    #plt.xlim([0,bins[-1]])
+    #axcs.xaxis.set_major_locator(plt.MaxNLocator(20))
+    #axcs.xaxis.set_tick_params(labelsize=labs)
+    #axcs.yaxis.set_tick_params(labelsize=labs)
+    #axcs.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
+    #axcs.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
+    #axcs.set_xlabel("Raw Sensor Value", fontsize=labs)
+    #axcs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
+    #compsigmoidfig.savefig("Figures\\sigmoid-comparison-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+    #return
 
 def PlotMain():
     historicaldata = pd.read_csv("DataFiles\\VIE-output-historical.csv", parse_dates=["runtimedt","overallprobadt", "wifidt", "co2dt", "elecdt"])
@@ -242,6 +245,6 @@ def PlotMain():
     PlotOutputComparison(historicaldata, realtimedata)
     return
 
-#PlotMain()
+PlotMain()
 
 stopgap = "this is a stopgap"

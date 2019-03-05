@@ -9,6 +9,7 @@
  
 
 # ----------------------------------------------------------------------------------------------------------
+import numpy as np
 import math as math
 import datetime as dt
 from pytz import timezone as tz
@@ -35,7 +36,7 @@ class VieSensor:
         self.vrparam4 = vrParameter4 # unused
         self.snapshotvalue = -1 # value of most recent data update from this sensor: dummy value
         self.snapshottimestamp = dt.datetime.now() # timestamp (datetime) of most recent data update from this sensor: dummy value
-        self.vacancyprobability = -1 # probability of vacancy corresponding to this sensor's snapshot value
+        self.snapshotvacancyprobability = -1 # probability of vacancy corresponding to this sensor's snapshot value
         if ( (self.vacancyrelationship == 0) & ( math.isnan(self.vrparam1) | math.isnan(self.vrparam2) ) ):
             self.BuildVacancyRelationship()
         elif ( (self.vacancyrelationship == 1) & ( math.isnan(self.vrparam1) | math.isnan(self.vrparam2) | math.isnan(self.vrparam3) ) ):
@@ -85,9 +86,9 @@ class VieSensor:
         # Applies the functional relationship between sensor data and vacancy to the sensor's snapshot value.
 
         # case 0: sigmoid
-        self.vacancyprobability = 1 - 1/(1 + math.exp((self.vrparam1-self.snapshotvalue)/self.vrparam2))         
-        if self.vacancyprobability < 0.01:
-            self.vacancyprobability = 0
+        self.snapshotvacancyprobability = 1 - 1/(1 + np.exp((self.vrparam1-self.snapshotvalue)/self.vrparam2))         
+        if self.snapshotvacancyprobability < 0.01:
+            self.snapshotvacancyprobability = 0
         else:
             pass
         # case 1: step

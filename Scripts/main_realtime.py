@@ -63,7 +63,7 @@ while True:
     
         v.PredictVacancyProbability()
         timestamps.append(v.snapshottimestamp) # Capture datetime in a list
-        probabilities.append(v.vacancyprobability) # Capture datetime in a list
+        probabilities.append(v.snapshotvacancyprobability) # Capture datetime in a list
 
     # fuse predictions for all sensors
     overallprobabilityvalue = FuseVacancyProbabilities(probabilities)

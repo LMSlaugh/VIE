@@ -12,6 +12,7 @@ import VieSensor as snsr
 import time as time
 import datetime as dt
 import math as math
+import helper_figure_generator as figen
 
 def CreateVirtualSensors(metadatabasePath):
     # Purpose: read each sensor into a list from the sensor metadatabase
@@ -33,14 +34,16 @@ def CreateVirtualSensors(metadatabasePath):
         p4 = row["Parameter-4"]
         newSensor = snsr.VieSensor(sn, st, uf, mu, dat, vrt, drfn, ppfn, rbfn, p1, p2, p3, p4)
         sensors[newSensor.sensorname] = newSensor
-    metadata_new = pd.DataFrame(index=metadata.index, columns=metadata.columns)
-    # TODO write out to metadatabase spreadsheet with calculated function parameters
-    #for index, row in metadata.iterrows():
-        #metadata_new.loc[index,"Parameter-1"] = sensors[row["Sensor-Name"]].param1
-        #row["Parameter-2"] = sensors[row["Sensor-Name"]].param2
-        #row["Parameter-3"] = sensors[row["Sensor-Name"]].param3
-        #row["Parameter-4"] = sensors[row["Sensor-Name"]].param4
     
+    metadata_new = metadata
+    for index, row in metadata.iterrows():
+        metadata_new.loc[index,"Parameter-1"] = sensors[row["Sensor-Name"]].vrparam1
+        metadata_new.loc[index,"Parameter-2"] = sensors[row["Sensor-Name"]].vrparam2
+        metadata_new.loc[index,"Parameter-3"] = sensors[row["Sensor-Name"]].vrparam3
+        metadata_new.loc[index,"Parameter-4"] = sensors[row["Sensor-Name"]].vrparam4
+    
+    metadata_new.to_csv("VIE-sensor-metadatabase-new.csv", header=True, index=False)
+
     return sensors
 
 def FuseVacancyProbabilities(probabilities):
@@ -76,11 +79,9 @@ for index, row in histdata.iterrows():
     overallprobabilityvalue = FuseVacancyProbabilities(probabilities)
     overallprobabilitytimestamp = FuseVacancyTimestamps(timestamps)
 
-    # output final vacancy probability to csv
-    # put info into dataframe, then append to csv
     # TODO build up output dataframe based on sensorname. Hardcoded by sensorname for now, see below...
     #for k, v in sensors:
-        # build the data frame column by column
+    #    #build the data frame column by column
 
     wifi = sensors["wifi1"]
     co2 = sensors["co21"]
@@ -88,5 +89,5 @@ for index, row in histdata.iterrows():
     output.iloc[0] = [dt.datetime.now(), overallprobabilitytimestamp, overallprobabilityvalue, wifi.snapshottimestamp, wifi.snapshotvalue, wifi.vacancyprobability, co2.snapshottimestamp, co2.snapshotvalue, co2.vacancyprobability, elec.snapshottimestamp, elec.snapshotvalue, elec.vacancyprobability]
     output.to_csv("DataFiles\\VIE-output-historical.csv", mode="a", header=False, index=False)
 
-
+figen.PlotMain()
 thisisastopgap = "stopgap"
