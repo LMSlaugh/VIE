@@ -35,7 +35,7 @@ def PlotSigmoids(sensor, sensorvals, probas):
     plt.close(sigmoidcompfig)
     return
 
-def BuildVacancyRelationship(sensor):
+def GetHistoricalVacancyData(sensor):
     client = pc.pi_client()
     point = sensor.dataaccesstype
     # TODO implement window of time from now to x months ago
@@ -46,12 +46,17 @@ def BuildVacancyRelationship(sensor):
     #mask_occ = (((data.index.hour > 7) & (data.index.hour < 23 )) & (data.index.dayofweek < 5))
     #mask_vac = (((data.index.hour <= 7) | (data.index.hour >= 23 )) | (data.index.dayofweek >= 5))
     data_v = sensor.histdata[mask_vac]
-    data_v = data_v[np.logical_not(np.isnan(data_v))]
+    sensor.vachistdata = data_v[np.logical_not(np.isnan(data_v))]
+    #sensor.occhistdata = sensor.histdata[mask_occ]
+    return sensor
+
+def BuildVacancyRelationship(sensor):
+    GetHistoricalVacancyData(sensor)
     if sensor.vacancyrelationship==0: # sigmoid
         cumsum = 0
         probas = []
-        cols = data_v.columns
-        sensorvals = data_v[cols[0]]
+        cols = sensor.vachistdata.columns
+        sensorvals = sensor.vachistdata[cols[0]]
         summary = sum(sensorvals)
         sensorvals = sensorvals.sort_values(ascending=True)
         for datum in sensorvals:
@@ -71,5 +76,7 @@ def BuildVacancyRelationship(sensor):
     else:
         pass # error out
     sensor.histdata = pd.DataFrame()
+    sensor.vachistdata = pd.DataFrame()
+    sensor.occhistdata = pd.DataFrame()
     return sensor
        

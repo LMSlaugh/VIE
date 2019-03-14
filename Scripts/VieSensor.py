@@ -16,7 +16,7 @@ from pytz import timezone as tz
 import PI_client_LMS as pc
 
 class VieSensor:
-    def __init__(self, sensorName, sensorType, frequency, measurementUnits, dataAccessType, vacancyRelationship, dataRetrievalFileName, preprocessingFileName, relationshipBuilderFileName, vrParameter1, vrParameter2, vrParameter3, vrParameter4, historicalData=[]):       
+    def __init__(self, sensorName, sensorType, frequency, measurementUnits, dataAccessType, vacancyRelationship, dataRetrievalFileName, preprocessingFileName, relationshipBuilderFileName, vrParameter1, vrParameter2, vrParameter3, vrParameter4, historicalData=[], vacantData=[], occupiedData=[]):       
         self.sensorname = sensorName # Must be unique
         self.sensortype = sensorType
         self.frequency = frequency # frequency of new values being added (data sample rate) in minutes.
@@ -24,6 +24,8 @@ class VieSensor:
         self.dataaccesstype = dataAccessType # tag for data stream in OSIsoft PI data historian. TODO Change to path for data retrieval file (read from config file)
         self.vacancyrelationship = vacancyRelationship # encoded types, represented by an enumeration (0=sigmoid, 1=...)
         self.histdata = historicalData
+        self.vachistdata = vacantData
+        self.occhistdata = occupiedData
         # TODO implement the following properties
         #self.vacancystart = vacancyStart # implement this upstream
         #self.vacancyend = vacancyEnd # implement this upstream

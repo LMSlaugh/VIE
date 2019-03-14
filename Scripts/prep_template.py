@@ -55,5 +55,6 @@ def PreprocessData(sensor):
 
 def ConvertSensorValues(sensor, conversionValue):
     sensor.snapshotvalue = sensor.snapshotvalue * conversionValue
-    sensor.histdata = sensor.histdata * conversionValue
+    if sensor.histdata:
+        sensor.histdata = sensor.histdata * conversionValue
     return sensor
