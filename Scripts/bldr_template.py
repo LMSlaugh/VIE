@@ -18,10 +18,11 @@ def PlotSigmoids(sensor, sensorvals, probas):
     labs = 11 # figure label size
     legs = "medium"
     
-    sigmoidcompfig, axcs = plt.subplots(figsize=(20,10))
-    axcs.plot(sensorvals, probas, label="sigmoidcompfig")
+    sigmoidcompfig, axcs = plt.subplots(figsize=(11,5))
+    axcs.plot(sensorvals, probas, label="Raw")
     #plt.savefig("sigmoid-value-check-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
-    axcs.plot(sensorvals, Sigmoid(sensorvals, sensor.vrparam1, sensor.vrparam2))
+    axcs.plot(sensorvals, Sigmoid(sensorvals, sensor.vrparam1, sensor.vrparam2), label="Generated")
+    axcs.legend(loc='best', fontsize=legs)
     plt.ylim([0,1])
     plt.xlim([0,max(sensorvals)])
     axcs.xaxis.set_major_locator(plt.MaxNLocator(20))

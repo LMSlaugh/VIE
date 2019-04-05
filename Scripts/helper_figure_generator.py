@@ -14,7 +14,6 @@ import matplotlib.dates as mdates
 labs = 11 # figure label size
 legs = "medium"
 
-
 def PlotHistoricalIns(historicaldata):
     # Plot Historical outputs and inputs
     historicalfig, ax = plt.subplots(figsize=(20,10))
@@ -99,28 +98,32 @@ def PlotRealtimeOuts(realtimedata):
 def PlotHistoricalInOuts(historicaldata):
     # Plot Historical outputs and inputs
     historicalfig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
-    ax[0].plot(historicaldata["wifidt"], historicaldata["wifival"], "b", label="Wifi (counts)")
-    ax[0].plot(historicaldata["co2dt"], historicaldata["co2val"], "r", label="CO2 (ppm)")
-    ax[0].plot(historicaldata["elecdt"], historicaldata["elecval"], "g", label="Elec (kW*10)")
+    ax[0].plot(historicaldata["wifidt"], historicaldata["wifiproba"], "b", label="Wifi (%)")
+    ax[0].plot(historicaldata["co2dt"], historicaldata["co2proba"], "r", label="CO2 (%)")
+    ax[0].plot(historicaldata["elecdt"], historicaldata["elecproba"], "g", label="Elec (%)")
     ax[0].legend(loc='best', fontsize=legs)
-    ax[0].set_title("Inputs: Raw Sensor Data")
-    ax[0].set_ylabel("Sensor Value", fontsize=labs)
+    ax[0].set_title("Inputs: Probability of Vacancy from Each Sensor Input")
+    ax[0].set_ylabel("Probability of Vacancy (%)", fontsize=labs)
     ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=[0,6,12,18,24]))
     ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
     ax[0].xaxis.set_tick_params(labelsize=labs)
     ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
+    ## Plot raw probas, no fusion
     #ax[1].plot(historicaldata["wifidt"], historicaldata["wifiproba"], "b", label="Wifi (%)")
     #ax[1].plot(historicaldata["co2dt"], historicaldata["co2proba"], "r", label="CO2 (%)")
     #ax[1].plot(historicaldata["elecdt"], historicaldata["elecproba"], "g", label="Elec (%)")
+    ##
+    # Plot fusion results:
     ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_rss"], label="Fused: RSS (%)")
     ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_rms"], label="Fused: RMS (%)")
     ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_max"], label="Fused: Max (%)")
     ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_avg"], label="Fused: Avg (%)")
     ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_mult"], label="Fused: Mult (%)")
+    #
     plt.ylim([0,1])
     ax[1].legend(loc='best', fontsize=legs)
-    ax[1].set_title("Outputs: Probabilities of Vacancy")
+    ax[1].set_title("Outputs: Fused Probability of Vacancy via Different Methods")
     ax[1].set_ylabel("Probability of Vacancy (%)", fontsize=labs)
     ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=[0,6,12,18,24]))
     ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
@@ -128,7 +131,7 @@ def PlotHistoricalInOuts(historicaldata):
     ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     historicalfig.autofmt_xdate()
-    historicalfig.suptitle("Comparison of Inputs and Outputs", fontsize=18, fontweight="bold")
+    historicalfig.suptitle("Comparison of Inputs and Outputs for Fusion Process", fontsize=18, fontweight="bold")
     historicalfig.savefig("Figures\\historical-method-diagnostic-fig.png", format='png', bbox_inches='tight')
     return
 
@@ -181,6 +184,9 @@ def PlotOutputComparison(historicaldata, realtimedata):
     ax.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     comparepredictionsfig.savefig("Figures\\overall-prediction-comparison-fig.png", format='png', bbox_inches='tight')
     return
+
+#def PlotOutDistribution(historicaldata):
+
 
 #def PlotSigmoids(sensor):
     #historicalvacantdata = sensor.histdata
@@ -243,17 +249,18 @@ def PlotOutputComparison(historicaldata, realtimedata):
 
 def PlotMain():
     historicaldata = pd.read_csv("DataFiles\\VIE-output-historical.csv", parse_dates=["runtimedt","overallprobadt", "wifidt", "co2dt", "elecdt"])
-    realtimedata = pd.read_csv("DataFiles\\VIE-output-realtime-feb3-run.csv", parse_dates=["runtimedt","overallprobadt", "wifidt", "co2dt", "elecdt"])
-    realtimedata["elecval"] = realtimedata["elecval"] * 0.293071
-    PlotHistoricalIns(historicaldata)
-    PlotHistoricalOuts(historicaldata)
+    #realtimedata = pd.read_csv("DataFiles\\VIE-output-realtime-feb3-run.csv", parse_dates=["runtimedt","overallprobadt", "wifidt", "co2dt", "elecdt"])
+    #realtimedata["elecval"] = realtimedata["elecval"] * 0.293071
+    #PlotHistoricalIns(historicaldata)
+    #PlotHistoricalOuts(historicaldata)
     PlotHistoricalInOuts(historicaldata)
     #PlotRealtimeIns(realtimedata)
     #PlotRealtimeOuts(realtimedata)
     #PlotRealtimeInOuts(realtimedata)
+    #PlotOutDistribution(historicaldata)
     #PlotOutputComparison(historicaldata, realtimedata)
     return
 
-#PlotMain()
+PlotMain()
 
 stopgap = "this is a stopgap"

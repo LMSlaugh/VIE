@@ -15,11 +15,12 @@ def PrepForHist(target):
     return testd
 
 client = pc.pi_client()
-l, r = client.search_by_point("ap*wickson*total*")
+l, r = client.search_by_point("*ap.wv*")
 #print(l)
-points = ["AP.WICKSON_Total_Count"]
+points = l[0]
 data = client.get_stream_by_point(points, start="2018-01-01 12:00:00", end="*", calculation="recorded")
-
+plt.plot(data)
+plt.savefig("Figures\\WV-wifi-raw.png", format='png', bbox_inches='tight')
 mask_occ = (((data.index.hour > 7) & (data.index.hour < 23 )) & (data.index.dayofweek < 5))
 mask_vac = (((data.index.hour <= 7) | (data.index.hour >= 23 )) | (data.index.dayofweek >= 5))
 data["vacant"] = 2

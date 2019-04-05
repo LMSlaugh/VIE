@@ -44,7 +44,8 @@ def CreateVirtualSensors(metadatabasePath):
         p2 = row["Parameter-2"]
         p3 = row["Parameter-3"]
         p4 = row["Parameter-4"]
-        newSensor = snsr.VieSensor(linreg_flag, sn, st, uf, mu, dat, vrt, drfn, ppfn, rbfn, p1, p2, p3, p4)
+        #newSensor = snsr.VieSensor(linreg_flag, sn, st, uf, mu, dat, vrt, drfn, ppfn, rbfn, p1, p2, p3, p4)
+        newSensor = snsr.VieSensor(sn, st, uf, mu, dat, vrt, drfn, ppfn, rbfn, p1, p2, p3, p4)
         sensors[newSensor.sensorname] = newSensor
     
     metadata_new = metadata
