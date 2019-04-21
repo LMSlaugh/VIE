@@ -24,7 +24,9 @@ linreg_flag = True
 #fusetype = "max"       #maximum
 #fusetype = "linreg"    #linear regression
 
-
+def MonteCarloFusion():
+    overallproba = 0.00
+    return overallproba
 
 def CreateVirtualSensors(metadatabasePath):
     # Purpose: read each sensor into a list from the sensor metadatabase
@@ -74,6 +76,8 @@ def FuseVacancyProbabilities(probabilities, fusetype="rss"):
         overallproba = np.prod(probabilities)
     elif fusetype=="linreg":
         overallproba = -1
+    elif fusetype=="montecarlo":
+        overallproba = MonteCarloFusion()
     else: # Default to "mult" - multiplying together the probabilities
         overallproba = np.prod(probabilities)
     return overallproba
@@ -87,8 +91,8 @@ def FuseVacancyTimestamps(timestamps, fusetype="rss"):
 output = pd.DataFrame(index=[0],columns=["runtimedt", "overallprobadt", "overallproba_rss", "overallproba_rms", "overallproba_max", "overallproba_avg", "overallproba_mult", "overallproba_linreg","wifidt","wifival","wifiproba","co2dt","co2val","co2proba","elecdt","elecval","elecproba"])
 output.to_csv("DataFiles\\VIE-output-historical.csv", header=True, index=False) # Apply headers to csv and remove existing entries
 
-sensors = CreateVirtualSensors("VIE-sensor-metadatabase-new.csv") # Read sensors from file, instantiate dictionary. If missing data, fill with dummy data ("") and move on to next sensor
-#sensors = CreateVirtualSensors("VIE-sensor-metadatabase.csv") # Read sensors from file, instantiate dictionary. If missing data, fill with dummy data ("") and move on to next sensor
+#sensors = CreateVirtualSensors("VIE-sensor-metadatabase-new.csv") # Read sensors from file, instantiate dictionary. If missing data, fill with dummy data ("") and move on to next sensor
+sensors = CreateVirtualSensors("VIE-sensor-metadatabase.csv") # Read sensors from file, instantiate dictionary. If missing data, fill with dummy data ("") and move on to next sensor
 
 # Import csv historical data to dataframe
 histdata = pd.read_csv("DataFiles\\VIE-input-historical.csv") # In order: timestamp for sensor 1 (wifi), timestamp for sensor 2 (co2), timestamp for sensor 3 (elec), etc.

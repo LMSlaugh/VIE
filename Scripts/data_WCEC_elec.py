@@ -13,7 +13,16 @@ import logging
 def UpdateSnapshot(sensor):
     return sensor
 
-def GetHistoricalData(): # Currently not called anywhere
+def GetHistoricalData(sensor):
+    historicaldata = pd.read_csv("DataFiles\\WCEC_ElecData.csv", parse_dates=["Date"])
+    historicaldata.set_index(historicaldata["Date"],inplace=True)
+    data = pd.DataFrame(index=historicaldata["Date"])
+    data["Total Demand (W)"] = historicaldata["Total Demand (W)"]
+    # Get X weeks worth of data only
+    sensor.histdata = data[0:8064,:]
+    return sensor
+
+def GetHistoricalDataFromAPI(): # Currently not called anywhere. Having trouble parsing results (appears to be in .csv format)
     url = 'https://webservice.hobolink.com/restv2/data/custom/file'
     payload = {
         "query": "215_Last_30_Days",
@@ -23,13 +32,14 @@ def GetHistoricalData(): # Currently not called anywhere
             "token": "Ei3pjgOLri",
         }
     }
-
     try:
         r = req.post(url, json=payload, timeout=30)
-        c = 10
+        #print(r.json)
+        #a = r.json()
+        b = r.text
+        c = r.content
+        data = pd.DataFrame(index=[0])
+        d = c.rows.length
     except req.exceptions.Timeout:
         logging.error("Hobolink HTTP request timed out (30 seconds)")
-
     return
-
-GetHistoricalData()

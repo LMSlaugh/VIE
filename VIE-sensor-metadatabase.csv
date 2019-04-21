@@ -1,4 +1,4 @@
 Sensor-Name,Sensor-Type,Measurement-Units,Data-Access-Type,Update-Frequency,Vacancy-Relationship-Type,Data-Retrieval-File-Name,Preprocessing-File-Name,Relationship-Builder-File-Name,Parameter-1,Parameter-2,Parameter-3,Parameter-4
+wifi1,wifi,,AP.UNIV-SVCS-270-743748,15m,0,data_template,prep_template,bldr_template,,,,
 elec1,electricitydemand,kbtu,SCC_Electricity_Demand_kBtu,15m,0,data_WCEC_elec,prep_template,bldr_template,,,,
-wifi1,wifi,,AP.STUD-COMM-CTR_Total_Count,15m,0,data_template,prep_template,bldr_template,,,,
-co21,carbondioxide,,SCC.AHU.AHU01.RM.1101A.CO2,15m,0,data_template,prep_template,bldr_template,,,,
+co21,carbondioxide,,SCC.AHU.AHU01.RM.1101A.CO2,15m,0,data_template,prep_WCEC_CO2,bldr_template,,,,

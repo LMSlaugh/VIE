@@ -8,12 +8,12 @@ import pandas as pd
 import numpy as np
 import math as math
 import scipy.optimize as opt
-import PI_client_LMS as pc
 import matplotlib.pyplot as plt
 
 def Sigmoid(x, a, b):
     return 1-1/(1+np.exp((a-x)/b))
 
+# The PlotSigmoids function should really go into helper_figure_generator.py, but it is convenient here. Having some troubles importing that file into this one.
 def PlotSigmoids(sensor, sensorvals, probas):
     labs = 11 # figure label size
     legs = "medium"
@@ -36,23 +36,15 @@ def PlotSigmoids(sensor, sensorvals, probas):
     plt.close(sigmoidcompfig)
     return
 
-def GetHistoricalVacancyData(sensor):
-    client = pc.pi_client()
-    point = sensor.dataaccesstype
-    # TODO implement window of time from now to x months ago
-    sensor.histdata = client.get_stream_by_point(point, start="2018-10-01 12:00:00", end="*", calculation="recorded")
-    sensor = sensor.PreprocessData()
+def BuildVacancyRelationship(sensor):
+    sensor.GetHistoricalData()
     # TODO implement vacancy start and end times in the config file for each sensor
-    mask_vac = ( (sensor.histdata.index.hour >= 3 ) & (sensor.histdata.index.hour <= 4) ) # slice data for vacant times and days
+    mask_vac = ( (sensor.histdata.index.hour >= 3 ) & (sensor.histdata.index.hour <= 5) ) # slice data for times of ~100% certain vacancy
     #mask_occ = (((data.index.hour > 7) & (data.index.hour < 23 )) & (data.index.dayofweek < 5))
     #mask_vac = (((data.index.hour <= 7) | (data.index.hour >= 23 )) | (data.index.dayofweek >= 5))
     data_v = sensor.histdata[mask_vac]
     sensor.vachistdata = data_v[np.logical_not(np.isnan(data_v))]
     #sensor.occhistdata = sensor.histdata[mask_occ]
-    return sensor
-
-def BuildVacancyRelationship(sensor):
-    GetHistoricalVacancyData(sensor)
     if sensor.vacancyrelationship==0: # sigmoid
         cumsum = 0
         probas = []
@@ -65,8 +57,8 @@ def BuildVacancyRelationship(sensor):
             probas.append(1-cumsum/summary)
         probas = pd.Series(probas)
         stats_v = sensorvals.describe()
-        mean = stats_v["mean"]
-        std = stats_v["std"]
+        mean = stats_v["mean"] # Starting value for parameter 1
+        std = stats_v["std"] # starting value for parameter 2
         popt, pcov = opt.curve_fit(Sigmoid, sensorvals, probas, p0=[mean, std])
         sensor.vrparam1 = popt[0]
         sensor.vrparam2 = popt[1]

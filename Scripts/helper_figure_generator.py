@@ -261,6 +261,6 @@ def PlotMain():
     #PlotOutputComparison(historicaldata, realtimedata)
     return
 
-PlotMain()
+#PlotMain()
 
 stopgap = "this is a stopgap"
