@@ -95,7 +95,7 @@ output.to_csv("DataFiles\\VIE-output-historical.csv", header=True, index=False) 
 sensors = CreateVirtualSensors("VIE-sensor-metadatabase.csv") # Read sensors from file, instantiate dictionary. If missing data, fill with dummy data ("") and move on to next sensor
 
 # Import csv historical data to dataframe
-histdata = pd.read_csv("DataFiles\\VIE-input-historical.csv") # In order: timestamp for sensor 1 (wifi), timestamp for sensor 2 (co2), timestamp for sensor 3 (elec), etc.
+histdata = pd.read_csv("DataFiles\\VIE-input-historical_WCEC.csv") # In order: timestamp for sensor 1 (wifi), timestamp for sensor 2 (co2), timestamp for sensor 3 (elec), etc.
 for index, row in histdata.iterrows():
     probabilities = []
     timestamps = []
