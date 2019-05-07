@@ -116,10 +116,10 @@ def PlotHistoricalInOuts(historicaldata):
     ##
     # Plot fusion results:
     ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_rss"], label="Fused: RSS (%)")
-    ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_rms"], label="Fused: RMS (%)")
-    ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_max"], label="Fused: Max (%)")
-    ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_avg"], label="Fused: Avg (%)")
-    ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_mult"], label="Fused: Mult (%)")
+    #ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_rms"], label="Fused: RMS (%)")
+    #ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_max"], label="Fused: Max (%)")
+    #ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_avg"], label="Fused: Avg (%)")
+    #ax[1].plot(historicaldata["overallprobadt"], historicaldata["overallproba_mult"], label="Fused: Mult (%)")
     #
     plt.ylim([0,1])
     ax[1].legend(loc='best', fontsize=legs)

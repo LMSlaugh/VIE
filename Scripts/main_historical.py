@@ -16,10 +16,10 @@ import helper_figure_generator as figen
 
 ## Global variables
 
-linreg_flag = True
-#linreg_flag = False
+#linreg_flag = True
+linreg_flag = False
 
-#fusetype = "rss"        #root sum square
+#fusetype = "rss"       #root sum square
 #fusetype = "rms"       #root mean square
 #fusetype = "max"       #maximum
 #fusetype = "linreg"    #linear regression
@@ -37,7 +37,7 @@ def CreateVirtualSensors(metadatabasePath):
         st = row["Sensor-Type"]
         uf = row["Update-Frequency"]
         mu = row["Measurement-Units"]
-        dat = row["Data-Access-Type"]
+        dat = row["Data-Access-Type"] # Remove this?
         vrt = row["Vacancy-Relationship-Type"]
         drfn = row["Data-Retrieval-File-Name"]
         ppfn = row["Preprocessing-File-Name"]
@@ -86,7 +86,6 @@ def FuseVacancyTimestamps(timestamps, fusetype="rss"):
     overalldt = max(timestamps)
     return overalldt
 
-
 # Create the following variables once...
 output = pd.DataFrame(index=[0],columns=["runtimedt", "overallprobadt", "overallproba_rss", "overallproba_rms", "overallproba_max", "overallproba_avg", "overallproba_mult", "overallproba_linreg","wifidt","wifival","wifiproba","co2dt","co2val","co2proba","elecdt","elecval","elecproba"])
 output.to_csv("DataFiles\\VIE-output-historical.csv", header=True, index=False) # Apply headers to csv and remove existing entries
@@ -128,7 +127,7 @@ for index, row in histdata.iterrows():
     wifi = sensors["wifi1"]
     co2 = sensors["co21"]
     elec = sensors["elec1"]
-    output.iloc[0] = [dt.datetime.now(), overallprobabilitytimestamp, overallprobabilityvalue_rss, overallprobabilityvalue_rms, overallprobabilityvalue_max, overallprobabilityvalue_avg, overallprobabilityvalue_mult, overallprobabilityvalue_linreg, wifi.snapshottimestamp, wifi.snapshotvalue, wifi.snapshotvacancyprobability, co2.snapshottimestamp, co2.snapshotvalue, co2.snapshotvacancyprobability, elec.snapshottimestamp, elec.snapshotvalue, elec.snapshotvacancyprobability]
+    #output.iloc[0] = [dt.datetime.now(), overallprobabilitytimestamp, overallprobabilityvalue_rss, overallprobabilityvalue_rms, overallprobabilityvalue_max, overallprobabilityvalue_avg, overallprobabilityvalue_mult, overallprobabilityvalue_linreg, wifi.snapshottimestamp, wifi.snapshotvalue, wifi.snapshotvacancyprobability, co2.snapshottimestamp, co2.snapshotvalue, co2.snapshotvacancyprobability, elec.snapshottimestamp, elec.snapshotvalue, elec.snapshotvacancyprobability]
     output.to_csv("DataFiles\\VIE-output-historical.csv", mode="a", header=False, index=False)
 
 figen.PlotMain()

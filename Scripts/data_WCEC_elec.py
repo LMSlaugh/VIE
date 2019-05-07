@@ -10,19 +10,25 @@ import requests as req
 import logging
 
 
-def UpdateSnapshot(sensor):
+def UpdateSnapshot(sensor): 
+    # No realtime option exists until API response can be parsed below.
+    # Get historical results for a certain time window
+    # Get most recent timestamp from that
+    # Update sensor snapshot value
     return sensor
 
 def GetHistoricalData(sensor):
-    historicaldata = pd.read_csv("DataFiles\\WCEC_ElecData.csv", parse_dates=["Date"])
+    historicaldata = pd.read_csv("DataFiles\\WCEC_Elec.csv", parse_dates=["Date"])
     historicaldata.set_index(historicaldata["Date"],inplace=True)
     data = pd.DataFrame(index=historicaldata["Date"])
     data["Total Demand (W)"] = historicaldata["Total Demand (W)"]
-    # Get X weeks worth of data only
-    sensor.histdata = data[0:8064,:]
+    # Get 2 weeks worth of data only
+    numWeeks = 3
+    items = numWeeks*7*24*6
+    sensor.histdata = data.iloc[0:items,:]
     return sensor
 
-def GetHistoricalDataFromAPI(): # Currently not called anywhere. Having trouble parsing results (appears to be in .csv format)
+def GetHistoricalDataFromAPI(): # Currently not called anywhere. Having trouble parsing results (appears to be in .csv format?)
     url = 'https://webservice.hobolink.com/restv2/data/custom/file'
     payload = {
         "query": "215_Last_30_Days",

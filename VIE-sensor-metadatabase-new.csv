@@ -1,4 +1,4 @@
 Sensor-Name,Sensor-Type,Measurement-Units,Data-Access-Type,Update-Frequency,Vacancy-Relationship-Type,Data-Retrieval-File-Name,Preprocessing-File-Name,Relationship-Builder-File-Name,Parameter-1,Parameter-2,Parameter-3,Parameter-4
-wifi1,wifi,,AP.STUD-COMM-CTR_Total_Count,15m,0,data_template,prep_template,bldr_template,17.227420863075455,6.27771239713259,,
-elec1,electricitydemand,kbtu,SCC_Electricity_Demand_kBtu,15m,0,data_WCEC_elec,prep_template,bldr_template,15030.963114901824,4052.3407965633514,,
-co21,carbondioxide,,SCC.AHU.AHU01.RM.1101A.CO2,15m,0,data_template,prep_template,bldr_template,434.66294695591625,20.35542911920799,,
+elec1,electricitydemand,W,WCEC_Elec.csv,15m,0,data_WCEC_elec,prep_WCEC_elec,bldr_sigmoid,7408.880385458975,2124.400598868725,,
+wifi1,wifi,cnxns,AP.VIRIDIAN2_Total_Count,15m,0,data_WCEC_wifi,prep_WCEC_wifi,bldr_sigmoid,3.0484149335881345,0.7328963668113556,,
+co21,carbondioxide,ppm,WCEC_CO2.csv,15m,0,data_WCEC_co2,prep_WCEC_co2,bldr_sigmoid,477.2316514037656,25.479453751161984,,
