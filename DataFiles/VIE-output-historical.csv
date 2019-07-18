@@ -1,2 +1,2 @@
-runtimedt,overallprobadt,overallproba_rss,overallproba_rms,overallproba_max,overallproba_avg,overallproba_mult,overallproba_linreg,wifidt,wifival,wifiproba,co2dt,co2val,co2proba,elecdt,elecval,elecproba
-,,,,,,,,,,,,,,,,
+runtimedt,overallprobadt,overallproba_wghtavg,overallproba_iterprod,overallproba_iterrms,overallproba_rss,overallproba_rms,overallproba_max,overallproba_avg,overallproba_mult,wifidt,wifival,wifiproba,co2dt,co2val,co2proba,elecdt,elecval,elecproba
+,,,,,,,,,,,,,,,,,,

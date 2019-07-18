@@ -1,4 +1,0 @@
-Sensor-Name,Sensor-Type,Measurement-Units,Data-Access-Type,Update-Frequency,Vacancy-Relationship-Type,Data-Retrieval-File-Name,Preprocessing-File-Name,Relationship-Builder-File-Name,Parameter-1,Parameter-2,Parameter-3,Parameter-4
-elec1,electricitydemand,W,WCEC_Elec.csv,15m,0,data_WCEC_elec,prep_WCEC_elec,bldr_sigmoid,,,,
-wifi1,wifi,cnxns,AP.VIRIDIAN2_Total_Count,15m,0,data_WCEC_wifi,prep_WCEC_wifi,bldr_sigmoid,,,,
-co21,carbondioxide,ppm,WCEC_CO2.csv,15m,0,data_WCEC_co2,prep_WCEC_co2,bldr_sigmoid,,,,

@@ -47,6 +47,6 @@ def PreprocessData(sensor):
 
 def ConvertSensorValues(sensor, conversionMultiplier):
     sensor.snapshotvalue = sensor.snapshotvalue * conversionMultiplier
-    if sensor.histdata:
+    if sensor.histdata.empty:
         sensor.histdata = sensor.histdata * conversionMultiplier
     return sensor

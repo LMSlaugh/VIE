@@ -10,8 +10,8 @@ import math as math
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
 
-def Sigmoid(x, a, b):
-    return 1-1/(1+np.exp((a-x)/b))
+def Sigmoid(x, p1, p2):
+    return 1-1/(1+np.exp((p1-x)/p2))
 
 # The PlotSigmoids function should really go into helper_figure_generator.py, but it is convenient here. Having some troubles importing that file into this one.
 def PlotSigmoids(sensor, sensorvals, probas):
@@ -62,6 +62,7 @@ def BuildVacancyRelationship(sensor):
         popt, pcov = opt.curve_fit(Sigmoid, sensorvals, probas, p0=[mean, std])
         sensor.vrparam1 = popt[0]
         sensor.vrparam2 = popt[1]
+        sensor.std = std
         sensor.probas = probas
         PlotSigmoids(sensor, sensorvals, probas)
     elif sensor.vacancyrelationship==1: # ???

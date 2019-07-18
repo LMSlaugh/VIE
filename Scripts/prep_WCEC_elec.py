@@ -35,6 +35,11 @@ def PreprocessData(sensor):
         elif sensor.units == 'btu':
             kwconversion = 0.000293071
             sensor = ConvertSensorValues(sensor, kwconversion)
+        #elif sensor.units == 'W':
+            ##kwconversion = .001
+            #kwconversion = 1
+            #sensor = ConvertSensorValues(sensor, kwconversion)
+            #pass
         else:
             pass
     else:
@@ -47,6 +52,6 @@ def PreprocessData(sensor):
 
 def ConvertSensorValues(sensor, conversionMultiplier):
     sensor.snapshotvalue = sensor.snapshotvalue * conversionMultiplier
-    if sensor.histdata:
+    if len(sensor.histdata) > 0:
         sensor.histdata = sensor.histdata * conversionMultiplier
     return sensor

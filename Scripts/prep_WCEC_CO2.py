@@ -55,18 +55,18 @@ def PreprocessData(sensor):
 
 def ConvertSensorValues(sensor, conversionValue):
     sensor.snapshotvalue = sensor.snapshotvalue * conversionValue
-    if sensor.histdata:
+    if sensor.histdata.empty:
         sensor.histdata = sensor.histdata * conversionValue
     return sensor
 
 def ProcessAmbiDaqFile():
     # starting .csv should include data from each DAQ appended to each other, with the "DAQ #" column replacing the existing identifier (MAC)
-    datatat = pd.read_csv("DataFiles\\AmbiDAQ_all_.csv", parse_dates=["Datetime"])
+    datatat = pd.read_csv("DataFiles\\WCEC\\AmbiDAQ_all_.csv", parse_dates=["Datetime"])
     datatat.set_index(datatat["Datetime"],inplace=True)
     #datatat.drop("Datetime", axis=1, inplace=True)
     dt = datatat.groupby(by=[datatat.index.minute,datatat.index.hour,datatat.index.day,datatat.index.month,datatat.index.year])
     temp_df = pd.DataFrame(index=[0],columns=["Datetime","Year","Month","Day","Hour","Minute","T_16","RH_16","CO2_16","PIR_16","T_18","RH_18","CO2_18","PIR_18","T_20","RH_20","CO2_20","PIR_20","T_21","RH_21","CO2_21","PIR_21","T_22","RH_22","CO2_22","PIR_22"])
-    temp_df.to_csv("DataFiles\\AmbiDAQ_group_output.csv", header=True, index=False)
+    temp_df.to_csv("DataFiles\\WCEC\\AmbiDAQ_group_output.csv", header=True, index=False)
     for t,g in dt:
         tdt = g.iloc[0,0:6]
         temp_df.iloc[0,:] = (tdt)
@@ -89,7 +89,7 @@ def ProcessAmbiDaqFile():
             new_pir = "PIR_" + str(daq)
             temp_df[new_pir] = pir
 
-        temp_df.to_csv("DataFiles\\AmbiDAQ_group_output.csv", mode="a", header=False, index=False)
+        temp_df.to_csv("DataFiles\\WCEC\\AmbiDAQ_group_output.csv", mode="a", header=False, index=False)
     x = "thisisastopgap"
     return
 

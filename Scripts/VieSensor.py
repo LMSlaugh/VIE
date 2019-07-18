@@ -15,7 +15,7 @@ import datetime as dt
 import PI_client_LMS as pc
 
 class VieSensor:
-    def __init__(self, sensorName, sensorType, frequency, measurementUnits, dataAccessType, vacancyRelationship, dataRetrievalFileName, preprocessingFileName, relationshipBuilderFileName, vrParameter1, vrParameter2, vrParameter3, vrParameter4, historicalData=[], vacantData=[], occupiedData=[]):       
+    def __init__(self, sensorName, sensorType, frequency, measurementUnits, dataAccessType, vacancyRelationship, dataRetrievalFileName, preprocessingFileName, relationshipBuilderFileName, stdDev, vrParameter1, vrParameter2, vrParameter3, vrParameter4, historicalData=[], vacantData=[], occupiedData=[]):       
         self.sensorname = sensorName # Must be unique
         self.sensortype = sensorType
         self.frequency = frequency # frequency of new values being added (data sample rate) in minutes.
@@ -31,6 +31,7 @@ class VieSensor:
         self.datafilename = dataRetrievalFileName # Namespace of .py file (without ".py") that retrieves data and preprocesses it for use. File must be present in root folder. Two tasks may be disaggregated into two separate files later.
         self.prepfilename = preprocessingFileName # Namespace of .py file (without ".py") that retrieves data and preprocesses it for use. File must be present in root folder. Two tasks may be disaggregated into two separate files later.
         self.bldrfilename = relationshipBuilderFileName # Namespace of .py file (without ".py") that retrieves data and preprocesses it for use. File must be present in root folder. Two tasks may be disaggregated into two separate files later.
+        self.std = stdDev
         self.vrparam1 = vrParameter1 # mean for sigmoid, threshold for step
         self.vrparam2 = vrParameter2 # std dev for sigmoid
         self.vrparam3 = vrParameter3 # unused

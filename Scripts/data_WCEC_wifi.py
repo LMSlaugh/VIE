@@ -42,6 +42,6 @@ def GetHistoricalData(sensor):
     client = pc.pi_client()
     point = sensor.dataaccesstype
     # TODO implement window of time from now to x months ago
-    sensor.histdata = client.get_stream_by_point(point, start="2019-02-04 12:00:00", end="2019-03-04 00:00:00", calculation="recorded")
+    sensor.histdata = client.get_stream_by_point(point, start="2019-02-04 12:00:00", end="2019-03-04 00:00:00", calculation="interpolated", interval="10m")
     sensor = sensor.PreprocessData()
     return sensor
