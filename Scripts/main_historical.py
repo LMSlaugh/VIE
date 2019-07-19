@@ -15,6 +15,7 @@ import math as math
 import scipy.optimize as opt
 import matplotlib.pyplot as plt
 import helper_figure_generator as figen
+import results_analysis as ra
 
 ## Global variables
 
@@ -267,8 +268,8 @@ def FuseVacancyTimestamps(timestamps, fusetype="rms"):
 # Create the following variables once...
 #output = pd.DataFrame(index=[0],columns=["runtimedt", "overallprobadt", "overallproba_rss", "overallproba_rms", "overallproba_max", "overallproba_avg", "overallproba_mult", "overallproba_linreg","wifidt","wifival","wifiproba","co2dt","co2val","co2proba","elecdt","elecval","elecproba"])
 output = pd.DataFrame(index=[0],columns=["runtimedt", "overallprobadt", "overallproba_wghtavg", "overallproba_iterprod", "overallproba_iterrms", "overallproba_rss", "overallproba_rms", "overallproba_max", "overallproba_avg", "overallproba_mult","wifidt","wifival","wifiproba","co2dt","co2val","co2proba","elecdt","elecval","elecproba","truthdt","truthval"])
-
-output.to_csv("DataFiles\\VIE-output-historical.csv", header=True, index=False) # Apply headers to csv and remove existing entries
+output_header = pd.DataFrame(columns=output.columns)
+output_header.to_csv("DataFiles\\VIE-output-historical.csv", header=True, index=False) # Apply headers to csv and remove existing entries
 
 sensors = CreateVirtualSensors("ConfigFiles\\VIE-sensor-metadatabase-new.csv") # Read sensors from file, instantiate dictionary. If missing data, fill with dummy data ("") and move on to next sensor
 #sensors = CreateVirtualSensors("VIE-sensor-metadatabase.csv") # Read sensors from file, instantiate dictionary. If missing data, fill with dummy data ("") and move on to next sensor
@@ -317,7 +318,7 @@ for index, row in histdata.iterrows():
     output.iloc[0] = [dt.datetime.now(), overallprobabilitytimestamp, overallprobabilityvalue_wghtavg, overallprobabilityvalue_iterprod, overallprobabilityvalue_iterrms,overallprobabilityvalue_rss, overallprobabilityvalue_rms, overallprobabilityvalue_max, overallprobabilityvalue_avg, overallprobabilityvalue_mult, wifi.snapshottimestamp, wifi.snapshotvalue, wifi.snapshotvacancyprobability, co2.snapshottimestamp, co2.snapshotvalue, co2.snapshotvacancyprobability, elec.snapshottimestamp, elec.snapshotvalue, elec.snapshotvacancyprobability, truthdt, truthval]
     #output.iloc[0] = [dt.datetime.now(), overallprobabilitytimestamp, overallprobabilityvalue_iterprod, overallprobabilityvalue_rss, overallprobabilityvalue_rms, overallprobabilityvalue_max, overallprobabilityvalue_avg, overallprobabilityvalue_mult, overallprobabilityvalue_linreg, wifi.snapshottimestamp, wifi.snapshotvalue, wifi.snapshotvacancyprobability, co2.snapshottimestamp, co2.snapshotvalue, co2.snapshotvacancyprobability, elec.snapshottimestamp, elec.snapshotvalue, elec.snapshotvacancyprobability]
     output.to_csv("DataFiles\\VIE-output-historical.csv", mode="a", header=False, index=False)
-
+ra.GenerateAnalytics("DataFiles\\VIE-output-historical.csv")
 figen.PlotMain()
 thisisastopgap = "stopgap"
 
