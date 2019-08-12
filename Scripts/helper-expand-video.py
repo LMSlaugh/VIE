@@ -32,37 +32,13 @@ def perVideo(output_arrays, count_arrays, average_output_count):
     else:
         return
 
-def CropVideo(input_video_path):
-    cropped_video_location = "initialize"
-    return cropped_video_location
-
-def DetectPersons(input_video_path):
-    video_person_detected = "initialize"
-    return video_person_detected
-
-# -----------INPUT DEFINITIONS---------------------
-root = "GroundTruthVideos"
-inputVideoDirectoryPath = root + "\\ToProcess"
-tempVideoDirectoryPath = root + "\\Temp" # This directory must already exist
-outputVideoDirectoryPath = root + "\\Processed" # This directory must already exist
-# -------------------------------------------------
-global humanFlag
-humanFlag = False
-inputFileNames = listdir(inputVideoDirectoryPath)
-detector = VideoObjectDetection()
-detector.setModelTypeAsYOLOv3()
-detector.setModelPath("DataFiles\\yolo.h5")
-detector.loadModel(detection_speed="flash")
-for filename in inputFileNames:
-    vidPath_in = inputVideoDirectoryPath + "\\" + filename
-    vidPath_temp = outputVideoDirectoryPath + "\\" + filename[:-4]
-    print("Now processing video: " + filename + " ...")
-    video = cv2.VideoCapture(vidPath_in)
-    # Crop the video to just the doorway in order to avoid detection of extraneous persons
+def CropVideo(inputPath, outputPath):
+    video = cv2.VideoCapture(inputPath)
     camera_angle = filename[3]     
     y0, y1, x0, x1 = GetCropBounds(camera_angle)
     fourcc = cv2.VideoWriter_fourcc(*"XVID")
-    video_temp = cv2.VideoWriter(vidPath_temp + "_cropped.avi", fourcc, 12, (x1-x0,y1-y0))
+    outputPath_modded = outputPath + "_cropped.avi"
+    video_temp = cv2.VideoWriter(outputPath_modded, fourcc, 12, (x1-x0,y1-y0))
     i = 1
     while( video.isOpened() ):
         print("Cropping Frame :  " + str(i))
@@ -72,22 +48,46 @@ for filename in inputFileNames:
             break
         doorway = frame[y0:y1, x0:x1]
         video_temp.write(doorway) # can we do video = []; video.append(doorway) ??
-        
+    video.release()
+    video_temp.release()
+    return outputPath_modded
+# -------------------------------------------------
+
+# -----------INPUT DEFINITIONS---------------------
+root = "GroundTruthVideos"
+inputVideoDirectoryPath = root + "\\ToProcess"
+tempVideoDirectoryPath = root + "\\Temp" # This directory must already exist
+outputVideoDirectoryPath = root + "\\Processed" # This directory must already exist
+# -------------------------------------------------
+
+# -------------MAIN PROGRAM------------------------
+inputFileNames = listdir(inputVideoDirectoryPath)
+detector = VideoObjectDetection()
+detector.setModelTypeAsYOLOv3()
+detector.setModelPath("DataFiles\\yolo.h5")
+detector.loadModel(detection_speed="flash")
+for filename in inputFileNames:
+    vidPath_in = inputVideoDirectoryPath + "\\" + filename
+    vidPath_temp = tempVideoDirectoryPath + "\\" + filename[:-4]
+    print("Now processing video: " + filename + " ...")
+    # Crop the video to just the doorway in order to avoid detection of extraneous persons
+    croppedPath = CropVideo(vidPath_in, vidPath_temp)
     # Load the cropped video and detect whether or not there is a person in it
-    detector.detectObjectsFromVideo(input_file_path=vidPath_temp + "_cropped.avi", output_file_path=vidPath_temp + "_detected", frames_per_second=12, minimum_percentage_probability=0.1, log_progress=True, video_complete_function=perVideo)
+    detectedPath = detector.detectObjectsFromVideo(input_file_path=croppedPath, output_file_path=vidPath_temp + "_detected", frames_per_second=12, minimum_percentage_probability=0.1, log_progress=True, video_complete_function=perVideo)
     if humanFlag:
         # Copy the original .mp4 into //processed directory
         try:
-            copyfile(vidPath_in, outputVideoDirectoryPath)
+            copyfile(vidPath_in, outputVideoDirectoryPath + "\\" + filename)
         except Exception as ex:
             print(ex)
 
     try:
-        remove(vidPath_temp + "_cropped.avi")
-        remove(vidPath_temp + "_detected.avi")
-    except Exception:
-        print(OSError.strerror)
+        remove(croppedPath)
+        remove(detectedPath)
+    except Exception as ex:
+        print(ex)
 
     print("Completed processing video: " + filename)
 
 stopgap = "thisisastopgap"
+# -------------------------------------------------
