@@ -73,7 +73,7 @@ for filename in inputFileNames:
     # Crop the video to just the doorway in order to avoid detection of extraneous persons
     croppedPath = CropVideo(vidPath_in, vidPath_temp)
     # Load the cropped video and detect whether or not there is a person in it
-    detectedPath = detector.detectObjectsFromVideo(input_file_path=croppedPath, output_file_path=vidPath_temp + "_detected", frames_per_second=12, minimum_percentage_probability=0.2, log_progress=True, video_complete_function=perVideo)
+    detectedPath = detector.detectObjectsFromVideo(input_file_path=croppedPath, output_file_path=vidPath_temp + "_detected", frames_per_second=12, minimum_percentage_probability=0.1, log_progress=True, video_complete_function=perVideo)
     if humanFlag:
         # Copy the original .mp4 into //processed directory
         try:
