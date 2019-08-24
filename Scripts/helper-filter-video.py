@@ -54,59 +54,40 @@ def CropVideo(inputPath, outputPath):
 # -------------------------------------------------
 
 # -----------INPUT DEFINITIONS---------------------
-# Expected folder structure is 
-# ..GroundTruthVideos >
-#   XX JUN 2019 >
-#       Processed
-#       Temp
-#       ToProcess >
-#           "ch0#_yyyymmddhhMMss.mp4" (where # is 1,4,5,6, or 8)
-#   XX JUN 2019 >
-#       Processed
-#       Temp
-#       ToProcess >
-#           "ch0#_yyyymmddhhMMss.mp4" (where # is 1,4,5,6, or 8)
-# ...etc
-root = "GroundTruthVideos_debug"
-inDir = "ToProcess"
-tempDir = "Temp" # This directory must already exist
-outDir = "Processed" # This directory must already exist
+root = "GroundTruthVideos"
+inputVideoDirectoryPath = root + "\\ToProcess"
+tempVideoDirectoryPath = root + "\\Temp" # This directory must already exist
+outputVideoDirectoryPath = root + "\\Processed" # This directory must already exist
 # -------------------------------------------------
 
 # -------------MAIN PROGRAM------------------------
+inputFileNames = listdir(inputVideoDirectoryPath)
 detector = VideoObjectDetection()
 detector.setModelTypeAsYOLOv3()
 detector.setModelPath("DataFiles\\yolo.h5")
 detector.loadModel(detection_speed="flash")
-
-dateDirs = listdir(root)
-for dateDir in dateDirs:
-    dateDirPath = root + "\\" + dateDir
-    inputFileNames = listdir(dateDirPath + "\\" + inDir)
-
-    for filename in inputFileNames:
-        vidPath_in = dateDirPath + "\\" + inDir + "\\" + filename
-        vidPath_temp = dateDirPath + "\\" + tempDir + "\\" + filename[:-4]
-        vidPath_out = dateDirPath + "\\" + outDir + "\\" + filename
-        print("Now processing video: " + filename + " ...")
-        # Crop the video to just the doorway in order to avoid detection of extraneous persons
-        croppedPath = CropVideo(vidPath_in, vidPath_temp)
-        # Load the cropped video and detect whether or not there is a person in it
-        detectedPath = detector.detectObjectsFromVideo(input_file_path=croppedPath, output_file_path=vidPath_temp + "_detected", frames_per_second=12, minimum_percentage_probability=0.1, log_progress=True, video_complete_function=perVideo)
-        if humanFlag:
-            # Copy the original .mp4 into //Processed directory
-            try:
-                copyfile(vidPath_in, vidPath_out)
-            except Exception as ex:
-                print(ex)
-
+for filename in inputFileNames:
+    vidPath_in = inputVideoDirectoryPath + "\\" + filename
+    vidPath_temp = tempVideoDirectoryPath + "\\" + filename[:-4]
+    print("Now processing video: " + filename + " ...")
+    # Crop the video to just the doorway in order to avoid detection of extraneous persons
+    croppedPath = CropVideo(vidPath_in, vidPath_temp)
+    # Load the cropped video and detect whether or not there is a person in it
+    detectedPath = detector.detectObjectsFromVideo(input_file_path=croppedPath, output_file_path=vidPath_temp + "_detected", frames_per_second=12, minimum_percentage_probability=0.1, log_progress=True, video_complete_function=perVideo)
+    if humanFlag:
+        # Copy the original .mp4 into //processed directory
         try:
-            remove(croppedPath)
-            remove(detectedPath)
+            copyfile(vidPath_in, outputVideoDirectoryPath + "\\" + filename)
         except Exception as ex:
             print(ex)
 
-        print("Completed processing video: " + filename)
+    try:
+        remove(croppedPath)
+        remove(detectedPath)
+    except Exception as ex:
+        print(ex)
+
+    print("Completed processing video: " + filename)
 
 stopgap = "thisisastopgap"
 # -------------------------------------------------
