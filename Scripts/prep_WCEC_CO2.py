@@ -59,7 +59,36 @@ def ConvertSensorValues(sensor, conversionValue):
         sensor.histdata = sensor.histdata * conversionValue
     return sensor
 
-def ProcessAmbiDaqFile():
+def ProcessAmbiDaqFile_New():
+# This is for AmbiDAQ data from anytime post-July 01 2019 (data was moved to a MySQL server in June 2019)
+# Note: Does not pull directly from server, but instead from a .csv file that horizontally appends columns for Timestamp and CO2 data, in that order, for each DAQ, in order.
+# i.e. Timstamp_DAQ_01, Value_DAQ_01, Timestamp_DAQ_02, Value_DAQ_02, etc...
+    value_type = "CO2"
+    date_cols = list(range(0,44,2))
+    my_date_parser = lambda x: pd.datetime.strptime(x, "%m/%d/%Y %H:%M:%S")
+    bigD = pd.read_csv("DataFiles\\WCEC-CO2-shrt.csv", parse_dates=date_cols, date_parser=my_date_parser)
+    cols = bigD.columns
+    df_list = []
+    i = 0
+    for col in cols:
+        if (i%2 == 0):
+            df_temp = pd.DataFrame(index=range(0,len(bigD[col]),1), columns=[0,1])
+            col_names = [col]
+        if (i%2 == 1):
+            col_names.append(col)
+            df_temp.columns = col_names
+        df_temp.iloc[:,i%2] = bigD[col]
+        df_temp
+        df_list.append(df_temp)
+        i = i + 1
+
+    j_list = list(range(0,len(df_list),1))
+    for j in j_list:
+        df_list[j].index = df_list[j].iloc[:,0]
+    return
+
+def ProcessAmbiDaqFile_Old(): 
+# This is for AmbiDAQ .csv files downloaded from https://energyinstitute-data.com/Ambi-DAQXX/ , where XX must be replaced with a number 01 through 22 (pre-June 2019)
     # starting .csv should include data from each DAQ appended to each other, with the "DAQ #" column replacing the existing identifier (MAC)
     datatat = pd.read_csv("DataFiles\\WCEC\\AmbiDAQ_all_.csv", parse_dates=["Datetime"])
     datatat.set_index(datatat["Datetime"],inplace=True)
@@ -94,3 +123,4 @@ def ProcessAmbiDaqFile():
     return
 
 #ProcessAmbiDaqFile()
+ProcessAmbiDaqFile_New()
