@@ -67,7 +67,7 @@ def CropVideo(inputPath, outputPath):
 #       ToProcess >
 #           "ch0#_yyyymmddhhMMss.mp4" (where # is 1,4,5,6, or 8)
 # ...etc
-root = "GroundTruthVideos_debug"
+root = "GroundTruthVideos"
 inDir = "ToProcess"
 tempDir = "Temp" # This directory must already exist
 outDir = "Processed" # This directory must already exist
