@@ -89,7 +89,7 @@ def ProcessAmbiDaqFile_New():
 
 def ProcessAmbiDaqFile_Old(): 
 # This is for AmbiDAQ .csv files downloaded from https://energyinstitute-data.com/Ambi-DAQXX/ , where XX must be replaced with a number 01 through 22 (pre-June 2019)
-    # starting .csv should include data from each DAQ appended to each other, with the "DAQ #" column replacing the existing identifier (MAC)
+    # starting .csv should include data from each DAQ appended to each other, with the "DAQ #" column replacing the existing identifier (MAC address)
     datatat = pd.read_csv("DataFiles\\WCEC\\AmbiDAQ_all_.csv", parse_dates=["Datetime"])
     datatat.set_index(datatat["Datetime"],inplace=True)
     #datatat.drop("Datetime", axis=1, inplace=True)

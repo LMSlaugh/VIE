@@ -1,0 +1,71 @@
+<!-- You must include this JavaScript file -->
+<script src="https://assets.crowd.aws/crowd-html-elements.js"></script>
+
+<!-- For the full list of available Crowd HTML Elements and their input/output documentation,
+      please refer to https://docs.aws.amazon.com/sagemaker/latest/dg/sms-ui-template-reference.html -->
+
+<!-- You must include crowd-form so that your task submits answers to MTurk -->
+<crowd-form answer-format="flatten-objects">
+
+    <!-- The crowd-classifier element will create a tool for the Worker to select the
+           correct answer to your question -->
+    <crowd-classifier 
+      name="category"
+      categories=["01","04","05","06","08"]
+      header="What camera took this video?"
+    >
+
+        <classification-target>
+            <video width="100%" height="315" controls>
+
+            <!-- Your video file URLs will be substituted for the "video_url" attribute below when 
+                 you publish a batch with a CSV input file containing multiple video file URLs -->
+            <source src="${video_url}" type="video/mp4">
+
+            </video> 
+        </classification-target>
+
+
+        <!-- Use the short-instructions section for quick instructions that the Worker
+            will see while working on the task. Including some basic examples of 
+            good and bad answers here can help get good results. You can include 
+            any HTML here. -->
+        <short-instructions>
+            <p>Watch the video and pause it the moment any persons pass through the door. Then extract the following information:</p>
+            <ul>
+                <li>Date (MM-dd-YYYY)</li>
+                <li>Time (hh:mm:ss, where hour is 24-hour format)</li>
+                <li>Camera #</li>
+                <li>In/Out</li>
+                <li># of persons</li>
+            </ul>
+            <p>Please use leading zeros for single-digit values (For example 01-01-2019 or 02:08:09)</p>
+            <p>*Note: this video may not contain any persons entering or exiting the building.</p>
+        </short-instructions>
+
+
+        <!-- Use the full-instructions section for more detailed instructions that the 
+            Worker can open while working on the task. Including more detailed 
+            instructions and additional examples of good and bad answers here can
+            help get good results. You can include any HTML here. -->
+        <full-instructions header="Instructions for Video Foot Traffic Information Capture">
+            <p>Watch the video and pause it the moment any persons pass through the door. Then extract the following information:</p>
+            <ul>
+                <li>Date (MM-dd-YYYY)</li>
+                <li>Time (hh:mm:ss, where hour is 24-hour format)</li>
+                <li>Camera #</li>
+                <li>Incoming or outgoing</li>
+                <li># of persons</li>
+            </ul>
+        <p>Additonal information:</p>
+        <p>The text in the upper left corner contains date and time.</p>
+        <p>  -Date is in the format {month}-{day}-{year}</p>
+        <p>  -Time is in the format {hour}:{minute}:{second} where hour ranges from 0 to 24</p>
+        <p>The camera number is located in the lower right corner.</p>
+        <p>Please use leading zeros for single-digit values (For example 01-01-2019 or 02:08:09)</p>
+        <p>If the person(s) lingers within a doorway for some amount of time, use your best judgement as to when they actually pass into/outside the building.</p>
+        <p>*Note: this video may not contain any persons entering or exiting the building.</p>
+      </full-instructions>
+
+    </crowd-classifier>
+</crowd-form>
