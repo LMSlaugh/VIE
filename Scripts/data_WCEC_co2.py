@@ -20,13 +20,13 @@ def UpdateSnapshot(sensor):
     # Update sensor snapshot value
     return sensor
 
-def GetHistoricalData(sensor):
-    historicaldata = pd.read_csv("DataFiles\\WCEC_CO2.csv", parse_dates=["dt"])
-    historicaldata.set_index(historicaldata["dt"],inplace=True)
-    data = pd.DataFrame(index=historicaldata["dt"])
-    data["CO2 (ppm)"] = historicaldata.max(axis=1)
-    # Get 2 weeks worth of data only
-    numWeeks = 3
-    items = numWeeks*7*24*60
-    sensor.histdata = data.iloc[0:items,:]
+def GetHistoricalData(sensor, start, end):
+    start = pd.to_datetime(start, format="%Y-%m-%d %H:%M:%S")
+    end = pd.to_datetime(end, format="%Y-%m-%d %H:%M:%S")
+    historicaldata = pd.read_csv("DataFiles\\VIE-historical-input_WCEC.csv", parse_dates=["timestamp"])
+    historicaldata.index = historicaldata["timestamp"]
+    if sensor.trainingdataset=="Cherry":
+        sensor.histdata = pd.DataFrame(historicaldata.loc[start:end,sensor.sensorname + "-val"])
+    elif sensor.trainingdataset=="Full":
+        sensor.histdata = pd.DataFrame(historicaldata.loc[start:end,[sensor.sensorname + "-val", "truth-val"]])
     return sensor

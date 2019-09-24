@@ -7,66 +7,57 @@
 import pandas as pd
 import numpy as np
 import math as math
-import scipy.optimize as opt
-import matplotlib.pyplot as plt
+import helper_figure_generator as figen
 
 def Sigmoid(x, p1, p2):
     return 1-1/(1+np.exp((p1-x)/p2))
 
-# The PlotSigmoids function should really go into helper_figure_generator.py, but it is convenient here. Having some troubles importing that file into this one.
-def PlotSigmoids(sensor, sensorvals, probas):
-    labs = 11 # figure label size
-    legs = "medium"
-    
-    sigmoidcompfig, axcs = plt.subplots(figsize=(11,5))
-    axcs.plot(sensorvals, probas, label="Raw")
-    #plt.savefig("sigmoid-value-check-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
-    axcs.plot(sensorvals, Sigmoid(sensorvals, sensor.vrparam1, sensor.vrparam2), label="Generated")
-    axcs.legend(loc='best', fontsize=legs)
-    plt.ylim([0,1])
-    plt.xlim([0,max(sensorvals)])
-    axcs.xaxis.set_major_locator(plt.MaxNLocator(20))
-    axcs.xaxis.set_tick_params(labelsize=labs)
-    axcs.yaxis.set_tick_params(labelsize=labs)
-    axcs.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
-    axcs.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
-    axcs.set_xlabel("Raw Sensor Value", fontsize=labs)
-    axcs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
-    plt.savefig("Figures\\sigmoid-comparison-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
-    plt.close(sigmoidcompfig)
-    return
-
 def BuildVacancyRelationship(sensor):
-    sensor.GetHistoricalData()
-    # TODO implement vacancy start and end times in the config file for each sensor
-    mask_vac = ( (sensor.histdata.index.hour >= 3 ) & (sensor.histdata.index.hour <= 5) ) # slice data for times of ~100% certain vacancy
-    #mask_occ = (((data.index.hour > 7) & (data.index.hour < 23 )) & (data.index.dayofweek < 5))
-    #mask_vac = (((data.index.hour <= 7) | (data.index.hour >= 23 )) | (data.index.dayofweek >= 5))
-    data_v = sensor.histdata[mask_vac]
-    sensor.vachistdata = data_v[np.logical_not(np.isnan(data_v))]
-    #sensor.occhistdata = sensor.histdata[mask_occ]
-    if sensor.vacancyrelationship==0: # sigmoid
+    GetHistData(sensor)
+    if sensor.vacancyrelationship=="Percentile": # sigmoid
+        import scipy.optimize as opt
         cumsum = 0
-        probas = []
+        rawprobas = []
         cols = sensor.vachistdata.columns
         sensorvals = sensor.vachistdata[cols[0]]
         summary = sum(sensorvals)
         sensorvals = sensorvals.sort_values(ascending=True)
         for datum in sensorvals:
             cumsum = cumsum + datum
-            probas.append(1-cumsum/summary)
-        probas = pd.Series(probas)
+            rawprobas.append(1-cumsum/summary)
+        rawprobas = pd.Series(rawprobas)
         stats_v = sensorvals.describe()
         mean = stats_v["mean"] # Starting value for parameter 1
         std = stats_v["std"] # starting value for parameter 2
-        popt, pcov = opt.curve_fit(Sigmoid, sensorvals, probas, p0=[mean, std])
+        popt, pcov = opt.curve_fit(Sigmoid, sensorvals, rawprobas, p0=[mean, std])
         sensor.vrparam1 = popt[0]
         sensor.vrparam2 = popt[1]
         sensor.std = std
-        sensor.probas = probas
-        PlotSigmoids(sensor, sensorvals, probas)
-    elif sensor.vacancyrelationship==1: # ???
-        pass
+        sensor.rawprobas = rawprobas
+        fitprobas = Sigmoid(sensorvals, sensor.vrparam1, sensor.vrparam2)
+        figen.PlotSigmoids(sensor, sensorvals, rawprobas, fitprobas)
+
+    elif sensor.vacancyrelationship=="Logistic": # Logistic Regression
+        from sklearn import linear_model
+        from scipy.special import expit
+        o_data = sensor.occhistdata.copy()
+        o_data["truth-val"] = 0
+        v_data = sensor.vachistdata.copy()
+        v_data["truth-val"] = 1
+        stats_v = v_data[sensor.sensorname + "-val"].describe()
+        std = stats_v["std"]
+        data_train = pd.concat([o_data,v_data], join="outer")
+        feature = data_train.loc[:,sensor.sensorname + "-val"].values.reshape(-1,1) # shape: (n,1)
+        labels = data_train.loc[:,"truth-val"].ravel() # shape: (n, )
+        clf = linear_model.LogisticRegression(C=1e5, solver='lbfgs')
+        clf.fit(feature, labels)
+        sensor.model = clf ################
+        x_plot = np.linspace(min(feature), max(feature), 300)
+        sensor.std = std
+        sensor.vrparam1 = clf.coef_[0][0]
+        sensor.vrparam2 = clf.intercept_[0]
+        loss = expit(x_plot * sensor.vrparam1 + sensor.vrparam2).ravel()
+        figen.PlotExpit(sensor, x_plot, loss, data_train)
     else:
         pass # error out
     sensor.histdata = pd.DataFrame()
@@ -74,3 +65,23 @@ def BuildVacancyRelationship(sensor):
     sensor.occhistdata = pd.DataFrame()
     return sensor
        
+def GetHistData(sensor):
+    sensor.GetHistoricalData()
+    if sensor.trainingdataset=="Cherry":
+        # TODO implement vacancy start and end times in the config file for each sensor
+        mask_vac = ( (sensor.histdata.index.hour >= 0 ) & (sensor.histdata.index.hour <= 4) ) # slice data for times of ~100% certain vacancy
+        data_v = sensor.histdata[mask_vac]
+        mask_occ = (((sensor.histdata.index.hour > 10) & (sensor.histdata.index.hour < 14 )) & (sensor.histdata.index.dayofweek < 5))
+        data_o = sensor.histdata[mask_occ]
+
+    elif sensor.trainingdataset=="Full":
+        data_v = sensor.histdata[sensor.histdata["truth-val"]==1]
+        data_o = sensor.histdata[sensor.histdata["truth-val"]==0]
+    
+    sensor.vachistdata = data_v[np.logical_not(np.isnan(data_v))]
+    sensor.occhistdata = data_o[np.logical_not(np.isnan(data_o))]
+    data_v.loc[:,"truth-val"] = 1
+    data_o.loc[:,"truth-val"] = 0
+    data_train = pd.concat([data_o,data_v], join="outer")
+    data_train.to_csv("DataFiles\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\Training_Data_" + sensor.sensorname + ".csv", index=True, header=True)
+    return

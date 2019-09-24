@@ -17,15 +17,15 @@ def UpdateSnapshot(sensor):
     # Update sensor snapshot value
     return sensor
 
-def GetHistoricalData(sensor):
-    historicaldata = pd.read_csv("DataFiles\\WCEC_Elec.csv", parse_dates=["Date"])
-    historicaldata.set_index(historicaldata["Date"],inplace=True)
-    data = pd.DataFrame(index=historicaldata["Date"])
-    data["Total Demand (W)"] = historicaldata["Total Demand (W)"]
-    # Get 2 weeks worth of data only
-    numWeeks = 3
-    items = numWeeks*7*24*6
-    sensor.histdata = data.iloc[0:items,:]
+def GetHistoricalData(sensor, start, end):
+    start = pd.to_datetime(start, format="%Y-%m-%d %H:%M:%S")
+    end = pd.to_datetime(end, format="%Y-%m-%d %H:%M:%S")
+    historicaldata = pd.read_csv("DataFiles\\VIE-historical-input_WCEC.csv", parse_dates=["timestamp"])
+    historicaldata.index = historicaldata["timestamp"]
+    if sensor.trainingdataset=="Cherry":
+        sensor.histdata = pd.DataFrame(historicaldata.loc[start:end,sensor.sensorname + "-val"])
+    elif sensor.trainingdataset=="Full":
+        sensor.histdata = pd.DataFrame(historicaldata.loc[start:end,[sensor.sensorname + "-val", "truth-val"]])
     return sensor
 
 def GetHistoricalDataFromAPI(): # Currently not called anywhere. Having trouble parsing results (appears to be in .csv format?)
@@ -49,3 +49,15 @@ def GetHistoricalDataFromAPI(): # Currently not called anywhere. Having trouble 
     except req.exceptions.Timeout:
         logging.error("Hobolink HTTP request timed out (30 seconds)")
     return
+
+def ResampleDataFile(freq):
+    td = pd.read_csv("DataFiles\\WCEC-Elec-1min.csv", parse_dates=["Timestamp"])
+    dts = pd.to_datetime(td["Timestamp"], format="%Y-%m-%d %H:%M:%S")
+    td.index = dts
+    td.drop(["Timestamp"], axis=1, inplace=True)
+    td.index.name = "Timestamp"
+    td2 = td["Demand (W)"].resample(freq).first()
+    td2.to_csv("DataFiles\\WCEC-Elec-" + freq + ".csv", index=True, header=True)
+    return
+
+#ResampleDataFile("2min")

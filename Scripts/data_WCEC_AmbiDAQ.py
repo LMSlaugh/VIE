@@ -2,13 +2,6 @@ from sshtunnel import SSHTunnelForwarder
 import threading
 import sqlalchemy as sa
 import pandas as pd
-#import time
-#import datetime
-#import matplotlib.pyplot as plt
-#import numpy as np
-#from scipy import signal
-
-
 
 #SSH into server
 server =  SSHTunnelForwarder(
@@ -34,18 +27,20 @@ table = meta.tables['DAQs']
 
 #daqnums = [1,2,3]
 daqnums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
-#desired_columns = ["CO2", "RH", "T"]
-desired_columns = ["CO2"]
+desired_columns = ["CO2"] # Options are: "CO2", "RH", "T", "PIR"
 for descol in desired_columns:
      i = 1
-     for daqnum in daqnums:             
-          select_statement=sa.text("SELECT `UTC Timestamp`,`" + descol + "` FROM `DAQs` WHERE (`UTC Timestamp` BETWEEN '2019-07-02 00:00:00' AND '2019-08-06 00:00:00') AND (`DAQ Name` LIKE 'A%Q" + str(daqnum) + "')")
+     # Getdata from MySQL server for all AmbiDAQ units
+     for daqnum in daqnums:
+          # Note that UTC Timestamp is time-shifted 3 hours ahead, so must subract 3 hours from final result to get into CA time
+          select_statement=sa.text("SELECT `UTC Timestamp`,`" + descol + "` FROM `DAQs` WHERE (`UTC Timestamp` BETWEEN '2019-07-02 03:00:00' AND '2019-08-06 03:00:00') AND (`DAQ Name` LIKE 'A%Q" + str(daqnum) + "')")
           res = conn.execute(select_statement)
           if (i==1):
                df = pd.DataFrame(res.fetchall())
                df.columns=res.keys()
                df.rename(columns={descol:descol + "_" + str(daqnum)}, inplace=True)
                ind = pd.to_datetime(df["UTC Timestamp"], format="%Y-%m-%d %H:%M:%S")
+               ind = ind - pd.Timedelta("3 hours")
                df.index = ind
                df.drop(["UTC Timestamp"], axis=1, inplace=True)
                i = i + 1
@@ -54,37 +49,47 @@ for descol in desired_columns:
                df_temp.columns=res.keys()
                df_temp.rename(columns={descol:descol + "_" + str(daqnum)}, inplace=True)
                ind = pd.to_datetime(df_temp["UTC Timestamp"], format="%Y-%m-%d %H:%M:%S")
+               ind = ind - pd.Timedelta("3 hours")
                df_temp.index = ind
                df_temp.drop(["UTC Timestamp"], axis=1, inplace=True)
                df = pd.concat([df,df_temp], join="outer")
                i = i + 1
-          
-     dt = df.groupby(pd.TimeGrouper(freq="10min"))
+     # Group data according to desired timestamp resolution    
+     dt = df.groupby(pd.TimeGrouper(freq="2min"))
      header_flag = 1
+     # Capture previous row of data to handle missing values
+     prev_df = pd.DataFrame()
      for time, group in dt:
           new_cols = df.columns
           max_col = pd.Index(["Max_" + descol])
+          avg_col = pd.Index(["Avg_" + descol])
           new_cols = new_cols.append(max_col)
+          new_cols = new_cols.append(avg_col)
           df_row = pd.DataFrame(index=[time],columns=new_cols)
           df_row.index.name = "Timestamp"
           for col in df.columns:
                temp_df = group[col].dropna()
                temp_df.sort_index(axis=0, ascending=True,inplace=True)
                if temp_df.empty:
-                    continue
-               v = temp_df[0] # This takes the value closest to "time" (but is actually just a little after "time"). Will need to do something different for PIR
-               df_row.loc[time,col] = v
-               row_max = max(df_row.loc[time,:])
-               df_row.loc[time,"Max_" + descol] = row_max
+                    if prev_df.empty:
+                         continue
+                    else:
+                     p = prev_df[col]
+                     df_row.loc[time,col] = p[0]
+                     t = df_row.loc[time,col]
+               else:
+                    v = temp_df[0] # This takes the value closest to "time" (but is actually just a little after "time"). Will need to do something different for PIR
+                    df_row.loc[time,col] = v
+                    row_max = max(df_row.loc[time,:])
+                    row_avg = df_row.mean(axis=1)[0]
+                    df_row.loc[time,"Max_" + descol] = row_max
+                    df_row.loc[time,"Avg_" + descol] = row_avg
+          prev_df = df_row
           if (header_flag==1):
                header_flag = 0
-               df_row.to_csv("DataFiles\\AmbiDAQ_grouped_" + descol + ".csv", mode="a", header=True, index=True)
+               df_row.to_csv("DataFiles\\AmbiDAQ_grouped_" + descol + ".csv", header=True, index=True)
           else:
                df_row.to_csv("DataFiles\\AmbiDAQ_grouped_" + descol + ".csv", mode="a", header=False, index=True)
-     
-                    
-
-#df.to_csv("DataFiles\\WCEC-CO2-RH-PIR_" + daqname + ".csv", header=True, index=False)
 conn.close()
 
 #Workaround for SSH threading issue. Don't delete this:

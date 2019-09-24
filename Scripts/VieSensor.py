@@ -13,15 +13,17 @@ import numpy as np
 import math as math
 import datetime as dt
 import PI_client_LMS as pc
+from scipy.special import expit
 
 class VieSensor:
-    def __init__(self, sensorName, sensorType, frequency, measurementUnits, dataAccessType, vacancyRelationship, dataRetrievalFileName, preprocessingFileName, relationshipBuilderFileName, stdDev, vrParameter1, vrParameter2, vrParameter3, vrParameter4, historicalData=[], vacantData=[], occupiedData=[]):       
+    def __init__(self, sensorName, sensorType, frequency, measurementUnits, dataAccessType, vacancyRelationship, trainingDataSet, dataRetrievalFileName, preprocessingFileName, relationshipBuilderFileName, stdDev, vrParameter1, vrParameter2, vrParameter3, vrParameter4, trainStart, trainEnd, historicalData=[], vacantData=[], occupiedData=[]):       
         self.sensorname = sensorName # Must be unique
         self.sensortype = sensorType
         self.frequency = frequency # frequency of new values being added (data sample rate) in minutes.
         self.units = measurementUnits # units of sensor measurement
         self.dataaccesstype = dataAccessType # tag for data stream in OSIsoft PI data historian. TODO Change to path for data retrieval file (read from config file)
-        self.vacancyrelationship = vacancyRelationship # encoded types, represented by an enumeration (0=sigmoid, 1=...)
+        self.vacancyrelationship = vacancyRelationship # encoded types, represented by an enumeration (0=percentile, 1=logistic regression...)
+        self.trainingdataset = trainingDataSet
         self.histdata = historicalData
         self.vachistdata = vacantData
         self.occhistdata = occupiedData
@@ -39,9 +41,9 @@ class VieSensor:
         self.snapshotvalue = -1 # value of most recent data update from this sensor: dummy value
         self.snapshottimestamp = dt.datetime.now() # timestamp (datetime) of most recent data update from this sensor: dummy value
         self.snapshotvacancyprobability = -1 # probability of vacancy corresponding to this sensor's snapshot value
-        if ( (self.vacancyrelationship == 0) & ( math.isnan(self.vrparam1) | math.isnan(self.vrparam2) ) ):
-            self.BuildVacancyRelationship()
-        elif ( (self.vacancyrelationship == 1) & ( math.isnan(self.vrparam1) | math.isnan(self.vrparam2) | math.isnan(self.vrparam3) ) ):
+        self.trainstart = trainStart
+        self.trainend = trainEnd
+        if ( math.isnan(self.vrparam1) | math.isnan(self.vrparam2) | math.isnan(self.vrparam3) | math.isnan(self.vrparam4)):
             self.BuildVacancyRelationship()
         else:
             pass
@@ -53,7 +55,7 @@ class VieSensor:
 
     def GetHistoricalData(self):
         dta = __import__(self.datafilename)
-        dta.GetHistoricalData(self)
+        dta.GetHistoricalData(self, self.trainstart, self.trainend)
         return self    
 
     def UpdateSnapshot(self):
@@ -70,13 +72,12 @@ class VieSensor:
         # This function is called by main.py to predict probability of vacancy.
         # Applies the functional relationship between sensor data and vacancy to the sensor's snapshot value.
 
-        # case 0: sigmoid
-        self.snapshotvacancyprobability = 1 - 1/(1 + np.exp((self.vrparam1-self.snapshotvalue)/self.vrparam2))         
-        if self.snapshotvacancyprobability < 0.01:
+        if self.vacancyrelationship=="Sigmoid":
+            self.snapshotvacancyprobability = 1 - 1/(1 + np.exp((self.vrparam1-self.snapshotvalue)/self.vrparam2))         
+        elif self.vacancyrelationship=="Logistic":
+            self.snapshotvacancyprobability = expit(self.snapshotvalue * self.vrparam1 + self.vrparam2)
+
+        if self.snapshotvacancyprobability < 0.001:
             self.snapshotvacancyprobability = 0
-        else:
-            pass
-        # case 1: step
-        # TODO build for step function (Just sigmoid with mean = threshold and low, hardcoded spread?)
         return
 

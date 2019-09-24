@@ -38,10 +38,18 @@ def UpdateSnapshot(sensor):
         sensor.snapshotvalue = s1.loc["Value",c[0]]
     return sensor
 
-def GetHistoricalData(sensor):
-    client = pc.pi_client()
-    point = sensor.dataaccesstype
-    # TODO implement window of time from now to x months ago
-    sensor.histdata = client.get_stream_by_point(point, start="2019-02-04 12:00:00", end="2019-03-04 00:00:00", calculation="interpolated", interval="10m")
-    sensor = sensor.PreprocessData()
+def GetHistoricalData(sensor, start, end):
+    start = pd.to_datetime(start, format="%Y-%m-%d %H:%M:%S")
+    end = pd.to_datetime(end, format="%Y-%m-%d %H:%M:%S")
+    historicaldata = pd.read_csv("DataFiles\\VIE-historical-input_WCEC.csv", parse_dates=["timestamp"])
+    historicaldata.index = historicaldata["timestamp"]
+    if sensor.trainingdataset=="Cherry":
+        sensor.histdata = pd.DataFrame(historicaldata.loc[start:end,sensor.sensorname + "-val"])
+    elif sensor.trainingdataset=="Full":
+        sensor.histdata = pd.DataFrame(historicaldata.loc[start:end,[sensor.sensorname + "-val", "truth-val"]])
+
+    #client = pc.pi_client()
+    #point = sensor.dataaccesstype
+    #sensor.histdata = client.get_stream_by_point(point, start="2019-07-06 00:00:00", end="2019-07-20 00:00:00", calculation="interpolated", interval="10m")
+    #sensor = sensor.PreprocessData()
     return sensor
