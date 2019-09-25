@@ -51,13 +51,13 @@ def GenerateConfusionMatrixNMetrics(data, params, threshold):
     metrics["TNs"] = TNs
 
     overacc, vacc, oacc, occ_vac_ratio, comp_rate, miss_opp_rate = GenerateKPIs(datacop, metrics)
-    confmtx.iloc[3,0] = occ_vac_ratio
-    confmtx.iloc[4,0] = threshold
-    confmtx.iloc[5,0] = overacc
-    confmtx.iloc[6,0] = vacc
-    confmtx.iloc[7,0] = oacc
-    confmtx.iloc[8,0] = comp_rate
-    confmtx.iloc[9,0] = miss_opp_rate
+    confmtx.iloc[3,0] = round(occ_vac_ratio,3)
+    confmtx.iloc[4,0] = round(threshold,3)
+    confmtx.iloc[5,0] = round(overacc,3)
+    confmtx.iloc[6,0] = round(vacc,3)
+    confmtx.iloc[7,0] = round(oacc,3)
+    confmtx.iloc[8,0] = round(comp_rate,3)
+    confmtx.iloc[9,0] = round(miss_opp_rate,3)
     confmtx.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-confusion-matrix.csv")
 
     return metrics, confmtx
