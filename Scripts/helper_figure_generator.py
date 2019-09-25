@@ -76,7 +76,7 @@ def PlotInsNMids(data, in_type, sufx, hrtx, params):
         ax[1].plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (%)")
         ax[1].plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (%)")
         ax[1].plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
-    plt.ylim([0,1.2])
+    ax[1].set_ylim([0,1.2])
     ax[1].legend(loc='best', fontsize=legs)
     ax[1].set_title("Intermediate Probability of Vacancy")
     ax[1].set_ylabel("Probability of Vacancy (%)", fontsize=labs)
@@ -87,7 +87,7 @@ def PlotInsNMids(data, in_type, sufx, hrtx, params):
     ax[1].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     fig.autofmt_xdate()
     fig.suptitle("Raw Sensor Input vs Intermediate Probability of Vacancy: " + in_type, fontsize=18, fontweight="bold")
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.trainset + "\\Intermediates vs Inputs-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\Intermediates vs Inputs-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -115,7 +115,7 @@ def PlotMidsNOut(data, in_type, sufx, hrtx, params):
     ax[0].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     # plot fusion result
     ax[1].plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], label="Fused: " + params.fusetype + " (%)")
-    plt.ylim([0,1.2])
+    ax[1].set_ylim([0,1.2])
     ax[1].legend(loc='best', fontsize=legs)
     ax[1].set_title("Fused Probability of Vacancy")
     ax[1].set_ylabel("Probability of Vacancy (%)", fontsize=labs)
@@ -126,7 +126,7 @@ def PlotMidsNOut(data, in_type, sufx, hrtx, params):
     ax[1].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     fig.autofmt_xdate()
     fig.suptitle("Intermediate Probability of Vacancy vs. Fused Probability of Vacancy", fontsize=18, fontweight="bold")
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.trainset + "\\Intermediates vs Output-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Intermediates vs Output-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -155,7 +155,7 @@ def PlotInsNOut(data, in_type, sufx, hrtx, params):
     ax[0].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     # plot fusion result
     ax[1].plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], label="Fused: " + params.fusetype + " (%)")
-    plt.ylim([0,1.2])
+    ax[1].set_ylim([0,1.2])
     ax[1].legend(loc='best', fontsize=legs)
     ax[1].set_title("Fused Probability of Vacancy")
     ax[1].set_ylabel("Probability of Vacancy (%)", fontsize=labs)
@@ -166,7 +166,7 @@ def PlotInsNOut(data, in_type, sufx, hrtx, params):
     ax[1].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     fig.autofmt_xdate()
     fig.suptitle("Raw Sensor Input vs Fused Probability of Vacancy", fontsize=18, fontweight="bold")
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.trainset + "\\Output vs. Inputs-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\" + params.fusetype + "\\" + params.buildtype + "\\" + params.traintype + "\\Output vs. Inputs-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -195,7 +195,7 @@ def PlotInsNTruth(data, in_type, sufx, hrtx, params):
     ax[0].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     # plot ground truth
     ax[1].plot(data["fused-proba-dt"], data["truth-val"], label="Truth: 1=vac, 0=occ ")
-    plt.ylim([0,1.2])
+    ax[1].set_ylim([0,1.2])
     ax[1].legend(loc='best', fontsize=legs)
     ax[1].set_title("Raw Sensor Input vs. Ground Truth")
     ax[1].set_ylabel("Probability of Vacancy (%)", fontsize=labs)
@@ -205,7 +205,7 @@ def PlotInsNTruth(data, in_type, sufx, hrtx, params):
     ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     fig.autofmt_xdate()
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.trainset + "\\Input vs. Truth" + "_" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\" + params.buildtype + "\\Inputs vs. Truth" + "_" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -224,7 +224,7 @@ def PlotMidsNTruth(data, in_type, sufx, hrtx, params):
         ax.plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
     # plot ground truth
     ax.plot(data["fused-proba-dt"], data["truth-val"], label="Truth: 1=vac, 0=occ ")
-    plt.ylim([0,1.2])
+    ax.set_ylim([0,1.2])
     ax.legend(loc='best', fontsize=legs)
     ax.set_title("Intermediate Probability of Vacancy vs. Ground Truth")
     ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
@@ -234,7 +234,7 @@ def PlotMidsNTruth(data, in_type, sufx, hrtx, params):
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     fig.autofmt_xdate()
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.trainset + "\\Input vs. Truth" + "_" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\Intermediates vs. Truth" + "_" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -244,7 +244,7 @@ def PlotOutNTruth(data, sufx, hrtx, params):
     ax.plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], label="Fused: " + params.fusetype + " (%)")
     # plot ground truth
     ax.plot(data["fused-proba-dt"], data["truth-val"], label="Truth: 1=vac, 0=occ ")
-    plt.ylim([0,1.2])
+    ax.set_ylim([0,1.2])
     ax.legend(loc='best', fontsize=legs)
     ax.set_title("Fused Probability of Vacancy vs. Ground Truth")
     ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
@@ -254,7 +254,7 @@ def PlotOutNTruth(data, sufx, hrtx, params):
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     fig.autofmt_xdate()
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.trainset + "\\Output vs. Truth" + "_" + sufx + ".png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Output vs. Truth" + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -317,7 +317,7 @@ def PlotInsNMidsNOutNTruth(data, in_type, sufx, hrtx, params):
     ax[2].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     fig.autofmt_xdate()
     fig.suptitle("Inputs, Intermediate Probability of Vacancy, and Fused Probability of Vacancy vs. Ground Truth", fontsize=18, fontweight="bold")
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.trainset + "\\Ins-Mids-Out&GroundTruth_" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Ins-Mids-Out&GroundTruth_" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -363,15 +363,16 @@ def PlotExpit(sensor, x, y, train_data):
 def PlotMain(in_type, start, end, save_suffix, params):
     tick_hrs = [0]
     
-    historicaldata = pd.read_csv("DataFiles\\" + params.buildtype + "\\" + params.trainset + "\\VIE-historical-output.csv", parse_dates=["fused-proba-dt"])
+    historicaldata = pd.read_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv", parse_dates=["fused-proba-dt"])
     historicaldata.index = historicaldata["fused-proba-dt"]
     historicaldata = historicaldata.loc[start:end,:]
     #PlotIns(historicaldata, in_type, save_suffix, tick_hrs)
     #PlotInsNMids(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotInsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
-    #PlotInsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    PlotInsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    PlotMidsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutNTruth(historicaldata, fusetype, save_suffix, tick_hrs, params)
-    PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    #PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutputDistribution(historicaldata, save_suffix, tick_hrs, params)
     return

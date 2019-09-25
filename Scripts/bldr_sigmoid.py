@@ -20,11 +20,11 @@ def BuildVacancyRelationship(sensor):
         rawprobas = []
         cols = sensor.vachistdata.columns
         sensorvals = sensor.vachistdata[cols[0]]
-        summary = sum(sensorvals)
+        summation = sum(sensorvals)
         sensorvals = sensorvals.sort_values(ascending=True)
         for datum in sensorvals:
             cumsum = cumsum + datum
-            rawprobas.append(1-cumsum/summary)
+            rawprobas.append(1-cumsum/summation)
         rawprobas = pd.Series(rawprobas)
         stats_v = sensorvals.describe()
         mean = stats_v["mean"] # Starting value for parameter 1
@@ -32,7 +32,7 @@ def BuildVacancyRelationship(sensor):
         popt, pcov = opt.curve_fit(Sigmoid, sensorvals, rawprobas, p0=[mean, std])
         sensor.vrparam1 = popt[0]
         sensor.vrparam2 = popt[1]
-        sensor.std = std
+        sensor.std = std / max(sensorvals)
         sensor.rawprobas = rawprobas
         fitprobas = Sigmoid(sensorvals, sensor.vrparam1, sensor.vrparam2)
         figen.PlotSigmoids(sensor, sensorvals, rawprobas, fitprobas)
@@ -51,13 +51,12 @@ def BuildVacancyRelationship(sensor):
         labels = data_train.loc[:,"truth-val"].ravel() # shape: (n, )
         clf = linear_model.LogisticRegression(C=1e5, solver='lbfgs')
         clf.fit(feature, labels)
-        sensor.model = clf ################
         x_plot = np.linspace(min(feature), max(feature), 300)
-        sensor.std = std
         sensor.vrparam1 = clf.coef_[0][0]
         sensor.vrparam2 = clf.intercept_[0]
-        loss = expit(x_plot * sensor.vrparam1 + sensor.vrparam2).ravel()
-        figen.PlotExpit(sensor, x_plot, loss, data_train)
+        sensor.std = std / max(feature)
+        proba = expit(x_plot * sensor.vrparam1 + sensor.vrparam2).ravel()
+        figen.PlotExpit(sensor, x_plot, proba, data_train)
     else:
         pass # error out
     sensor.histdata = pd.DataFrame()

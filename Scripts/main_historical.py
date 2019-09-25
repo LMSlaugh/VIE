@@ -20,25 +20,17 @@ import results_analysis as ra
 
 # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv.....Function Definitions
 def StdDevWeightedAverage(sensors):
-    # get std dev and snapshot val for each sensor input
-    fusionparams = pd.DataFrame(index=range(len(sensors)), columns=range(2))
-    stddevs = []
+    topterms = []
+    weights = []
     i = 0
     for k, v in sensors.items():
-        c = 1/(2*v.vrparam1)
-        fusionparams.iloc[i,0] = v.snapshotvalue * c
-        fusionparams.iloc[i,1] = v.std * c # standard deviation
-        stddevs.append(v.std * c)
+        topterms.append(v.snapshotvacancyprobability/v.std)
+        weights.append(1/v.std)
         i = i + 1
-    corrected_vars = [1 / (i ** 2) for i in stddevs]
-    #vardevs = [i ** 2 for i in stddevs]
-    #vardevs = stddevs
-    #varsum = sum(vardevs)
-    varsum = sum(corrected_vars)
-    overallproba = 0
-    for index, row in fusionparams.iterrows():
-        overallproba = overallproba + row[0] / (row[1] * varsum)
-    return 1 - overallproba
+    numer = sum(topterms)
+    denom = sum(weights)
+    overallproba = numer/denom
+    return overallproba
 
 def CreateVirtualSensors(params):
     new = ""
@@ -64,7 +56,7 @@ def CreateVirtualSensors(params):
         p2 = row["Parameter-2"]
         p3 = row["Parameter-3"]
         p4 = row["Parameter-4"]
-        newSensor = snsr.VieSensor(sn, st, uf, mu, dat, vrt, trs, drfn, ppfn, rbfn, std, p1, p2, p3, p4, ts, te)
+        newSensor = snsr.VieSensor(sn, st, uf, mu, dat, vrt, trs, drfn, ppfn, rbfn, std, p1, p2, p3, p4, params.trainstart, params.trainend)
         sensors[newSensor.sensorname] = newSensor
     
     metadata_new = metadata
@@ -84,19 +76,19 @@ def FuseVacancyProbabilities(sensors, fusetype="rms"):
     for k,v in sensors.items():
         probabilities.append(v.snapshotvacancyprobability)
 
-    if fusetype=="rss":
+    if fusetype=="RSS":
         probasq = [i ** 2 for i in probabilities]
         overallproba = sum(probasq) ** 0.5
-    elif fusetype=="rms":
+    elif fusetype=="RMS":
         probasq = [i ** 2 for i in probabilities]
         overallproba = (sum(probasq) / len(probabilities)) ** 0.5
-    elif fusetype=="max":
+    elif fusetype=="MAX":
         overallproba = max(probabilities)
-    elif fusetype=="avg":
+    elif fusetype=="AVG":
         overallproba = sum(probabilities) / len(probabilities)        
-    elif fusetype=="mult":
+    elif fusetype=="MULT":
         overallproba = np.prod(probabilities)
-    elif fusetype=="wghtavg":
+    elif fusetype=="SDWA":
         overallproba = StdDevWeightedAverage(sensors)
     else: # Default to "mult" - multiplying together the probabilities
         overallproba = np.prod(probabilities)
@@ -106,7 +98,15 @@ def FuseVacancyTimestamps(timestamps, fusetype="rms"):
     overalldt = max(timestamps)
     return overalldt
 
+def GetTrainTestData():
+    data = pd.read_csv("DataFiles\\VIE-historical-input_WCEC.csv", parse_dates=["timestamp"]) # columns: timestamp, {sensorname}-val, {sensorname}-val, ..., truth-val
+    data.index = data["timestamp"]
+    testdata = data.loc[params.teststart:params.testend,:]
+    traindata = data.loc[params.trainstart:params.trainend,:]
+    return traindata, testdata
+
 def GenerateOutput(testdata, sensors, params):
+    temp_df = pd.DataFrame(index=[0], columns=["val","proba"])
     header_flag = 1
     for index, row in testdata.iterrows():
         output = pd.DataFrame(index=[0], columns=["fused-proba-dt", "fused-proba-" + params.fusetype, "truth-val"])
@@ -129,58 +129,45 @@ def GenerateOutput(testdata, sensors, params):
 
         if (header_flag==1):
             header_flag=0        
-            output.to_csv("DataFiles\\" + params.buildtype + "\\" + params.trainset + "\\VIE-historical-output.csv", header=True, index=False)
+            output.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv", header=True, index=False)
         else:
-            output.to_csv("DataFiles\\" + params.buildtype + "\\" + params.trainset + "\\VIE-historical-output.csv", mode="a", header=False, index=False)
+            output.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv", mode="a", header=False, index=False)
     return
+
+def GeneratePlots(params):
+    #figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
+    figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
+    figen.PlotMain("wifi", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
+    figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
+    #figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    figen.PlotMain("wifi", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    return
+
+def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end):
+    params = mp.ModelParameters(build_flag, train_start, train_end, test_start, test_end, train_type, build_type, fuse_type)
+    #sensors = CreateVirtualSensors(params)
+    #traindata, testdata = GetTrainTestData()
+    #for k,v in sensors.items():
+    #   pa.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
+    #GenerateOutput(testdata, sensors, params)
+    ra.GenerateAnalytics(params)
+    #GeneratePlots(params)
+    return
+
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Function Definitions
-
-
-# vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv.....Parameter Definitions
-## uncomment one of these to run that fusion method
-#fuse_type = "rss"       # root sum square
-fuse_type = "rms"       # root mean square
-#fuse_type = "max"       # maximum
-#fuse_type = "avg"       # average
-#fuse_type = "mult"      # multiplication
-#fuse_type = "whtavg"    # standard-deviation-weighted average
-
-build_flag = True # Use this to tell model to rebuild vacancy relationship (True = rebuild and re-plot)
-
-train_start = "2019-07-02 00:00:00"
-train_end = "2019-07-16 00:00:00"
-
-test_start = train_end
-test_end = "2019-08-06 00:00:00"
-
-#train_type = "Cherry"
-train_type = "Full"
-
-build_type = "Percentile"
-#build_type = "Logistic"
-
-params = mp.ModelParameters(build_flag, train_start, train_end, test_start, test_end, train_type, build_type, fuse_type)
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Parameter Definitions
-
 # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv.....Main Program 
-sensors = CreateVirtualSensors(params)
-temp_df = pd.DataFrame(index=[0], columns=["val","proba"])
-data = pd.read_csv("DataFiles\\VIE-historical-input_WCEC.csv", parse_dates=["timestamp"]) # columns: timestamp, {sensorname}-val, {sensorname}-val, ..., truth-val
-data.index = data["timestamp"]
-testdata = data.loc[params.teststart:params.testend,:]
-traindata = data.loc[params.trainstart:params.trainend,:]
-#for k,v in sensors.items():
-#   pa.RunExploration(v.sensorname, traindata, build_type, train_set)
-GenerateOutput(testdata, sensors, params)
-ra.GenerateAnalytics(params)
-#figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
-figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
-figen.PlotMain("wifi", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
-figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
-#figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
-figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
-figen.PlotMain("wifi", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
-figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+#Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end)
+Main(False, "Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+
+Main(False, "Logistic", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
 thisisastopgap = "stopgap"
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Main Program

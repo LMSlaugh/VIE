@@ -120,7 +120,7 @@ def CompareHistogramsNFits_Full_Cherry_Vac(bins, sensorname, td_full, td_cherry,
     ax.set_ylabel("Probability (%)", fontsize=labs)
     ax.set_xlabel("Raw Sensor Value", fontsize=labs)
     ax.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
-    plt.savefig("Figures\\" + build_type + "\\Histograms-Vacancy-Comparison_cherry_full" + sensorname + ".png", format="png", bbox_inches="tight")
+    plt.savefig("Figures\\" + build_type + "\\Histograms-Vacancy-Comparison_cherry_full_" + sensorname + ".png", format="png", bbox_inches="tight")
     plt.close(histfig)
     return
 
@@ -175,7 +175,7 @@ def CompareHistogramFits_Full_Cherry_Vac_Occ(bins, sensorname, td_full, td_cherr
     ax2.set_ylabel("Probability (%)", fontsize=labs)
     ax2.set_xlabel("Raw Sensor Value", fontsize=labs)
     ax2.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
-    plt.savefig("Figures\\" + build_type + "\\Histograms-Comparison_cherry_full" + sensorname + ".png", format="png", bbox_inches="tight")
+    plt.savefig("Figures\\" + build_type + "\\Histograms-Comparison_cherry_full_" + sensorname + ".png", format="png", bbox_inches="tight")
     plt.close(histfig2)
     return
 
@@ -237,7 +237,7 @@ def CompareCumulativeDistributions_Full_Cherry_Vac_Occ(sensorname, td_full, td_c
     axcs.set_ylabel("Probability (%)", fontsize=labs)
     axcs.set_xlabel("Raw Sensor Value", fontsize=labs)
     axcs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
-    plt.savefig("Figures\\" + build_type + "\\Cumulative-Dists-Comparison_cherry_full" + sensorname + ".png", format="png", bbox_inches="tight")
+    plt.savefig("Figures\\" + build_type + "\\Cumulative-Dists-Comparison_cherry_full_" + sensorname + ".png", format="png", bbox_inches="tight")
     plt.close(cumsumfig2)
     return
 
