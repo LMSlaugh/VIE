@@ -51,13 +51,13 @@ def GenerateConfusionMatrixNMetrics(data, params, threshold):
     metrics["TNs"] = TNs
 
     overacc, vacc, oacc, occ_vac_ratio, comp_rate, miss_opp_rate = GenerateKPIs(datacop, metrics)
-    confmtx.iloc[3,0] = round(occ_vac_ratio,3)
-    confmtx.iloc[4,0] = round(threshold,3)
-    confmtx.iloc[5,0] = round(overacc,3)
-    confmtx.iloc[6,0] = round(vacc,3)
-    confmtx.iloc[7,0] = round(oacc,3)
-    confmtx.iloc[8,0] = round(comp_rate,3)
-    confmtx.iloc[9,0] = round(miss_opp_rate,3)
+    confmtx.iloc[3,0] = str(round(occ_vac_ratio,3)*100) + "%"
+    confmtx.iloc[4,0] = str(round(threshold,3)*100) + "%"
+    confmtx.iloc[5,0] = str(round(overacc,3)*100) + "%"
+    confmtx.iloc[6,0] = str(round(vacc,3)*100) + "%"
+    confmtx.iloc[7,0] = str(round(oacc,3)*100) + "%"
+    confmtx.iloc[8,0] = str(round(comp_rate,3)*100) + "%"
+    confmtx.iloc[9,0] = str(round(miss_opp_rate,3)*100) + "%"
     confmtx.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-confusion-matrix.csv")
 
     return metrics, confmtx
@@ -99,7 +99,7 @@ def GenerateMetricsForAllThresholds(data, params):
         i = i + 1
     return metrics_vthresh, thresholds
 
-def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
+def GenerateAccuracyCurves(metrics_vthresh, thresh, params, opt_thresh):
     # for different thresholds from 0 -> 1....
     TPs = metrics_vthresh["TPs"] 
     TNs = metrics_vthresh["TNs"] 
@@ -142,6 +142,21 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.plot(MOR, CR)
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.1])
+    n = round(len(thresh)-1, 0)
+    step = int(round(n/10, 0))
+    #half = int(round(n/2, 0))
+    callout_locs = range(0,n+1,step)
+    for val in callout_locs:
+        if val==0:
+            ax.plot(MOR.values[val], CR.values[val], 'xk', label="Decision Thresholds")
+        else:
+            ax.plot(MOR.values[val], CR.values[val], 'xk')
+        #ax.annotate(round(val/10) + "%", xy=(MOR.values[val],CR.values[val]), textcoords="data", xytext=(10,10))
+        ax.text(MOR.values[val]+.03,CR.values[val]+.004, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
+    #ax.annotate("0.0", xy=(MOR[0],CR[0]), xytext=(0.2,0.85), textcoords="axes fraction", arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')
+    #ax.annotate("0.5", xy=(MOR.values[half],CR.values[half]), xytext=(0.1,0.1), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')    
+    #ax.annotate("1.0", xy=(MOR.values[-1],CR.values[-1]), xytext=(0.8,0.25), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')
+    ax.legend(loc="best", fontsize="medium")
     ax.set_title("Missed Opportunity Rate vs. Complaint Rate for different thresholds", fontsize=18, fontweight="bold")
     ax.set_xlabel("Missed Opportunity Rate: FN/(TP + TN + FN + FP) (%)", fontsize=9)
     ax.set_ylabel("Complaint Rate: FP/(TP + TN + FN + FP) (%)", fontsize=9)
@@ -187,8 +202,23 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     # Plot vac_acc and occ_acc against eachother
     fig, ax = plt.subplots(figsize=(10,5))
     ax.plot(occupied_acc, vacant_acc)
+    n = round(len(thresh)-1, 0)
+    step = int(round(n/10, 0))
+    #half = int(round(n/2, 0))
+    callout_locs = range(0,n+1,step)
+    for val in callout_locs:
+        if val==0:
+            ax.plot(occupied_acc.values[val], vacant_acc.values[val], 'xk', label="Decision Thresholds")
+        else:
+            ax.plot(occupied_acc.values[val], vacant_acc.values[val], 'xk')
+        #ax.annotate(val/10, xy=(occupied_acc.values[val],vacant_acc.values[val]))
+        ax.text(occupied_acc.values[val]-.005,vacant_acc.values[val]-.05, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
+    #ax.annotate("0.0", xy=(occupied_acc[0],vacant_acc[0]), xytext=(0.15,0.8), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')
+    #ax.annotate("0.5", xy=(occupied_acc.values[half],vacant_acc.values[half]), xytext=(0.6,0.6), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')    
+    #ax.annotate("1.0", xy=(occupied_acc.values[-1],vacant_acc.values[-1]), xytext=(0.75,0.2), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.1])
+    ax.legend(loc="best", fontsize="medium")
     ax.set_title("Vacancy Detection Accuracy vs. Occupancy Detection Accuracy for different thresholds", fontsize=18, fontweight="bold")
     ax.set_ylabel("Accuracy of Detecting \"Vacant\": TP/(TP + FN) (%)", fontsize=9)
     ax.set_xlabel("Accuracy of Detecting \"Occupied\": TN/(TN + FP) (%)", fontsize=9)
@@ -196,10 +226,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     plt.close(fig)
     return
 
-def GetOptimalThreshold(metrics_vthresh, thresholds, params):
-    #CR = FPs/(FPs + FNs + TPs + TNs)
-    #MOR = FNs/(FPs + FNs + TPs + TNs)
-
+def GetOptimalValues(metrics_vthresh, thresholds, params):
     opt_tab = pd.DataFrame(index=range(len(thresholds)), columns=["thresholds", "TP", "TN", "FP", "FN", "CR", "MOR", "dist to 0,0"])
     opt_tab["thresholds"] = thresholds
     opt_tab["TP"] = metrics_vthresh["TPs"] 
@@ -223,9 +250,9 @@ def GenerateAnalytics(params):
     outputcsvlocation = "DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv"
     output = pd.read_csv(outputcsvlocation, parse_dates=["fused-proba-dt"])
     metrics_vthresh, thresholds = GenerateMetricsForAllThresholds(output.copy(), params)
-    GenerateAccuracyCurves(metrics_vthresh, thresholds, params)
-    opt_thresh = GetOptimalThreshold(metrics_vthresh, thresholds, params)
-    metrics, confmtx = GenerateConfusionMatrixNMetrics(output.copy(), params, threshold=opt_thresh)
+    optimal_threshold = GetOptimalValues(metrics_vthresh, thresholds, params)
+    GenerateAccuracyCurves(metrics_vthresh, thresholds, params, optimal_threshold)
+    metrics, confmtx = GenerateConfusionMatrixNMetrics(output.copy(), params, threshold=optimal_threshold)
 
     # TODO generate confusion matrix @ optimal threshold for intermediates
     return

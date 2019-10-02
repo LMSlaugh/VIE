@@ -370,9 +370,9 @@ def PlotMain(in_type, start, end, save_suffix, params):
     #PlotInsNMids(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotInsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
-    PlotInsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
-    PlotMidsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    #PlotInsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    #PlotMidsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutNTruth(historicaldata, fusetype, save_suffix, tick_hrs, params)
-    #PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutputDistribution(historicaldata, save_suffix, tick_hrs, params)
     return
