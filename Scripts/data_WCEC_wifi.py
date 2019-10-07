@@ -28,14 +28,7 @@ def UpdateSnapshot(sensor):
     timestamp = timestamp.replace(tzinfo=tz('UTC'))
     timestamp = timestamp.astimezone(tz("US/Pacific"))
     sensor.snapshottimestamp = timestamp
-    if sensor.sensortype == "carbondioxide":
-        d = s1.loc["Value",c[0]]
-        if ( isinstance(d,int) | isinstance(d,float) ):
-            sensor.snapshotvalue = d
-        else:
-            sensor.snapshotvalue = d["Value"]
-    else:
-        sensor.snapshotvalue = s1.loc["Value",c[0]]
+    sensor.snapshotvalue = s1.loc["Value",c[0]]
     return sensor
 
 def GetHistoricalData(sensor, start, end):

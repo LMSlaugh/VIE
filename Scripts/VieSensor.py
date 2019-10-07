@@ -21,7 +21,7 @@ class VieSensor:
         self.sensortype = sensorType
         self.frequency = frequency # frequency of new values being added (data sample rate) in minutes.
         self.units = measurementUnits # units of sensor measurement
-        self.dataaccesstype = dataAccessType # tag for data stream in OSIsoft PI data historian. TODO Change to path for data retrieval file (read from config file)
+        self.dataaccesstype = dataAccessType # tag for data stream in OSIsoft PI data historian.
         self.vacancyrelationship = vacancyRelationship # encoded types, represented by an enumeration (0=percentile, 1=logistic regression...)
         self.trainingdataset = trainingDataSet
         self.histdata = historicalData

@@ -1,4 +1,4 @@
-timestamp,wifi1-val,elec1-val,co21-val,truth-val
+timestamp,wifi-val,elec-val,co2-val,truth-val
 7/2/2019 00:00,3,9098.97,89,1
 7/2/2019 00:05,3,9213.88,94,1
 7/2/2019 00:10,3,9545.79,88,1

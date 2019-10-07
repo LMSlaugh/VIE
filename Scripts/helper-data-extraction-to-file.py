@@ -12,9 +12,9 @@ l, d = client.search_by_point("*AP.*VIRIDIAN2*tot*")
 
 #points = ['AP.STUD-COMM-CTR_Total_Count', 'SCC.AHU.AHU01.RM.1101A.CO2', 'SCC_Electricity_Demand_kBtu']
 points = l
-data = client.get_stream_by_point(points, calculation="recorded", start="2019-07-02 00:00:00", end="2019-08-06 00:00:00")
+data = client.get_stream_by_point(points, calculation="recorded", start="2019-07-02 00:00:00", end="2019-07-06 00:00:00")
 #data = client.get_stream_by_point(points, calculation="end")
 
-data.to_csv("DataFiles\\OACO2_raw.csv", header=True, index=True)
+data.to_csv("DataFiles\\wifi_raw.csv", header=True, index=True)
 
 a = "this is a stopgap"

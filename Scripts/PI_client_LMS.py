@@ -499,8 +499,9 @@ class pi_client(object):
         data: Dataframe
             Pandas dataframe with timestamp index adjusted for local timezone
         '''
-        data.index = data.index.tz_localize(pytz.utc).tz_convert(
-            local_zone)  # accounts for localtime shift
+        #data.index = data.index.tz_localize(pytz.utc).tz_convert(local_zone)  #    old version, changed for python v3.7.4
+        data.index = data.index.tz_convert(local_zone)  # accounts for localtime shift
+
         # Gets rid of extra offset information so can compare with csv data
         data.index = data.index.tz_localize(None)
 

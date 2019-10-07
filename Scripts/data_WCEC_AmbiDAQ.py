@@ -57,8 +57,7 @@ for descol in desired_columns:
      # Group data according to desired timestamp resolution    
      dt = df.groupby(pd.TimeGrouper(freq="2min"))
      header_flag = 1
-     # Capture previous row of data to handle missing values
-     prev_df = pd.DataFrame()
+     prev_df = pd.DataFrame()     # Capture previous row of data to handle missing values
      for time, group in dt:
           new_cols = df.columns
           max_col = pd.Index(["Max_" + descol])

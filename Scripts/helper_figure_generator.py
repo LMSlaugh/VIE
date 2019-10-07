@@ -18,17 +18,17 @@ def PlotIns(data, in_type, sufx, hrtx):
     fig, ax = plt.subplots(figsize=(20,10))
     # plot inputs
     if (in_type=="elec"):
-        ax.plot(data["fused-proba-dt"], data["elec1-val"], "g", label="Elec (W)")
+        ax.plot(data["fused-proba-dt"], data["elec-val"], "g", label="Elec (W)")
     elif (in_type=="wifi"):
-        ax.plot(data["fused-proba-dt"], data["wifi1-val"], "b", label="Wifi (counts)")
+        ax.plot(data["fused-proba-dt"], data["wifi-val"], "b", label="Wifi (counts)")
     elif (in_type=="co2"):
-        ax.plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        ax.plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec1-val-s"] = data["elec1-val"]*0.01
-        ax.plot(data["fused-proba-dt"], data["elec1-val-s"], "g", label="Elec (W*.01)")
-        data["wifi1-val-s"] = data["wifi1-val"]*10
-        ax.plot(data["fused-proba-dt"], data["wifi1-val-s"], "b", label="Wifi (counts*10)")
-        ax.plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        data["elec-val-s"] = data["elec-val"]*0.01
+        ax.plot(data["fused-proba-dt"], data["elec-val-s"], "g", label="Elec (W*.01)")
+        data["wifi-val-s"] = data["wifi-val"]*10
+        ax.plot(data["fused-proba-dt"], data["wifi-val-s"], "b", label="Wifi (counts*10)")
+        ax.plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     ax.legend(loc='best', fontsize=legs)
     ax.set_ylabel("Sensor Value", fontsize=labs)
     ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
@@ -46,17 +46,17 @@ def PlotInsNMids(data, in_type, sufx, hrtx, params):
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
     # plot inputs
     if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec1-val"], "g", label="Elec (W)")
+        ax[0].plot(data["fused-proba-dt"], data["elec-val"], "g", label="Elec (W)")
     elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-val"], "b", label="Wifi (counts)")
+        ax[0].plot(data["fused-proba-dt"], data["wifi-val"], "b", label="Wifi (counts)")
     elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec1-val-s"] = data["elec1-val"]*0.01
-        ax[0].plot(data["fused-proba-dt"], data["elec1-val-s"], "g", label="Elec (W*.01)")
-        data["wifi1-val-s"] = data["wifi1-val"]*10
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-val-s"], "b", label="Wifi (counts*10)")
-        ax[0].plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        data["elec-val-s"] = data["elec-val"]*0.01
+        ax[0].plot(data["fused-proba-dt"], data["elec-val-s"], "g", label="Elec (W*.01)")
+        data["wifi-val-s"] = data["wifi-val"]*10
+        ax[0].plot(data["fused-proba-dt"], data["wifi-val-s"], "b", label="Wifi (counts*10)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     ax[0].legend(loc='best', fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -67,15 +67,15 @@ def PlotInsNMids(data, in_type, sufx, hrtx, params):
     ax[0].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     # plot intermediates
     if (in_type=="elec"):
-        ax[1].plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (W)")
+        ax[1].plot(data["fused-proba-dt"], data["elec-proba"], "g", label="Elec (W)")
     elif (in_type=="wifi"):
-        ax[1].plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (counts)")
+        ax[1].plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (counts)")
     elif (in_type=="co2"):
-        ax[1].plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (ppm)")
+        ax[1].plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        ax[1].plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (%)")
-        ax[1].plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (%)")
-        ax[1].plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
+        ax[1].plot(data["fused-proba-dt"], data["elec-proba"], "g", label="Elec (%)")
+        ax[1].plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (%)")
+        ax[1].plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (%)")
     ax[1].set_ylim([0,1.2])
     ax[1].legend(loc='best', fontsize=legs)
     ax[1].set_title("Intermediate Probability of Vacancy")
@@ -95,15 +95,15 @@ def PlotMidsNOut(data, in_type, sufx, hrtx, params):
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
     # plot intermediates
     if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (%)")
+        ax[0].plot(data["fused-proba-dt"], data["elec-proba"], "g", label="Elec (%)")
     elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (%)")
+        ax[0].plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (%)")
     elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (%)")
     elif (in_type=="comp"):
-        ax[0].plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (%)")
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (%)")
-        ax[0].plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
+        ax[0].plot(data["fused-proba-dt"], data["elec-proba"], "g", label="Elec (%)")
+        ax[0].plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (%)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (%)")
     plt.ylim([0,1.2])
     ax[0].legend(loc='best', fontsize=legs)
     ax[0].set_title("Intermediate Probability of Vacancy: " + in_type)
@@ -134,17 +134,17 @@ def PlotInsNOut(data, in_type, sufx, hrtx, params):
     # plot inputs
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
     if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec1-val"], "g", label="Elec (W)")
+        ax[0].plot(data["fused-proba-dt"], data["elec-val"], "g", label="Elec (W)")
     elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-val"], "b", label="Wifi (counts)")
+        ax[0].plot(data["fused-proba-dt"], data["wifi-val"], "b", label="Wifi (counts)")
     elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec1-val-s"] = data["elec1-val"]*0.01
-        ax[0].plot(data["fused-proba-dt"], data["elec1-val-s"], "g", label="Elec (W*.01)")
-        data["wifi1-val-s"] = data["wifi1-val"]*10
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-val-s"], "b", label="Wifi (counts*10)")
-        ax[0].plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        data["elec-val-s"] = data["elec-val"]*0.01
+        ax[0].plot(data["fused-proba-dt"], data["elec-val-s"], "g", label="Elec (W*.01)")
+        data["wifi-val-s"] = data["wifi-val"]*10
+        ax[0].plot(data["fused-proba-dt"], data["wifi-val-s"], "b", label="Wifi (counts*10)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     ax[0].legend(loc='best', fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -174,17 +174,17 @@ def PlotInsNTruth(data, in_type, sufx, hrtx, params):
     # plot inputs
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
     if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec1-val"], "g", label="Elec (W)")
+        ax[0].plot(data["fused-proba-dt"], data["elec-val"], "g", label="Elec (W)")
     elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-val"], "b", label="Wifi (counts)")
+        ax[0].plot(data["fused-proba-dt"], data["wifi-val"], "b", label="Wifi (counts)")
     elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec1-val-s"] = data["elec1-val"]*0.01
-        ax[0].plot(data["fused-proba-dt"], data["elec1-val-s"], "g", label="Elec (W*.01)")
-        data["wifi1-val-s"] = data["wifi1-val"]*10
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-val-s"], "b", label="Wifi (counts*10)")
-        ax[0].plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        data["elec-val-s"] = data["elec-val"]*0.01
+        ax[0].plot(data["fused-proba-dt"], data["elec-val-s"], "g", label="Elec (W*.01)")
+        data["wifi-val-s"] = data["wifi-val"]*10
+        ax[0].plot(data["fused-proba-dt"], data["wifi-val-s"], "b", label="Wifi (counts*10)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     ax[0].legend(loc='best', fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -213,15 +213,15 @@ def PlotMidsNTruth(data, in_type, sufx, hrtx, params):
     fig, ax = plt.subplots(figsize=(20,10))
     # plot intermediates
     if (in_type=="elec"):
-        ax.plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (%)")
+        ax.plot(data["fused-proba-dt"], data["elec-proba"], "g", label="Elec (%)")
     elif (in_type=="wifi"):
-        ax.plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (%)")
+        ax.plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (%)")
     elif (in_type=="co2"):
-        ax.plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
+        ax.plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (%)")
     elif (in_type=="comp"):
-        ax.plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (%)")
-        ax.plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (%)")
-        ax.plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
+        ax.plot(data["fused-proba-dt"], data["elec-proba"], "g", label="Elec (%)")
+        ax.plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (%)")
+        ax.plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (%)")
     # plot ground truth
     ax.plot(data["fused-proba-dt"], data["truth-val"], label="Truth: 1=vac, 0=occ ")
     ax.set_ylim([0,1.2])
@@ -262,17 +262,17 @@ def PlotInsNMidsNOutNTruth(data, in_type, sufx, hrtx, params):
     fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(20,10))
     # plot inputs
     if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec1-val"], "g", label="Elec (W)")
+        ax[0].plot(data["fused-proba-dt"], data["elec-val"], "g", label="Elec (W)")
     elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-val"], "b", label="Wifi (counts)")
+        ax[0].plot(data["fused-proba-dt"], data["wifi-val"], "b", label="Wifi (counts)")
     elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec1-val-s"] = data["elec1-val"]*0.01
-        ax[0].plot(data["fused-proba-dt"], data["elec1-val-s"], "g", label="Elec (W*.01)")
-        data["wifi1-val-s"] = data["wifi1-val"]*10
-        ax[0].plot(data["fused-proba-dt"], data["wifi1-val-s"], "b", label="Wifi (counts*10)")
-        ax[0].plot(data["fused-proba-dt"], data["co21-val"], "r", label="CO2 (ppm)")
+        data["elec-val-s"] = data["elec-val"]*0.01
+        ax[0].plot(data["fused-proba-dt"], data["elec-val-s"], "g", label="Elec (W*.01)")
+        data["wifi-val-s"] = data["wifi-val"]*10
+        ax[0].plot(data["fused-proba-dt"], data["wifi-val-s"], "b", label="Wifi (counts*10)")
+        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", label="CO2 (ppm)")
     ax[0].legend(loc='best', fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -283,15 +283,15 @@ def PlotInsNMidsNOutNTruth(data, in_type, sufx, hrtx, params):
     ax[0].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     # plot intermediates
     if (in_type=="elec"):
-        ax[1].plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (%)")
+        ax[1].plot(data["fused-proba-dt"], data["elec-proba"], "g", label="Elec (%)")
     elif (in_type=="wifi"):
-        ax[1].plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (%)")
+        ax[1].plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (%)")
     elif (in_type=="co2"):
-        ax[1].plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
+        ax[1].plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (%)")
     elif (in_type=="comp"):
-        ax[1].plot(data["fused-proba-dt"], data["elec1-proba"], "g", label="Elec (%)")
-        ax[1].plot(data["fused-proba-dt"], data["wifi1-proba"], "b", label="Wifi (%)")
-        ax[1].plot(data["fused-proba-dt"], data["co21-proba"], "r", label="CO2 (%)")
+        ax[1].plot(data["fused-proba-dt"], data["elec-proba"], "g", label="Elec (%)")
+        ax[1].plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (%)")
+        ax[1].plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (%)")
     
     ax[1].set_ylim([0,1.2])
     ax[1].legend(loc='best', fontsize=legs)
