@@ -42,8 +42,7 @@ def StdDevWeightedRMS(sensors):
         i = i + 1
     numer = sum(topterms)
     denom = sum(weights)
-    n = len(topterms)
-    overallproba =  ( numer/(n*denom) )**0.5
+    overallproba =  ( numer/(denom) )**0.5
     return overallproba
 
 def CreateVirtualSensors(params):

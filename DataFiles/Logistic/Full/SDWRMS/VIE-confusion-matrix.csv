@@ -3,7 +3,7 @@ predicted:Vacant(1),3509,382
 predicted:Occupied(0),108,2046
 -,,
 True Vacancy Ratio,59.8%,
-Optimum Cutoff,30.2%,
+Optimum Cutoff,52.300000000000004%,
 Accuracy: Overall,91.9%,
 Accuracy: Vacant,97.0%,
 Accuracy: Occupied,84.3%,
