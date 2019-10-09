@@ -13,8 +13,7 @@ server =  SSHTunnelForwarder(
 server.start()
 
 #SQL Engine and connection string
-engine = sa.create_engine('mysql+pymysql://enerkkwg_remote:westerncooling@127.0.0.1:%s/enerkkwg_data'
-                       % server.local_bind_port,echo=True)
+engine = sa.create_engine('mysql+pymysql://enerkkwg_remote:westerncooling@127.0.0.1:%s/enerkkwg_data'% server.local_bind_port,echo=True)
 
 
 print('Connecting...')
@@ -27,13 +26,13 @@ table = meta.tables['DAQs']
 
 #daqnums = [1,2,3]
 daqnums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
-desired_columns = ["CO2"] # Options are: "CO2", "RH", "T", "PIR"
+desired_columns = ["PIR"] # Options are: "CO2", "RH", "T", "PIR"
 for descol in desired_columns:
      i = 1
      # Getdata from MySQL server for all AmbiDAQ units
      for daqnum in daqnums:
           # Note that UTC Timestamp is time-shifted 3 hours ahead, so must subract 3 hours from final result to get into CA time
-          select_statement=sa.text("SELECT `UTC Timestamp`,`" + descol + "` FROM `DAQs` WHERE (`UTC Timestamp` BETWEEN '2019-07-02 03:00:00' AND '2019-08-06 03:00:00') AND (`DAQ Name` LIKE 'A%Q" + str(daqnum) + "')")
+          select_statement=sa.text("SELECT `UTC Timestamp`,`" + descol + "` FROM `DAQs` WHERE (`UTC Timestamp` BETWEEN '2019-07-16 03:00:00' AND '2019-07-18 03:00:00') AND (`DAQ Name` LIKE 'A%Q" + str(daqnum) + "')")
           res = conn.execute(select_statement)
           if (i==1):
                df = pd.DataFrame(res.fetchall())
@@ -55,7 +54,7 @@ for descol in desired_columns:
                df = pd.concat([df,df_temp], join="outer")
                i = i + 1
      # Group data according to desired timestamp resolution    
-     dt = df.groupby(pd.TimeGrouper(freq="2min"))
+     dt = df.groupby(pd.TimeGrouper(freq="1min"))
      header_flag = 1
      prev_df = pd.DataFrame()     # Capture previous row of data to handle missing values
      for time, group in dt:

@@ -114,7 +114,7 @@ def PlotMidsNOut(data, in_type, sufx, hrtx, params):
     ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     # plot fusion result
-    ax[1].plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], label="Fused: " + params.fusetype + " (%)")
+    ax[1].plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], "o", label="Fused: " + params.fusetype + " (%)")
     ax[1].set_ylim([0,1.2])
     ax[1].legend(loc='best', fontsize=legs)
     ax[1].set_title("Fused Probability of Vacancy")
@@ -154,7 +154,7 @@ def PlotInsNOut(data, in_type, sufx, hrtx, params):
     ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
     # plot fusion result
-    ax[1].plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], label="Fused: " + params.fusetype + " (%)")
+    ax[1].plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], "o", label="Fused: " + params.fusetype + " (%)")
     ax[1].set_ylim([0,1.2])
     ax[1].legend(loc='best', fontsize=legs)
     ax[1].set_title("Fused Probability of Vacancy")
@@ -223,7 +223,7 @@ def PlotMidsNTruth(data, in_type, sufx, hrtx, params):
         ax.plot(data["fused-proba-dt"], data["wifi-proba"], "b", label="Wifi (%)")
         ax.plot(data["fused-proba-dt"], data["co2-proba"], "r", label="CO2 (%)")
     # plot ground truth
-    ax.plot(data["fused-proba-dt"], data["truth-val"], label="Truth: 1=vac, 0=occ ")
+    ax.plot(data["fused-proba-dt"], data["truth-val"], "k", label="Truth: 1=vac, 0=occ ")
     ax.set_ylim([0,1.2])
     ax.legend(loc='best', fontsize=legs)
     ax.set_title("Intermediate Probability of Vacancy vs. Ground Truth")
@@ -241,9 +241,9 @@ def PlotMidsNTruth(data, in_type, sufx, hrtx, params):
 def PlotOutNTruth(data, sufx, hrtx, params):
     fig, ax = plt.subplots(figsize=(20,10))
     # plot fusion result
-    ax.plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], label="Fused: " + params.fusetype + " (%)")
+    ax.plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], "o", label="Fused: " + params.fusetype + " (%)")
     # plot ground truth
-    ax.plot(data["fused-proba-dt"], data["truth-val"], label="Truth: 1=vac, 0=occ ")
+    ax.plot(data["fused-proba-dt"], data["truth-val"], "k", label="Truth: 1=vac, 0=occ ")
     ax.set_ylim([0,1.2])
     ax.legend(loc='best', fontsize=legs)
     ax.set_title("Fused Probability of Vacancy vs. Ground Truth")
@@ -305,7 +305,7 @@ def PlotInsNMidsNOutNTruth(data, in_type, sufx, hrtx, params):
     # plot fusion result
     ax[2].plot(data["fused-proba-dt"], data["fused-proba-" + params.fusetype], label="Fused: " + params.fusetype + " (%)")
     # Plot ground truth
-    ax[2].plot(data["fused-proba-dt"], data["truth-val"], label="Truth: 1=vac, 0=occ ")
+    ax[2].plot(data["fused-proba-dt"], data["truth-val"], "k", label="Truth: 1=vac, 0=occ ")
     ax[2].set_ylim([0,1.2])
     ax[2].legend(loc='best', fontsize=legs)
     ax[2].set_title("Fused Probability of Vacancy vs. Ground Truth")
@@ -327,7 +327,7 @@ def PlotSigmoids(sensor, sensorvals, probas, sigvals):
     ax.plot(sensorvals, sigvals, label="Generated")
     ax.legend(loc='best', fontsize=legs)
     ax.set_ylim([0,1.2])
-    ax.set_xlim([0,max(sensorvals)])
+    ax.set_xlim([min(sensorvals),max(sensorvals)])
     ax.xaxis.set_major_locator(plt.MaxNLocator(20))
     ax.xaxis.set_tick_params(labelsize=labs)
     ax.yaxis.set_tick_params(labelsize=labs)
@@ -357,15 +357,52 @@ def PlotExpit(sensor, x, y, train_data):
     plt.close(fig)
     return
 
+def PlotInsNIns(data, sufx):
+    # plot elec vs wifi
+    fig, ax = plt.subplots(figsize=(20,10))
+    ax.plot(data["wifi-val"], data["elec-val"], ".")
+    ax.set_ylabel("Electricity Demand (W)", fontsize=labs)
+    ax.set_xlabel("WiFi Connection Count", fontsize=labs)
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
+    fig.suptitle("Independence Test: WiFi Connection Count vs. Electricity Demand", fontsize=18, fontweight="bold")
+    fig.savefig("Figures\\Indep-Test_wifi_elec_" + sufx + ".png", format='png', bbox_inches='tight')
+    plt.close(fig)
+
+    # plot elec vs co2
+    fig, ax = plt.subplots(figsize=(20,10))
+    ax.plot(data["co2-val"], data["elec-val"], ".")
+    ax.set_ylabel("Electricity Demand (W)", fontsize=labs)
+    ax.set_xlabel("Carbon Dioxide Concentration (ppm)", fontsize=labs)
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
+    fig.suptitle("Independence Test: Carbon Dioxide Concentration vs. Electricity Demand", fontsize=18, fontweight="bold")
+    fig.savefig("Figures\\Indep-Test_co2_elec_" + sufx + ".png", format='png', bbox_inches='tight')
+    plt.close(fig)
+
+    # plot wifi vs co2
+    fig, ax = plt.subplots(figsize=(20,10))
+    ax.plot(data["wifi-val"], data["co2-val"], ".")
+    ax.set_ylabel("Carbon Dioxide Concentration (ppm)", fontsize=labs)
+    ax.set_xlabel("WiFi Connection Count", fontsize=labs)
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
+    fig.suptitle("Independence Test: WiFi Connection Count vs. Carbon Dioxide Concentration", fontsize=18, fontweight="bold")
+    fig.savefig("Figures\\Indep-Test_wifi_co2_" + sufx + ".png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
 #def PlotOutDistribution(data, fusetype, sufx, tick_hrs, build_type, train_set):
     #return
 
 def PlotMain(in_type, start, end, save_suffix, params):
     tick_hrs = [0]
-    
-    historicaldata = pd.read_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv", parse_dates=["fused-proba-dt"])
-    historicaldata.index = historicaldata["fused-proba-dt"]
-    historicaldata = historicaldata.loc[start:end,:]
+    #historicaldata = pd.read_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv", parse_dates=["fused-proba-dt"])
+    #historicaldata.index = historicaldata["fused-proba-dt"]
+    #historicaldata = historicaldata.loc[start:end,:]
     #PlotIns(historicaldata, in_type, save_suffix, tick_hrs)
     #PlotInsNMids(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
@@ -373,6 +410,28 @@ def PlotMain(in_type, start, end, save_suffix, params):
     #PlotInsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutNTruth(historicaldata, fusetype, save_suffix, tick_hrs, params)
-    PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    #PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutputDistribution(historicaldata, save_suffix, tick_hrs, params)
     return
+
+def IndependenceTest():
+    trainingdata_e = pd.read_csv("DataFiles\\Logistic\\Cherry\\Training_Data_elec.csv", parse_dates=["timestamp"])
+    trainingdata_e.index = trainingdata_e["timestamp"]
+    trainingdata_c = pd.read_csv("DataFiles\\Logistic\\Cherry\\Training_Data_co2.csv", parse_dates=["timestamp"])
+    trainingdata_c.index = trainingdata_c["timestamp"]
+    trainingdata_w = pd.read_csv("DataFiles\\Logistic\\Cherry\\Training_Data_wifi.csv", parse_dates=["timestamp"])
+    trainingdata_w.index = trainingdata_w["timestamp"]
+    trainingdata = pd.concat([trainingdata_e["elec-val"],trainingdata_c["co2-val"],trainingdata_w["wifi-val"]], axis=1, join="inner", sort=True)
+    PlotInsNIns(trainingdata,"Cherry")
+
+    trainingdata_e = pd.read_csv("DataFiles\\Logistic\\Full\\Training_Data_elec.csv", parse_dates=["timestamp"])
+    trainingdata_e.index = trainingdata_e["timestamp"]
+    trainingdata_c = pd.read_csv("DataFiles\\Logistic\\Full\\Training_Data_co2.csv", parse_dates=["timestamp"])
+    trainingdata_c.index = trainingdata_c["timestamp"]
+    trainingdata_w = pd.read_csv("DataFiles\\Logistic\\Full\\Training_Data_wifi.csv", parse_dates=["timestamp"])
+    trainingdata_w.index = trainingdata_w["timestamp"]
+    trainingdata = pd.concat([trainingdata_e["elec-val"],trainingdata_c["co2-val"],trainingdata_w["wifi-val"]], axis=1, join="inner", sort=True)
+    PlotInsNIns(trainingdata,"Full")
+    return
+
+#IndependenceTest()

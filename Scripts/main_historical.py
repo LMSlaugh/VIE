@@ -32,10 +32,24 @@ def StdDevWeightedAverage(sensors):
     overallproba = numer/denom
     return overallproba
 
+def StdDevWeightedRMS(sensors):
+    topterms = []
+    weights = []
+    i = 0
+    for k, v in sensors.items():
+        topterms.append(v.snapshotvacancyprobability**2/v.std)
+        weights.append(1/v.std)
+        i = i + 1
+    numer = sum(topterms)
+    denom = sum(weights)
+    n = len(topterms)
+    overallproba =  ( numer/(n*denom) )**0.5
+    return overallproba
+
 def CreateVirtualSensors(params):
-    new = ""
-    if params.buildflag:
-        new = "_new"
+    new = "_new"
+    if not(params.buildflag):
+        new = ""
 
     path = "ConfigFiles\\VIE-sensor-metadatabase_" + params.buildtype + "_" + params.traintype + new + ".csv"
     metadata = pd.read_csv(path)
@@ -90,6 +104,8 @@ def FuseVacancyProbabilities(sensors, fusetype="rms"):
         overallproba = np.prod(probabilities)
     elif fusetype=="SDWA":
         overallproba = StdDevWeightedAverage(sensors)
+    elif fusetype=="SDWRMS":
+        overallproba = StdDevWeightedRMS(sensors)
     else: # Default to "mult" - multiplying together the probabilities
         overallproba = np.prod(probabilities)
     return overallproba
@@ -149,8 +165,8 @@ def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, 
     params = mp.ModelParameters(build_flag, train_start, train_end, test_start, test_end, train_type, build_type, fuse_type)
     sensors = CreateVirtualSensors(params)
     traindata, testdata = GetTrainTestData(params)
-    for k,v in sensors.items():
-       pa.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
+    #for k,v in sensors.items():
+       #pa.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
     GenerateOutput(testdata, sensors, params)
     ra.GenerateAnalytics(params)
     GeneratePlots(params)
@@ -159,15 +175,20 @@ def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Function Definitions
 # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv.....Main Program 
 # for reference: Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end)
-#Main(False, "Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Logistic", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-Main(False, "Percentile", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-Main(False, "Percentile", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(True, "Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(True, "Logistic", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(True, "Percentile", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(True, "Percentile", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-#Main(False, "Logistic", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Logistic", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-Main(False, "Percentile", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-Main(False, "Percentile", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(True, "Logistic", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(True, "Logistic", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(True, "Percentile", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(True, "Percentile", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+
+Main(False, "Logistic", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
 thisisastopgap = "stopgap"
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Main Program
