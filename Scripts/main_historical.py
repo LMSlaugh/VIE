@@ -47,7 +47,7 @@ def StdDevWeightedRMS(sensors):
 
 def CreateVirtualSensors(params):
     new = "_new"
-    if not(params.buildflag):
+    if params.buildflag:
         new = ""
 
     path = "ConfigFiles\\VIE-sensor-metadatabase_" + params.buildtype + "_" + params.traintype + new + ".csv"
@@ -83,7 +83,7 @@ def CreateVirtualSensors(params):
     metadata_new.to_csv("ConfigFiles\\VIE-sensor-metadatabase_" + params.buildtype + "_" + params.traintype + "_new.csv", header=True, index=False)
     return sensors
 
-def FuseVacancyProbabilities(sensors, fusetype="rms"):
+def FuseVacancyProbabilities(sensors, fusetype="RMS"):
     # Capture individual vacancy probability predictions into a list
     probabilities = []
     for k,v in sensors.items():
@@ -109,7 +109,7 @@ def FuseVacancyProbabilities(sensors, fusetype="rms"):
         overallproba = np.prod(probabilities)
     return overallproba
 
-def FuseVacancyTimestamps(timestamps, fusetype="rms"):
+def FuseVacancyTimestamps(timestamps, fusetype="RMS"):
     overalldt = max(timestamps)
     return overalldt
 
@@ -162,32 +162,40 @@ def GeneratePlots(params):
 
 def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end):
     params = mp.ModelParameters(build_flag, train_start, train_end, test_start, test_end, train_type, build_type, fuse_type)
-    sensors = CreateVirtualSensors(params)
-    traindata, testdata = GetTrainTestData(params)
+    #sensors = CreateVirtualSensors(params)
+    #traindata, testdata = GetTrainTestData(params)
     #for k,v in sensors.items():
        #pa.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
-    GenerateOutput(testdata, sensors, params)
-    ra.GenerateAnalytics(params)
+    #GenerateOutput(testdata, sensors, params)
+    #ra.GenerateAnalytics(params)
     GeneratePlots(params)
     return
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Function Definitions
 # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv.....Main Program 
 # for reference: Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end)
-#Main(True, "Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(True, "Logistic", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(True, "Percentile", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(True, "Percentile", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-#Main(True, "Logistic", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(True, "Logistic", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(True, "Percentile", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(True, "Percentile", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Full", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Cherry", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Full", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Cherry", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-Main(False, "Logistic", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-Main(False, "Logistic", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-Main(False, "Percentile", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-Main(False, "Percentile", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+
+#Main(False, "Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Logistic", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Percentile", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Percentile", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+
+#Main(False, "Logistic", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Logistic", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Percentile", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Percentile", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+
+#Main(False, "Logistic", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Logistic", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Percentile", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main(False, "Percentile", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+
 
 thisisastopgap = "stopgap"
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Main Program

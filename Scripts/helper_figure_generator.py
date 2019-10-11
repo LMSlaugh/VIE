@@ -400,9 +400,9 @@ def PlotInsNIns(data, sufx):
 
 def PlotMain(in_type, start, end, save_suffix, params):
     tick_hrs = [0]
-    #historicaldata = pd.read_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv", parse_dates=["fused-proba-dt"])
-    #historicaldata.index = historicaldata["fused-proba-dt"]
-    #historicaldata = historicaldata.loc[start:end,:]
+    historicaldata = pd.read_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv", parse_dates=["fused-proba-dt"])
+    historicaldata.index = historicaldata["fused-proba-dt"]
+    historicaldata = historicaldata.loc[start:end,:]
     #PlotIns(historicaldata, in_type, save_suffix, tick_hrs)
     #PlotInsNMids(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
@@ -410,7 +410,7 @@ def PlotMain(in_type, start, end, save_suffix, params):
     #PlotInsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutNTruth(historicaldata, fusetype, save_suffix, tick_hrs, params)
-    #PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutputDistribution(historicaldata, save_suffix, tick_hrs, params)
     return
 
