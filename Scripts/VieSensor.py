@@ -43,7 +43,7 @@ class VieSensor:
         self.snapshotvacancyprobability = -1 # probability of vacancy corresponding to this sensor's snapshot value
         self.trainstart = trainStart
         self.trainend = trainEnd
-        if ( math.isnan(self.vrparam1) | math.isnan(self.vrparam2) | math.isnan(self.vrparam3) | math.isnan(self.vrparam4)):
+        if ( math.isnan(self.vrparam1) | math.isnan(self.vrparam2) | math.isnan(self.std)):
             self.BuildVacancyRelationship()
         else:
             pass

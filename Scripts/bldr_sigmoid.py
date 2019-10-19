@@ -12,6 +12,53 @@ import helper_figure_generator as figen
 def Sigmoid(x, p1, p2):
     return 1-1/(1+np.exp((p1-x)/p2))
 
+def GetCumulativeDist(sensor, data):
+    import scipy.optimize as opt
+    cumsum = 0
+    rawprobas = []
+
+    # Remove any outliers
+    data = pd.DataFrame(data)
+    stats_pre = data.describe()
+    std_pre = stats_pre.loc["std",0]
+    mean_pre = stats_pre.loc["mean",0]
+    sensorvals = data[data.values < ( mean_pre + 6 * std_pre )]
+    sensorvals = sensorvals[sensorvals.values > ( mean_pre - 6 * std_pre )]
+
+    # Normalize (place values between zero and one)
+    sensorvals_normed = ( sensorvals - min(sensorvals) ) / ( max(sensorvals) - min(sensorvals) )
+    summation = sum(sensorvals_normed)
+    
+    sensorvals = sensorvals.sort_values(ascending=True)
+    sensorvals_normed = sensorvals_normed.sort_values(ascending=True)
+    for datum in sensorvals_normed:
+        cumsum = cumsum + datum
+        rawprobas.append(1-cumsum/summation) # dividing by the sum makes area under the curve equal to 1
+    rawprobas = pd.Series(rawprobas)
+    stats_v = sensorvals_normed.describe()
+    mean = stats_v["mean"] # Starting value for parameter 1
+    std = stats_v["std"] # starting value for parameter 2
+    popt, pcov = opt.curve_fit(Sigmoid, sensorvals, rawprobas, p0=[mean_pre, std_pre])
+
+    fitprobas = Sigmoid(sensorvals, popt[0], popt[1])
+
+    fig, ax = plt.subplots(figsize=(10,5))
+    ax.plot(sensorvals, rawprobas, label="Raw")
+    ax.plot(sensorvals, fitprobas, label="Generated")
+    ax.legend(loc="upper right", fontsize=legs)
+    ax.set_ylim([0,1.2])
+    ax.set_xlim([min(sensorvals),max(sensorvals)])
+    ax.xaxis.set_major_locator(plt.MaxNLocator(20))
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
+    ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
+    ax.set_xlabel("Raw Sensor Value", fontsize=labs)
+    ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    fig.savefig("Figures\\sigmoid-comparison_full_" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+    plt.close(fig)
+    return
+
 def BuildVacancyRelationship(sensor):
     GetHistData(sensor)
     if sensor.vacancyrelationship=="Percentile": # sigmoid
@@ -76,6 +123,8 @@ def BuildVacancyRelationship(sensor):
         labels = data_train.loc[:,"truth-val"].ravel() # shape: (n, )
         clf = linear_model.LogisticRegression(C=1e5, solver='lbfgs')
         clf.fit(feature, labels)
+
+        GetCumulativeDist(sensor, feature)
 
         x_plot = np.linspace(min(feature), max(feature), 300)
         sensor.vrparam1 = clf.coef_[0][0]

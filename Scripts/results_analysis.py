@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def GenerateConfusionMatrixNMetrics(data, params, threshold):
+def GenerateConfusionMatrixNMetrics(data, params, threshold, sufx):
     datacop = data.copy()
-    ind = ["predicted:Vacant(1)","predicted:Occupied(0)","-","True Vacancy Ratio","Optimum Cutoff","Accuracy: Overall","Accuracy: Vacant","Accuracy: Occupied","Complaint Rate","Missed Opportunity Rate"]
+    ind = ["predicted:Vacant(1)","predicted:Occupied(0)","-","True Vacancy Ratio","Optimum Cutoff","Accuracy: Overall","Accuracy: Vacant","Accuracy: Occupied","Complaint Opportunity Rate","Missed Opportunity Rate"]
     col = ["truth:Vacant(1)","truth:Occupied(0)"]
     confmtx = pd.DataFrame(index=ind,columns=col)
     ## Should we instead define 1 as non-vacant, since that is what we are actually testing for? Because it is easier to show occupied than it is to show vacant.
@@ -58,7 +58,7 @@ def GenerateConfusionMatrixNMetrics(data, params, threshold):
     confmtx.iloc[7,0] = str(round(oacc,3)*100) + "%"
     confmtx.iloc[8,0] = str(round(comp_rate,3)*100) + "%"
     confmtx.iloc[9,0] = str(round(miss_opp_rate,3)*100) + "%"
-    confmtx.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-confusion-matrix.csv")
+    confmtx.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-confusion-matrix" + sufx + ".csv")
 
     return metrics, confmtx
     
@@ -91,7 +91,7 @@ def GenerateMetricsForAllThresholds(data, params):
     thresholds = thresholds/1000
     i = 0
     for threshold in thresholds:
-        met_arr_tmp, cm = GenerateConfusionMatrixNMetrics(data, params, threshold)
+        met_arr_tmp, cm = GenerateConfusionMatrixNMetrics(data, params, threshold, "")
         metrics_vthresh.loc[i,"TPs"] = met_arr_tmp.loc[0,"TPs"]
         metrics_vthresh.loc[i,"FPs"] = met_arr_tmp.loc[0,"FPs"]
         metrics_vthresh.loc[i,"FNs"] = met_arr_tmp.loc[0,"FNs"]
@@ -99,8 +99,8 @@ def GenerateMetricsForAllThresholds(data, params):
         i = i + 1
     return metrics_vthresh, thresholds
 
-def GenerateAccuracyCurves(metrics_vthresh, thresh, params, opt_thresh):
-    # for different thresholds from 0 -> 1....
+def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
+    # for Different Thresholds from 0 -> 1....
     TPs = metrics_vthresh["TPs"] 
     TNs = metrics_vthresh["TNs"] 
     FPs = metrics_vthresh["FPs"] 
@@ -112,17 +112,24 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params, opt_thresh):
     # get False Negative Rate
     #FNRs = FNs/(TPs + FNs)
 
-    # Get complaint rate and plot against thresholds
-    CR = FPs/(FPs + FNs + TPs + TNs)
+    # Get complaint opportunity rate and plot against thresholds
+    COR = FPs/(FPs + FNs + TPs + TNs)
     fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(thresh, CR)
+    ax.plot(thresh, COR)
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.0])
-    ax.set_title("Complaint Rate for different thresholds", fontsize=18, fontweight="bold")
+    #start, end = ax.get_xlim()
+    #ax.xaxis.set_ticks(np.arange(start, end, 0.05))
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("COR by threshold", fontsize=18, fontweight="bold")
     #ax.set_ylabel("True Positive Rate: TP/(TP + FN)", fontsize=9)
-    ax.set_ylabel("Complaint Rate: FP/(TP + TN + FN + FP) (%)", fontsize=9)
+    ax.set_ylabel("Complaint Opportunity Rate: FP/(TP + TN + FN + FP) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Complaint-Rate.png", format="png", bbox_inches="tight")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
     # Get missed opportunity rate and plot against thresholds
@@ -131,36 +138,88 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params, opt_thresh):
     ax.plot(thresh, MOR)
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.0])
-    ax.set_title("Missed Opportunity Rate for different thresholds", fontsize=18, fontweight="bold")
+    #start, end = ax.get_xlim()
+    #ax.xaxis.set_ticks(np.arange(start, end, 0.05))
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("MOR by threshold", fontsize=18, fontweight="bold")
     ax.set_ylabel("Missed Opportunity Rate: FN/(TP + TN + FN + FP) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Missed-Opportunity-Rate.png", format="png", bbox_inches="tight")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\MOR.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
-    # Plot missed opportunity rate and complaint rate against eachother
+    # Get missed opportunity fraction and plot against thresholds
+    MOF = FNs/(FNs + TPs)
     fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(MOR, CR)
+    ax.plot(thresh, MOF)
+    #ax.set_ylim([0,1.1])
+    #ax.set_xlim([0,1.0])
+    #start, end = ax.get_xlim()
+    #ax.xaxis.set_ticks(np.arange(start, end, 0.05))
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("MOF by threshold", fontsize=18, fontweight="bold")
+    ax.set_ylabel("Missed Opportunity Fraction: FN/(TP + FN) (%)", fontsize=9)
+    ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\MOF.png", format="png", bbox_inches="tight")
+    plt.close(fig)
+
+    # Plot missed opportunity rate and complaint opportunity rate against eachother
+    fig, ax = plt.subplots(figsize=(10,5))
+    ax.plot(MOR, COR)
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.1])
     n = round(len(thresh)-1, 0)
     step = int(round(n/10, 0))
-    #half = int(round(n/2, 0))
     callout_locs = range(0,n+1,step)
     for val in callout_locs:
         if val==0:
-            ax.plot(MOR.values[val], CR.values[val], 'xk', label="Decision Thresholds")
+            ax.plot(MOR.values[val], COR.values[val], 'xk', label="Decision Thresholds")
         else:
-            ax.plot(MOR.values[val], CR.values[val], 'xk')
-        #ax.annotate(round(val/10) + "%", xy=(MOR.values[val],CR.values[val]), textcoords="data", xytext=(10,10))
-        ax.text(MOR.values[val]+.03,CR.values[val]+.004, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
-    #ax.annotate("0.0", xy=(MOR[0],CR[0]), xytext=(0.2,0.85), textcoords="axes fraction", arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')
-    #ax.annotate("0.5", xy=(MOR.values[half],CR.values[half]), xytext=(0.1,0.1), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')    
-    #ax.annotate("1.0", xy=(MOR.values[-1],CR.values[-1]), xytext=(0.8,0.25), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')
-    ax.legend(loc="best", fontsize="medium")
-    ax.set_title("Missed Opportunity Rate vs. Complaint Rate for different thresholds", fontsize=18, fontweight="bold")
+            ax.plot(MOR.values[val], COR.values[val], 'xk')
+        ax.text(MOR.values[val]+.03,COR.values[val]+.004, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
+    ax.legend(loc="upper right", fontsize="medium")
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("MOR vs. COR by threshold", fontsize=18, fontweight="bold")
     ax.set_xlabel("Missed Opportunity Rate: FN/(TP + TN + FN + FP) (%)", fontsize=9)
-    ax.set_ylabel("Complaint Rate: FP/(TP + TN + FN + FP) (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Complaint-Missed-Opp-Rate-Comp.png", format="png", bbox_inches="tight")
+    ax.set_ylabel("Complaint Opportunity Rate: FP/(TP + TN + FN + FP) (%)", fontsize=9)
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Comp.png", format="png", bbox_inches="tight")
+    plt.close(fig)
+
+    # Plot missed opportunity fraction and complaint opportunity rate against eachother
+    fig, ax = plt.subplots(figsize=(10,5))
+    ax.plot(MOF, COR)
+    #ax.set_ylim([0,1.1])
+    #ax.set_xlim([0,1.1])
+    n = round(len(thresh)-1, 0)
+    step = int(round(n/10, 0))
+    callout_locs = range(0,n+1,step)
+    for val in callout_locs:
+        if val==0:
+            ax.plot(MOF.values[val], COR.values[val], 'xk', label="Decision Thresholds")
+        else:
+            ax.plot(MOF.values[val], COR.values[val], 'xk')
+        ax.text(MOF.values[val]+.03,COR.values[val]+.004, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
+    ax.legend(loc="upper right", fontsize="medium")
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("MOF vs. COR by threshold", fontsize=18, fontweight="bold")
+    ax.set_xlabel("Missed Opportunity Fraction: FN/(TP + FN) (%)", fontsize=9)
+    ax.set_ylabel("Complaint Opportunity Rate: FP/(TP + TN + FN + FP) (%)", fontsize=9)
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOF-Comp.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
     # Get overall accuracy and plot against thresholds
@@ -169,10 +228,15 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params, opt_thresh):
     ax.plot(thresh, overall_acc)
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.0])
-    ax.set_title("Overall Accuracy for different thresholds", fontsize=18, fontweight="bold")
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("Overall Accuracy by threshold", fontsize=18, fontweight="bold")
     ax.set_ylabel("Overall Accuracy: (TP + TN)/(TP + TN + FN + FP) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Overall-Accuracy-Rate.png", format="png", bbox_inches="tight")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\AR.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
     # Get accuracy of vacancy and plot against thresholds
@@ -181,22 +245,34 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params, opt_thresh):
     ax.plot(thresh, vacant_acc)
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.0])
-    ax.set_title("Vacancy Detection Accuracy for different thresholds", fontsize=18, fontweight="bold")
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("Vacancy Detection Accuracy by threshold", fontsize=18, fontweight="bold")
     ax.set_ylabel("Accuracy of Detecting \"Vacant\": TP/(TP + FN) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Vacant-Accuracy-Rate.png", format="png", bbox_inches="tight")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VAR.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
-    # Get accuracy of occupancy and plot against thrsholds
+    # Get accuracy of occupancy and plot against thresholds
     occupied_acc = TNs/(FPs + TNs) # True Negative Rate
     fig, ax = plt.subplots(figsize=(10,5))
     ax.plot(thresh, occupied_acc)
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.0])
-    ax.set_title("Occupancy Detection Accuracy for different thresholds", fontsize=18, fontweight="bold")
+    #start, end = ax.get_xlim()
+    #ax.xaxis.set_ticks(np.arange(start, end, 0.05))
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("Occupancy Detection Accuracy by threshold", fontsize=18, fontweight="bold")
     ax.set_ylabel("Accuracy of Detecting \"Occupied\": TN/(TN + FP) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Occupied-Accuracy-Rate.png", format="png", bbox_inches="tight")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\OAR.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
     # Plot vac_acc and occ_acc against eachother
@@ -204,55 +280,65 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params, opt_thresh):
     ax.plot(occupied_acc, vacant_acc)
     n = round(len(thresh)-1, 0)
     step = int(round(n/10, 0))
-    #half = int(round(n/2, 0))
     callout_locs = range(0,n+1,step)
     for val in callout_locs:
         if val==0:
             ax.plot(occupied_acc.values[val], vacant_acc.values[val], 'xk', label="Decision Thresholds")
         else:
             ax.plot(occupied_acc.values[val], vacant_acc.values[val], 'xk')
-        #ax.annotate(val/10, xy=(occupied_acc.values[val],vacant_acc.values[val]))
         ax.text(occupied_acc.values[val]-.005,vacant_acc.values[val]-.05, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
-    #ax.annotate("0.0", xy=(occupied_acc[0],vacant_acc[0]), xytext=(0.15,0.8), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')
-    #ax.annotate("0.5", xy=(occupied_acc.values[half],vacant_acc.values[half]), xytext=(0.6,0.6), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')    
-    #ax.annotate("1.0", xy=(occupied_acc.values[-1],vacant_acc.values[-1]), xytext=(0.75,0.2), textcoords='axes fraction', arrowprops=dict(arrowstyle="->"), horizontalalignment='right', verticalalignment='bottom')
     #ax.set_ylim([0,1.1])
     #ax.set_xlim([0,1.1])
-    ax.legend(loc="best", fontsize="medium")
-    ax.set_title("Vacancy Detection Accuracy vs. Occupancy Detection Accuracy for different thresholds", fontsize=18, fontweight="bold")
+    ax.legend(loc="lower left", fontsize="medium")
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("\"Vacant\" Accuracy vs. \"Occupied\" Accuracy by threshold", fontsize=18, fontweight="bold")
     ax.set_ylabel("Accuracy of Detecting \"Vacant\": TP/(TP + FN) (%)", fontsize=9)
     ax.set_xlabel("Accuracy of Detecting \"Occupied\": TN/(TN + FP) (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Occupied-Vacant-Acc-Rate-Comp.png", format="png", bbox_inches="tight")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\OAR-VAR-Comp.png", format="png", bbox_inches="tight")
     plt.close(fig)
     return
 
 def GetOptimalValues(metrics_vthresh, thresholds, params):
-    opt_tab = pd.DataFrame(index=range(len(thresholds)), columns=["thresholds", "TP", "TN", "FP", "FN", "CR", "MOR", "dist to 0,0"])
+    opt_tab = pd.DataFrame(index=range(len(thresholds)), columns=["thresholds", "TP", "TN", "FP", "FN", "COR", "MOR", "MOF", "MCC", "dist to 0,0"])
     opt_tab["thresholds"] = thresholds
     opt_tab["TP"] = metrics_vthresh["TPs"] 
     opt_tab["TN"] = metrics_vthresh["TNs"] 
     opt_tab["FP"] = metrics_vthresh["FPs"] 
     opt_tab["FN"] = metrics_vthresh["FNs"]
+    
     total = opt_tab["FP"] + opt_tab["FN"] + opt_tab["TP"] + opt_tab["TN"]
-    opt_tab["CR"] = opt_tab["FP"]/total
+    opt_tab["COR"] = opt_tab["FP"]/total
     opt_tab["MOR"] = opt_tab["FN"]/total
-    #opt_tab["CR"] = CR.values
-    #opt_tab["MOR"] = MOR.values
-    opt_tab["dist to 0,0"] = (opt_tab["CR"] ** 2 + opt_tab["MOR"] ** 2) ** 0.5
-    opt_tab.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\optimization_table.csv")
-    dat = opt_tab["dist to 0,0"]
-    metric_min = min(dat)
-    opt_mask = opt_tab["dist to 0,0"]==metric_min
-    optimal_threshold = opt_tab.loc[opt_tab[opt_mask].index, ["thresholds"]]
-    return optimal_threshold.iloc[0,0]
+    opt_tab["MOF"] = opt_tab["FN"]/(opt_tab["FN"] + opt_tab["TP"])
+    
+    num_mcc = opt_tab["TP"]*opt_tab["TN"] - opt_tab["FP"]*opt_tab["FN"]
+    den_mcc =( (opt_tab["TP"]+opt_tab["FP"])*(opt_tab["TP"]+opt_tab["FN"])*(opt_tab["TN"]+opt_tab["FP"])*(opt_tab["TN"]+opt_tab["FN"]) )**0.5
+    opt_tab["MCC"] = num_mcc/den_mcc
+    
+    opt_tab["dist 0,0: COR-MOR"] = (opt_tab["COR"] ** 2 + opt_tab["MOR"] ** 2) ** 0.5
+    mor_min = min(opt_tab["dist 0,0: COR-MOR"])
+    opt_mask = opt_tab["dist 0,0: COR-MOR"]==mor_min
+    mor_opt_thresh = opt_tab.loc[opt_tab[opt_mask].index, ["thresholds"]]
+    
+    opt_tab["dist 0,0: COR-MOF"] = (opt_tab["COR"] ** 2 + opt_tab["MOF"] ** 2) ** 0.5
+    mof_min = min(opt_tab["dist 0,0: COR-MOF"])
+    opt_mask = opt_tab["dist 0,0: COR-MOF"]==mof_min
+    mof_opt_thresh = opt_tab.loc[opt_tab[opt_mask].index, ["thresholds"]]
+
+    opt_tab.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\metrics.csv")
+
+    return mor_opt_thresh.iloc[0,0], mof_opt_thresh.iloc[0,0]
 
 def GenerateAnalytics(params):
     outputcsvlocation = "DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv"
     output = pd.read_csv(outputcsvlocation, parse_dates=["fused-proba-dt"])
     metrics_vthresh, thresholds = GenerateMetricsForAllThresholds(output.copy(), params)
-    optimal_threshold = GetOptimalValues(metrics_vthresh, thresholds, params)
-    GenerateAccuracyCurves(metrics_vthresh, thresholds, params, optimal_threshold)
-    metrics, confmtx = GenerateConfusionMatrixNMetrics(output.copy(), params, threshold=optimal_threshold)
-
-    # TODO generate confusion matrix @ optimal threshold for intermediates
+    mor_opt, mof_opt = GetOptimalValues(metrics_vthresh, thresholds, params)
+    GenerateAccuracyCurves(metrics_vthresh, thresholds, params)
+    GenerateConfusionMatrixNMetrics(output.copy(), params, mor_opt, "_MOR")
+    GenerateConfusionMatrixNMetrics(output.copy(), params, mof_opt, "_MOF")
     return

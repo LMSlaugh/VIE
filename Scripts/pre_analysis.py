@@ -3,11 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats as st
 
-def CumulativeDistributions_Vac_Occ(sensorname, traindata, build_type, train_set, truth_flag=0):
-    tf = "_cherry"
-    if (truth_flag==1):
-        tf = "_full"
-    
+def CumulativeDistributions_Vac_Occ(sensorname, traindata, build_type, train_set):
     vaccumsum = 0
     vacprobas = []
     vacdata = traindata[traindata["truth-val"]==1]
@@ -44,7 +40,7 @@ def CumulativeDistributions_Vac_Occ(sensorname, traindata, build_type, train_set
     axcs.set_ylabel("Probability (%)", fontsize=labs)
     axcs.set_xlabel("Raw Sensor Value", fontsize=labs)
     axcs.grid(b=True, which='major', color='k', linestyle=':', linewidth=1)
-    plt.savefig("Figures\\" + build_type + "\\" + train_set + "\\Cumulative-Proba-Dists-" + sensorname + tf + ".png", format="png", bbox_inches="tight")
+    plt.savefig("Figures\\" + build_type + "\\" + train_set + "\\Cumulative-Proba-Dists-" + sensorname + "_" + train_set + ".png", format="png", bbox_inches="tight")
     plt.close(cumsumfig)
     return
 
@@ -64,10 +60,10 @@ def Histograms_Vac_Occ(bins, sensorname, traindata, build_type, train_set):
     vcounts, vbins, vpatches = ax.hist(vacdata, bins=bins, label="Vacant: Hist", histtype="step", density=True)
     ocounts, obins, opatches = ax.hist(occdata, bins=bins, label="Occupied: Hist", histtype="step", density=True)
     
-    vacparam = st.norm.fit(vacdata)
-    vacfit = st.norm.pdf(bins, loc=vacparam[0], scale=vacparam[1])
-    occparam = st.norm.fit(occdata)
-    occfit = st.norm.pdf(bins, loc=occparam[0], scale=occparam[1])
+    vacparam = st.logistic.fit(vacdata)
+    vacfit = st.logistic.pdf(bins, loc=vacparam[0], scale=vacparam[1])
+    occparam = st.logistic.fit(occdata)
+    occfit = st.logistic.pdf(bins, loc=occparam[0], scale=occparam[1])
     
     ax.plot(bins, vacfit, "b-", label="Vacant: Fit")
     ax.plot(bins, occfit, "r-", label="Occupied: Fit")
@@ -103,10 +99,10 @@ def CompareHistogramsNFits_Full_Cherry_Vac(bins, sensorname, td_full, td_cherry,
     vcounts_cherry, vbins_cherry, vpatches_cherry = ax.hist(vacdata_cherry, bins=bins, density=True, histtype="step", label="Vacant_cherry: Hist")
     vcounts_full, vbins_full, vpatches_full = ax.hist(vacdata_full, bins=bins, density=True, histtype="step", label="Vacant_full: Hist")
     
-    vacparam_cherry = st.norm.fit(vacdata_cherry)
-    vacfit_cherry = st.norm.pdf(bins, loc=vacparam_cherry[0], scale=vacparam_cherry[1])
-    vacparam_full = st.norm.fit(vacdata_full)
-    vacfit_full = st.norm.pdf(bins, loc=vacparam_full[0], scale=vacparam_full[1])
+    vacparam_cherry = st.logistic.fit(vacdata_cherry)
+    vacfit_cherry = st.logistic.pdf(bins, loc=vacparam_cherry[0], scale=vacparam_cherry[1])
+    vacparam_full = st.logistic.fit(vacdata_full)
+    vacfit_full = st.logistic.pdf(bins, loc=vacparam_full[0], scale=vacparam_full[1])
 
     ax.plot(bins, vacfit_cherry, "k", label="Vacant_cherry: Fit")
     ax.plot(bins, vacfit_full, "k--", label="Vacant_full: Fit")
@@ -151,14 +147,14 @@ def CompareHistogramFits_Full_Cherry_Vac_Occ(bins, sensorname, td_full, td_cherr
     ocounts_full, obins_full, opatches_full = ax.hist(occdata_full, bins=bins, density=True, histtype="step", label="Occupied_full: Hist")
     plt.close(histfig)
 
-    vacparam_cherry = st.norm.fit(vacdata_cherry)
-    vacfit_cherry = st.norm.pdf(bins, loc=vacparam_cherry[0], scale=vacparam_cherry[1])
-    occparam_cherry = st.norm.fit(occdata_cherry)
-    occfit_cherry = st.norm.pdf(bins, loc=occparam_cherry[0], scale=occparam_cherry[1])
-    vacparam_full = st.norm.fit(vacdata_full)
-    vacfit_full = st.norm.pdf(bins, loc=vacparam_full[0], scale=vacparam_full[1])
-    occparam_full = st.norm.fit(occdata_full)
-    occfit_full = st.norm.pdf(bins, loc=occparam_full[0], scale=occparam_full[1])
+    vacparam_cherry = st.logistic.fit(vacdata_cherry)
+    vacfit_cherry = st.logistic.pdf(bins, loc=vacparam_cherry[0], scale=vacparam_cherry[1])
+    occparam_cherry = st.logistic.fit(occdata_cherry)
+    occfit_cherry = st.logistic.pdf(bins, loc=occparam_cherry[0], scale=occparam_cherry[1])
+    vacparam_full = st.logistic.fit(vacdata_full)
+    vacfit_full = st.logistic.pdf(bins, loc=vacparam_full[0], scale=vacparam_full[1])
+    occparam_full = st.logistic.fit(occdata_full)
+    occfit_full = st.logistic.pdf(bins, loc=occparam_full[0], scale=occparam_full[1])
     
     histfig2, ax2 = plt.subplots(figsize=(11,5))
     ax2.plot(bins, vacfit_cherry, "k", label="Vacant_cherry: Fit")
@@ -242,8 +238,8 @@ def CompareCumulativeDistributions_Full_Cherry_Vac_Occ(sensorname, td_full, td_c
     return
 
 def WhatsMyDistribution(sensorname, td_full, build_type, train_set):
-    #distributions = [st.alpha, st.betaprime, st.burr, st.chi2, st.exponnorm, st.exponweib, st.f, st.fisk, st.frechet_r, st.genextreme, st.gamma, st.gengamma, st.gumbel_r, st.invgamma, st.invgauss, st.invweibull, st.johnsonsb, st.kappa4, st.ksone, st.kstwobign, st.lognorm, st.maxwell, st.mielke, st.moyal, st.ncx2, st.ncf, st.norminvgauss, st.powerlognorm, st.rayleigh, st.rice, st.recipinvgauss, st.skewnorm, st.wald, st.weibull_min]
-    #distributions = [st.alpha, st.chi2, st.f, st.gamma, st.lognorm, st.maxwell, st.ncf, st.rayleigh, st.skewnorm] # a, df, dfn & dfd, a, s, 0, dfn & dfd & nc, 0, a
+    #distributions = [st.alpha, st.betaprime, st.burr, st.chi2, st.exponlogistic, st.exponweib, st.f, st.fisk, st.frechet_r, st.genextreme, st.gamma, st.gengamma, st.gumbel_r, st.invgamma, st.invgauss, st.invweibull, st.johnsonsb, st.kappa4, st.ksone, st.kstwobign, st.loglogistic, st.maxwell, st.mielke, st.moyal, st.ncx2, st.ncf, st.logisticinvgauss, st.powerloglogistic, st.rayleigh, st.rice, st.recipinvgauss, st.skewlogistic, st.wald, st.weibull_min]
+    #distributions = [st.alpha, st.chi2, st.f, st.gamma, st.loglogistic, st.maxwell, st.ncf, st.rayleigh, st.skewlogistic] # a, df, dfn & dfd, a, s, 0, dfn & dfd & nc, 0, a
     distributions = [st.maxwell, st.rayleigh] # a, df, dfn & dfd, a, s, 0, dfn & dfd & nc, 0, a
     mles = []
 
@@ -285,5 +281,4 @@ def RunExploration(sensorname, td_full, build_type, train_set):
     elif train_set=="Full":
         Histograms_Vac_Occ(bins, sensorname, td_full, build_type, train_set)
         CumulativeDistributions_Vac_Occ(sensorname, td_full, build_type, train_set)
-
     return
