@@ -178,7 +178,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
             ax.plot(MOR.values[val], COR.values[val], 'xk', label="Decision Thresholds")
         else:
             ax.plot(MOR.values[val], COR.values[val], 'xk')
-        ax.text(MOR.values[val]+.03,COR.values[val]+.004, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
+        ax.text(MOR.values[val]+.05,COR.values[val]+.004, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
     ax.legend(loc="upper right", fontsize="medium")
     ax.minorticks_on()
     ax.xaxis.set_tick_params(labelsize=9)
@@ -392,7 +392,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
             ax.plot(COR.values[val], vacant_acc.values[val], 'xk', label="Decision Thresholds")
         else:
             ax.plot(COR.values[val], vacant_acc.values[val], 'xk')
-        ax.text(COR.values[val]+.03,vacant_acc.values[val]-.05, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
+        ax.text(COR.values[val]+.05,vacant_acc.values[val]-.05, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom')
     ax.legend(loc="lower right", fontsize="medium")
     ax.minorticks_on()
     ax.xaxis.set_tick_params(labelsize=9)
