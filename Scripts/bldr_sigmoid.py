@@ -14,6 +14,7 @@ def Sigmoid(x, p1, p2):
 
 def GetCumulativeDist(sensor, data):
     import scipy.optimize as opt
+    import matplotlib.pyplot as plt
     cumsum = 0
     rawprobas = []
 
@@ -26,9 +27,10 @@ def GetCumulativeDist(sensor, data):
     sensorvals = sensorvals[sensorvals.values > ( mean_pre - 6 * std_pre )]
 
     # Normalize (place values between zero and one)
+    sensorvals = sensorvals.iloc[:,0]
+
     sensorvals_normed = ( sensorvals - min(sensorvals) ) / ( max(sensorvals) - min(sensorvals) )
     summation = sum(sensorvals_normed)
-    
     sensorvals = sensorvals.sort_values(ascending=True)
     sensorvals_normed = sensorvals_normed.sort_values(ascending=True)
     for datum in sensorvals_normed:
@@ -45,15 +47,15 @@ def GetCumulativeDist(sensor, data):
     fig, ax = plt.subplots(figsize=(10,5))
     ax.plot(sensorvals, rawprobas, label="Raw")
     ax.plot(sensorvals, fitprobas, label="Generated")
-    ax.legend(loc="upper right", fontsize=legs)
+    ax.legend(loc="upper right", fontsize="medium")
     ax.set_ylim([0,1.2])
     ax.set_xlim([min(sensorvals),max(sensorvals)])
     ax.xaxis.set_major_locator(plt.MaxNLocator(20))
-    ax.xaxis.set_tick_params(labelsize=labs)
-    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
     ax.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
-    ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
-    ax.set_xlabel("Raw Sensor Value", fontsize=labs)
+    ax.set_ylabel("Probability of Vacancy (%)", fontsize=9)
+    ax.set_xlabel("Raw Sensor Value", fontsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\sigmoid-comparison_full_" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
     plt.close(fig)

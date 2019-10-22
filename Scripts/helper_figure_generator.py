@@ -473,12 +473,12 @@ def PlotMain(in_type, start, end, save_suffix, params):
     #PlotInsNMids(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotInsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
-    PlotInsNTruth_1plot(historicaldata, in_type, save_suffix, tick_hrs, params) # need to scale ground truth
-    PlotInsNTruth_2plots(historicaldata, in_type, save_suffix, tick_hrs, params)
+    #PlotInsNTruth_1plot(historicaldata, in_type, save_suffix, tick_hrs, params) # need to scale ground truth
+    #PlotInsNTruth_2plots(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNTruth_1plot(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNTruth_2plots(historicaldata, in_type, save_suffix, tick_hrs, params) # not working for some reason
-    #PlotOutNTruth(historicaldata, save_suffix, tick_hrs, params)
-    #PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    PlotOutNTruth(historicaldata, save_suffix, tick_hrs, params)
+    PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutputDistribution(historicaldata, save_suffix, tick_hrs, params)
     return
 
@@ -502,4 +502,52 @@ def IndependenceTest():
     PlotInsNIns(trainingdata,"Full")
     return
 
+def PlotOutcomeExplanation():
+    # Generate the fake data
+    data = pd.read_csv("DataFiles\\outcome-illustration.csv", parse_dates=["timestamp"])
+    data.index = data["timestamp"]
+    hrtx = [0,2,4,6,8,10,12,14,16,18,20,22]
+    fig, ax = plt.subplots(figsize=(20,10))
+    ax.plot(data["timestamp"], data["fused-val"] + 1.5, color="xkcd:pumpkin", linewidth="2", label="VIE Output")
+    ax.plot(data["timestamp"], data["truth-val"], "k", linewidth="2", label="Ground Truth")
+    #ax.legend(loc="upper right", fontsize=legs)
+    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    ax.yaxis.grid(False)
+    fig.autofmt_xdate()
+    fig.savefig("Figures\\Outcomes-Illustration.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
+def ROCExplanation():
+    # Generate the fake data
+    data = pd.read_csv("DataFiles\\ROC-illustration.csv")
+    data.index = data["x-val"]
+    fig, ax = plt.subplots(nrows=1, ncols=2,figsize=(12,5))
+    ax[0].plot(data["x-val"], data["perfect"], "k", linewidth="2", label="Perfect Model")
+    #ax[0].legend(loc="lower right", fontsize=legs)
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
+    ax[0].set_xlabel("False Positive Rate: FP/(FP + TN)")
+    ax[0].set_ylabel("True Positive Rate: TP/(TP + FN)")
+    ax[0].set_title("Example: Perfect Model")
+    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    #ax.yaxis.grid(False)
+    ax[1].plot(data["x-val"], data["x-val"], "k", linewidth="2", label="Random Chance")
+    #ax[1].legend(loc="lower right", fontsize=legs)
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
+    ax[1].set_xlabel("False Positive Rate: FP/(FP + TN)")
+    ax[1].set_ylabel("True Positive Rate: TP/(TP + FN)")
+    ax[1].set_title("Example: Random Chance")
+    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    fig.savefig("Figures\\ROC-Illustration.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
 #IndependenceTest()
+#PlotOutcomeExplanation()
+#ROCExplanation()

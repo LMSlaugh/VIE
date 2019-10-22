@@ -45,6 +45,16 @@ def StdDevWeightedRMS(sensors):
     overallproba =  ( numer/(denom) )**0.5
     return overallproba
 
+def HarmonicAverage(probas):
+    inv_probas = []
+    for elem in probas:
+        if elem==0:
+            return 0 # Because anything / infinity = 0
+        else:
+            inv_probas.append(1/elem)
+    overallproba = len(probas) / sum(inv_probas)
+    return overallproba
+
 def CreateVirtualSensors(params):
     new = "_new"
     if params.buildflag:
@@ -105,6 +115,8 @@ def FuseVacancyProbabilities(sensors, fusetype="RMS"):
         overallproba = StdDevWeightedAverage(sensors)
     elif fusetype=="SDWRMS":
         overallproba = StdDevWeightedRMS(sensors)
+    elif fusetype=="HAVG":
+        overallproba = HarmonicAverage(probabilities)
     else: # Default to "mult" - multiplying together the probabilities
         overallproba = np.prod(probabilities)
     return overallproba
@@ -139,7 +151,8 @@ def GenerateOutput(testdata, sensors, params):
             output = pd.concat([output,temp_df], join="outer", axis=1)
 
         # fuse predictions for all sensors
-        output["fused-proba-" + params.fusetype] = FuseVacancyProbabilities(sensors, params.fusetype)
+        tempy = FuseVacancyProbabilities(sensors, params.fusetype)
+        output["fused-proba-" + params.fusetype] = tempy
         output["fused-proba-dt"] = row["timestamp"].strftime("%Y-%m-%d %H:%M:%S")
 
         if (header_flag==1):
@@ -153,21 +166,21 @@ def GeneratePlots(params):
     #figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
     #figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
     figen.PlotMain("wifi", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
-    #figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
+    figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
     #figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
     #figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
     figen.PlotMain("wifi", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
-    #figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
     return
 
 def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end):
     params = mp.ModelParameters(build_flag, train_start, train_end, test_start, test_end, train_type, build_type, fuse_type)
     sensors = CreateVirtualSensors(params)
-    #traindata, testdata = GetTrainTestData(params)
+    traindata, testdata = GetTrainTestData(params)
     #for k,v in sensors.items():
        #pa.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
     #GenerateOutput(testdata, sensors, params)
-    #ra.GenerateAnalytics(params)
+    ra.GenerateAnalytics(params)
     GeneratePlots(params)
     return
 
@@ -175,36 +188,30 @@ def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, 
 # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv.....Main Program 
 # for reference: Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end)
 
-Main(True, "Logistic", "Full", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Full", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main(False, "Logistic", "Cherry", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main(False, "Percentile", "Full", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main(False, "Percentile", "Cherry", "AVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
+Main(False, "Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-#Main(False, "Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Logistic", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-#Main(False, "Logistic", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Logistic", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Full", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Cherry", "SDWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-#Main(False, "Logistic", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Logistic", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-
-#Main(False, "Logistic", "Full", "FEWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Logistic", "Cherry", "FEWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Full", "FEWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Cherry", "FEWA", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-
-#Main(False, "Logistic", "Full", "FEWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Logistic", "Cherry", "FEWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Full", "FEWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
-#Main(False, "Percentile", "Cherry", "FEWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Full", "HAVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Logistic", "Cherry", "HAVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Full", "HAVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(False, "Percentile", "Cherry", "HAVG", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
 thisisastopgap = "stopgap"
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Main Program
