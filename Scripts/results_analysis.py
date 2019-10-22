@@ -191,18 +191,21 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Comp.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
-    # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold
+    # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 100
     fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(thresh, COR/MOR)
+    zoomed = COR/MOR
+    zmask = zoomed<=100
+    zoomed = zoomed[zmask]
+    ax.plot(thresh[zmask], zoomed)
     ax.minorticks_on()
     ax.xaxis.set_tick_params(labelsize=9)
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR/MOR vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("COR/MOR < 100 vs. Threshold", fontsize=18, fontweight="bold")
     ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio.png", format="png", bbox_inches="tight")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under100.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
 
@@ -217,7 +220,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR/MOR vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("COR/MOR < 20 vs. Threshold", fontsize=18, fontweight="bold")
     ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under20.png", format="png", bbox_inches="tight")
@@ -234,11 +237,29 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR/MOR vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("COR/MOR < 5 vs. Threshold", fontsize=18, fontweight="bold")
     ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under5.png", format="png", bbox_inches="tight")
     plt.close(fig)
+
+    # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 1
+    fig, ax = plt.subplots(figsize=(10,5))
+    zoomed = COR/MOR
+    zmask = zoomed<=1
+    zoomed = zoomed[zmask]
+    ax.plot(thresh[zmask], zoomed)
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.set_title("COR/MOR < 1 vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
+    ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under1.png", format="png", bbox_inches="tight")
+    plt.close(fig)
+
 
     # Plot missed opportunity fraction and complaint opportunity rate against eachother
     fig, ax = plt.subplots(figsize=(10,5))
@@ -442,7 +463,7 @@ def GetOptimalValues(metrics_vthresh, thresholds, params):
     opt_mask = opt_tab["dist 0,0: COR-MOF"]==mof_min
     mof_opt_thresh = opt_tab.loc[opt_tab[opt_mask].index, ["thresholds"]]
 
-    opt_tab["dist 0,1: ROC"] = ( opt_tab["COR"] ** 2 + (1-opt_tab["MOF"] ** 2) ) ** 0.5
+    opt_tab["dist 0,1: ROC"] = ( opt_tab["COR"] ** 2 + (1-opt_tab["VDA"] ** 2) ) ** 0.5
     roc_min = min(opt_tab["dist 0,1: ROC"])
     opt_mask = opt_tab["dist 0,1: ROC"]==roc_min
     roc_opt_thresh = opt_tab.loc[opt_tab[opt_mask].index, ["thresholds"]]
