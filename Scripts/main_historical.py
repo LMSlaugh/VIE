@@ -164,11 +164,11 @@ def GenerateOutput(testdata, sensors, params):
 
 def GeneratePlots(params):
     #figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
-    #figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
+    figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
     figen.PlotMain("wifi", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
     figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
     #figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
-    #figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    figen.PlotMain("elec", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
     figen.PlotMain("wifi", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
     figen.PlotMain("co2", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
     return
@@ -181,7 +181,7 @@ def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, 
        #pa.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
     #GenerateOutput(testdata, sensors, params)
     ra.GenerateAnalytics(params)
-    GeneratePlots(params)
+    #GeneratePlots(params)
     return
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^.....Function Definitions

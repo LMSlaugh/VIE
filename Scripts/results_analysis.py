@@ -100,6 +100,19 @@ def GenerateMetricsForAllThresholds(data, params):
     return metrics_vthresh, thresholds
 
 def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
+    fusestr = ""
+    if params.fusetype == "AVG":
+        fusestr = "Simple Mean"
+    elif params.fusetype == "SDWA":
+        fusestr = "Standard Deviation Weighted Mean"
+    elif params.fusetype == "HAVG":
+        fusestr = "Harmonic Mean"
+    elif params.fusetype == "RMS":
+        fusestr = "Root Mean Square"
+    elif params.fusetype == "SDWRMS":
+        fusestr = "Std. Dev. Weighted Root Mean Square"
+
+
     # for Different Thresholds from 0 -> 1....
     TPs = metrics_vthresh["TPs"] 
     TNs = metrics_vthresh["TNs"] 
@@ -115,7 +128,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COF vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("COF vs. Threshold for " + fusestr, fontsize=18, fontweight="bold")
     #ax.set_ylabel("True Positive Rate: TP/(TP + FN)", fontsize=9)
     ax.set_ylabel("Complaint Opportunity Fraction: FP/(TP + TN + FN + FP) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
@@ -131,7 +144,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("COR vs. Threshold for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("Complaint Opportunity Rate: FP/(FP + TN) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR.png", format="png", bbox_inches="tight")
@@ -146,7 +159,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("MOF vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("MOF vs. Threshold for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("Missed Opportunity Fraction: FN/(TP + TN + FN + FP) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\MOF.png", format="png", bbox_inches="tight")
@@ -161,7 +174,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("MOR vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("MOR vs. Threshold for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("Missed Opportunity Rate: FN/(TP + FN) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\MOR.png", format="png", bbox_inches="tight")
@@ -185,80 +198,116 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR vs. MOR by Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("CMC Curve for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_xlabel("Missed Opportunity Rate: FN/(TP + FN) (%)", fontsize=9)
     ax.set_ylabel("Complaint Opportunity Rate: FP/(FP + TN) (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Comp.png", format="png", bbox_inches="tight")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\CMC.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
     # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 100
-    fig, ax = plt.subplots(figsize=(10,5))
-    zoomed = COR/MOR
-    zmask = zoomed<=100
-    zoomed = zoomed[zmask]
-    ax.plot(thresh[zmask], zoomed)
-    ax.minorticks_on()
-    ax.xaxis.set_tick_params(labelsize=9)
-    ax.yaxis.set_tick_params(labelsize=9)
-    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
-    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR/MOR < 100 vs. Threshold", fontsize=18, fontweight="bold")
-    ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
-    ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under100.png", format="png", bbox_inches="tight")
+    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(16,8))
+    ratio = COR/MOR
+    zmask_100 = ratio<=100
+    zmask_20 = ratio<=20
+    zmask_5 = ratio<=5
+    zmask_1 = ratio<=1
+    ax[0,0].plot(thresh[zmask_100], ratio[zmask_100])
+    ax[0,0].set_title("COR/MOR < 100 vs. Threshold", fontsize=12)
+    ax[0,0].set_ylabel("COR/MOR: FP/FN", fontsize=9)
+    #ax[0,0].set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    ax[0,0].xaxis.set_tick_params(labelsize=9)
+    ax[0,0].yaxis.set_tick_params(labelsize=9)
+    ax[0,0].grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax[0,0].grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax[0,0].minorticks_on()
+
+    ax[1,0].plot(thresh[zmask_20], ratio[zmask_20])
+    ax[1,0].set_title("COR/MOR < 20 vs. Threshold", fontsize=12)
+    ax[1,0].set_ylabel("COR/MOR: FP/FN", fontsize=9)
+    ax[1,0].set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    ax[1,0].xaxis.set_tick_params(labelsize=9)
+    ax[1,0].yaxis.set_tick_params(labelsize=9)
+    ax[1,0].grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax[1,0].grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax[1,0].minorticks_on()
+
+    ax[0,1].plot(thresh[zmask_5], ratio[zmask_5])
+    ax[0,1].set_title("COR/MOR < 5 vs. Threshold", fontsize=12)
+    #ax[0,1].set_ylabel("COR/MOR: FP/FN", fontsize=9)
+    #ax[0,1].set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    ax[0,1].xaxis.set_tick_params(labelsize=9)
+    ax[0,1].yaxis.set_tick_params(labelsize=9)
+    ax[0,1].grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax[0,1].grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax[0,1].minorticks_on()
+
+    ax[1,1].plot(thresh[zmask_1], ratio[zmask_1])
+    ax[1,1].set_title("COR/MOR < 1 vs. Threshold", fontsize=12)
+    #ax[1,1].set_ylabel("COR/MOR: FP/FN", fontsize=9)
+    ax[1,1].set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    ax[1,1].xaxis.set_tick_params(labelsize=9)
+    ax[1,1].yaxis.set_tick_params(labelsize=9)
+    ax[1,1].grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax[1,1].grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax[1,1].minorticks_on()
+
+    plt.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    plt.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    plt.suptitle("COR/MOR vs. Threshold for " + fusestr, fontsize=18, fontweight="bold")
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
 
     # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 20
-    fig, ax = plt.subplots(figsize=(10,5))
-    zoomed = COR/MOR
-    zmask = zoomed<=20
-    zoomed = zoomed[zmask]
-    ax.plot(thresh[zmask], zoomed)
-    ax.minorticks_on()
-    ax.xaxis.set_tick_params(labelsize=9)
-    ax.yaxis.set_tick_params(labelsize=9)
-    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
-    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR/MOR < 20 vs. Threshold", fontsize=18, fontweight="bold")
-    ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
-    ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under20.png", format="png", bbox_inches="tight")
-    plt.close(fig)
+    #fig, ax = plt.subplots(figsize=(10,5))
+    #zoomed = COR/MOR
+    #zmask = zoomed<=20
+    #zoomed = zoomed[zmask]
+    #ax.plot(thresh[zmask], zoomed)
+    #ax.minorticks_on()
+    #ax.xaxis.set_tick_params(labelsize=9)
+    #ax.yaxis.set_tick_params(labelsize=9)
+    #ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    #ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    #ax.set_title("COR/MOR < 20 vs. Threshold", fontsize=18, fontweight="bold")
+    #ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
+    #ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    #fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under20.png", format="png", bbox_inches="tight")
+    #plt.close(fig)
 
     # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 5
-    fig, ax = plt.subplots(figsize=(10,5))
-    zoomed = COR/MOR
-    zmask = zoomed<=5
-    zoomed = zoomed[zmask]
-    ax.plot(thresh[zmask], zoomed)
-    ax.minorticks_on()
-    ax.xaxis.set_tick_params(labelsize=9)
-    ax.yaxis.set_tick_params(labelsize=9)
-    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
-    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR/MOR < 5 vs. Threshold", fontsize=18, fontweight="bold")
-    ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
-    ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under5.png", format="png", bbox_inches="tight")
-    plt.close(fig)
+    #fig, ax = plt.subplots(figsize=(10,5))
+    #zoomed = COR/MOR
+    #zmask = zoomed<=5
+    #zoomed = zoomed[zmask]
+    #ax.plot(thresh[zmask], zoomed)
+    #ax.minorticks_on()
+    #ax.xaxis.set_tick_params(labelsize=9)
+    #ax.yaxis.set_tick_params(labelsize=9)
+    #ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    #ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    #ax.set_title("COR/MOR < 5 vs. Threshold", fontsize=18, fontweight="bold")
+    #ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
+    #ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    #fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under5.png", format="png", bbox_inches="tight")
+    #plt.close(fig)
 
     # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 1
-    fig, ax = plt.subplots(figsize=(10,5))
-    zoomed = COR/MOR
-    zmask = zoomed<=1
-    zoomed = zoomed[zmask]
-    ax.plot(thresh[zmask], zoomed)
-    ax.minorticks_on()
-    ax.xaxis.set_tick_params(labelsize=9)
-    ax.yaxis.set_tick_params(labelsize=9)
-    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
-    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR/MOR < 1 vs. Threshold", fontsize=18, fontweight="bold")
-    ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
-    ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
-    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under1.png", format="png", bbox_inches="tight")
-    plt.close(fig)
+    #fig, ax = plt.subplots(figsize=(10,5))
+    #zoomed = COR/MOR
+    #zmask = zoomed<=1
+    #zoomed = zoomed[zmask]
+    #ax.plot(thresh[zmask], zoomed)
+    #ax.minorticks_on()
+    #ax.xaxis.set_tick_params(labelsize=9)
+    #ax.yaxis.set_tick_params(labelsize=9)
+    #ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    #ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    #ax.set_title("COR/MOR < 1 vs. Threshold", fontsize=18, fontweight="bold")
+    #ax.set_ylabel("COR/MOR: FP/FN", fontsize=9)
+    #ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
+    #fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio_zoomed_under1.png", format="png", bbox_inches="tight")
+    #plt.close(fig)
 
 
     # Plot missed opportunity fraction and complaint opportunity rate against eachother
@@ -279,7 +328,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COR vs. MOF by Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("COR vs. MOF by Threshold for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_xlabel("Missed Opportunity Fraction: FN/(TP + FP + FN + TN) (%)", fontsize=9)
     ax.set_ylabel("Complaint Opportunity Rate: FP/(FP + TN) (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOF-Comp.png", format="png", bbox_inches="tight")
@@ -293,7 +342,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("COF/MOR vs. Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("COF/MOR vs. Threshold for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("COF/MOR: FP(TP + FN)/FN(TP + TN + FN + FP)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COF-MOR-Ratio.png", format="png", bbox_inches="tight")
@@ -342,7 +391,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("Overall Accuracy by Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("Overall Accuracy by Threshold for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("Overall Accuracy: (TP + TN)/(TP + TN + FN + FP) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\OverAcc.png", format="png", bbox_inches="tight")
@@ -357,7 +406,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("VDA by Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("VDA by Threshold  for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("Vacancy Detection Accuracy: TP/(TP + FN) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VDA.png", format="png", bbox_inches="tight")
@@ -372,7 +421,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("ODA by Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("ODA by Threshold for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("Occupancy Detection Accuracy: TN/(TN + FP) (%)", fontsize=9)
     ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\ODA.png", format="png", bbox_inches="tight")
@@ -396,7 +445,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("VDA vs. ODA by Threshold", fontsize=18, fontweight="bold")
+    ax.set_title("VDA vs. ODA by Threshold for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("Vacancy Detection Accuracy: TP/(TP + FN) (%)", fontsize=9)
     ax.set_xlabel("Occupancy Detection Accuracy: TN/(TN + FP) (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\ODA-VDA-Comp.png", format="png", bbox_inches="tight")
@@ -420,7 +469,7 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.yaxis.set_tick_params(labelsize=9)
     ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
     ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
-    ax.set_title("ROC Curve", fontsize=18, fontweight="bold")
+    ax.set_title("ROC Curve for " + fusestr, fontsize=18, fontweight="bold")
     ax.set_ylabel("Vacancy Detection Accuracy: TP/(TP + FN) (%)", fontsize=9)
     ax.set_xlabel("Complaint Opportunity Rate: FP/(TN + FP) (%)", fontsize=9)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\ROC.png", format="png", bbox_inches="tight")

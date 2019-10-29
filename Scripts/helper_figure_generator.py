@@ -478,7 +478,7 @@ def PlotMain(in_type, start, end, save_suffix, params):
     #PlotMidsNTruth_1plot(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNTruth_2plots(historicaldata, in_type, save_suffix, tick_hrs, params) # not working for some reason
     PlotOutNTruth(historicaldata, save_suffix, tick_hrs, params)
-    PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    #PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutputDistribution(historicaldata, save_suffix, tick_hrs, params)
     return
 
@@ -522,32 +522,130 @@ def PlotOutcomeExplanation():
     plt.close(fig)
     return
 
+def CMCExplanation():
+    # Generate the fake data
+    data = pd.read_csv("DataFiles\\CMC-illustration.csv")
+    fig, ax = plt.subplots(nrows=1, ncols=2,figsize=(12,5))
+    ax[0].plot(data["MOR"], data["COR"], "k", linewidth="2", label="Perfect Model")
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
+    ax[0].set_xlabel("False Negative Rate: FN/(TP + FN)")
+    ax[0].set_ylabel("False Positive Rate: FP/(FP + TN)")
+    ax[0].set_title("CMC Example: Perfect Model")
+    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    ax[1].plot(data["random"], 1-data["random"], "k", linewidth="2", label="Random Chance")
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
+    ax[1].set_xlabel("False Negative Rate: FN/(TP + FN)")
+    ax[1].set_ylabel("False Positive Rate: FP/(FP + TN)")
+    ax[1].set_title("CMC Example: Random Chance")
+    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    fig.savefig("Figures\\CMC-Illustration.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
 def ROCExplanation():
     # Generate the fake data
     data = pd.read_csv("DataFiles\\ROC-illustration.csv")
-    data.index = data["x-val"]
     fig, ax = plt.subplots(nrows=1, ncols=2,figsize=(12,5))
-    ax[0].plot(data["x-val"], data["perfect"], "k", linewidth="2", label="Perfect Model")
-    #ax[0].legend(loc="lower right", fontsize=legs)
+    ax[0].plot(data["COR"], data["VAD"], "k", linewidth="2", label="Perfect Model")
     ax[0].xaxis.set_tick_params(labelsize=labs)
     ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].set_xlabel("False Positive Rate: FP/(FP + TN)")
     ax[0].set_ylabel("True Positive Rate: TP/(TP + FN)")
-    ax[0].set_title("Example: Perfect Model")
+    ax[0].set_title("ROC Example: Perfect Model")
     ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-    #ax.yaxis.grid(False)
-    ax[1].plot(data["x-val"], data["x-val"], "k", linewidth="2", label="Random Chance")
-    #ax[1].legend(loc="lower right", fontsize=legs)
+    ax[1].plot(data["random"], data["random"], "k", linewidth="2", label="Random Chance")
     ax[1].xaxis.set_tick_params(labelsize=labs)
     ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].set_xlabel("False Positive Rate: FP/(FP + TN)")
     ax[1].set_ylabel("True Positive Rate: TP/(TP + FN)")
-    ax[1].set_title("Example: Random Chance")
+    ax[1].set_title("ROC Example: Random Chance")
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\ROC-Illustration.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
+def PlotCampusDemand():
+    data = pd.read_csv("DataFiles\\elec_raw.csv", parse_dates=["timestamp"])
+    #data.index = data["timestamp"]
+    hrtx = [0,12]
+    fig, ax = plt.subplots(figsize=(16,8))
+    x = data["timestamp"]
+    #y = data["net"]/1000
+    y = data["elec"]
+    ax.plot(x, y, "k", linewidth="1")
+    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    ax.yaxis.grid(False)
+    ax.set_ylim(bottom=0)
+    ax.set_ylabel("Electricity Demand (kW)")
+    ax.set_title("Roessler Hall Electricity Demand", fontsize=16)
+    #fig.autofmt_xdate()
+    fig.savefig("Campus-Energy.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
+def PlotInputsExample():
+    # plot co2
+    data = pd.read_csv("DataFiles\\WCEC-inputs-10min.csv", parse_dates=["timestamp"])
+    data.index = data["timestamp"]
+    data = data.loc["2019-07-08 00:00:00":"2019-07-16 00:00:00",:]
+    hrtx = [0,8,17]
+
+    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(20,10))
+    ax[0].plot(data["timestamp"], data["co2"], "r", linewidth="1", label="CO2 (ppm)")
+    #ax[0].plot(data["timestamp"], data["hours"]*max(data["co2"])+min(data["co2"]), "k", linewidth="1", label="Business Hours")
+    ax[0].set_ylabel("Carbon Dioxide (ppm)", fontsize=labs)
+    ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
+    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+
+    # plot elec    
+    ax[1].plot(data["timestamp"], data["wifi"], "b", linewidth="1", label="Wi-Fi connections")
+    #ax[1].plot(data["timestamp"], data["hours"]*max(data["elec"])+min(data["elec"]), "k", linewidth="1", label="Business Hours")
+    ax[1].set_ylabel("Wi-Fi Connections", fontsize=labs)
+    ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
+    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+
+    # plot wifi
+    ax[2].plot(data["timestamp"], data["temp"], "m", linewidth="1", label="Temperature (°F)")
+    #ax[2].plot(data["timestamp"], data["hours"]*max(data["wifi"])+min(data["wifi"]), "k", linewidth="1", label="Business Hours")
+    ax[2].set_ylabel("Temperature (°F)", fontsize=labs)
+    ax[2].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[2].xaxis.set_tick_params(labelsize=labs)
+    ax[2].yaxis.set_tick_params(labelsize=labs)
+    ax[2].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+
+    # plot temp
+    ax[3].plot(data["timestamp"], data["rh"], "c", linewidth="1", label="Relative Humidity (%)")
+    #ax[3].plot(data["timestamp"], data["hours"]*max(data["temp"])-min(data["temp"]), "k", linewidth="1", label="Business Hours")
+    ax[3].set_ylabel("Relative Humidity (%)", fontsize=labs)
+    ax[3].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[3].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[3].xaxis.set_tick_params(labelsize=labs)
+    ax[3].yaxis.set_tick_params(labelsize=labs)
+    ax[3].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    
+    #fig.legend(loc="upper right", fontsize=legs)
+    fig.autofmt_xdate()
+    fig.savefig("Inputs-Example.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
+
 #IndependenceTest()
 #PlotOutcomeExplanation()
+#CMCExplanation()
 #ROCExplanation()
+#PlotCampusDemand()
+PlotInputsExample()
