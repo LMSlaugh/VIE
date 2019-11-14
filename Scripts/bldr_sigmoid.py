@@ -23,8 +23,8 @@ def GetCumulativeDist(sensor, data):
     stats_pre = data.describe()
     std_pre = stats_pre.loc["std",0]
     mean_pre = stats_pre.loc["mean",0]
-    sensorvals = data[data.values < ( mean_pre + 6 * std_pre )]
-    sensorvals = sensorvals[sensorvals.values > ( mean_pre - 6 * std_pre )]
+    sensorvals = data[data.values < ( mean_pre + 3 * std_pre )]
+    sensorvals = sensorvals[sensorvals.values > ( mean_pre - 3 * std_pre )]
 
     # Normalize (place values between zero and one)
     sensorvals = sensorvals.iloc[:,0]
@@ -44,18 +44,32 @@ def GetCumulativeDist(sensor, data):
 
     fitprobas = Sigmoid(sensorvals, popt[0], popt[1])
 
-    fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(sensorvals, rawprobas, label="Raw")
-    ax.plot(sensorvals, fitprobas, label="Generated")
-    ax.legend(loc="upper right", fontsize="medium")
+    titlesz = 16
+    labs = 12
+    legs = 12
+
+    fig, ax = plt.subplots(figsize=(12,6))
+    if sensor.sensortype=="electricity demand":
+        sensorvals = sensorvals*.001
+        ax.plot(sensorvals, rawprobas, "r-", label="Raw")
+        ax.plot(sensorvals,fitprobas, "b-", label="Generated")
+    else:
+        ax.plot(sensorvals, rawprobas, "r-", label="Raw")
+        ax.plot(sensorvals, fitprobas, "b-", label="Generated")
+    ax.legend(loc="upper right", fontsize=legs)
     ax.set_ylim([0,1.2])
     ax.set_xlim([min(sensorvals),max(sensorvals)])
     ax.xaxis.set_major_locator(plt.MaxNLocator(20))
-    ax.xaxis.set_tick_params(labelsize=9)
-    ax.yaxis.set_tick_params(labelsize=9)
-    ax.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
-    ax.set_ylabel("Probability of Vacancy (%)", fontsize=9)
-    ax.set_xlabel("Raw Sensor Value", fontsize=9)
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=titlesz, fontweight="bold")
+    ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
+    if sensor.sensortype=="wifi connections":
+        ax.set_xlabel("Raw Sensor Value (counts)", fontsize=labs)
+    elif sensor.sensortype=="electricity demand":
+        ax.set_xlabel("Raw Sensor Value (kW)", fontsize=labs)
+    elif sensor.sensortype=="carbon dioxide":
+        ax.set_xlabel("Raw Sensor Value (ppm)", fontsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\sigmoid-comparison_full_" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
     plt.close(fig)
@@ -74,8 +88,8 @@ def BuildVacancyRelationship(sensor):
         stats_pre = sensorvals_raw.describe()
         std_pre = stats_pre["std"]
         mean_pre = stats_pre["mean"]
-        sensorvals = sensorvals_raw[sensorvals_raw.values < ( mean_pre + 6 * std_pre )]
-        sensorvals = sensorvals[sensorvals.values > ( mean_pre - 6 * std_pre )]
+        sensorvals = sensorvals_raw[sensorvals_raw.values < ( mean_pre + 3 * std_pre )]
+        sensorvals = sensorvals[sensorvals.values > ( mean_pre - 3 * std_pre )]
 
         # Normalize (place values between zero and one)
         sensorvals_normed = ( sensorvals - min(sensorvals) ) / ( max(sensorvals) - min(sensorvals) )
@@ -107,8 +121,8 @@ def BuildVacancyRelationship(sensor):
         stats_o = o_data[sensor.sensorname + "-val"].describe()
         std_o = stats_o["std"]
         mean_o = stats_o["mean"]
-        o_data = o_data[o_data[sensor.sensorname + "-val"] < ( mean_o + 6 * std_o )]
-        o_data = o_data[o_data[sensor.sensorname + "-val"] > ( mean_o - 6 * std_o )]
+        o_data = o_data[o_data[sensor.sensorname + "-val"] < ( mean_o + 3 * std_o )]
+        o_data = o_data[o_data[sensor.sensorname + "-val"] > ( mean_o - 3 * std_o )]
 
         v_data = sensor.vachistdata.copy()
         v_data["truth-val"] = 1
@@ -116,8 +130,8 @@ def BuildVacancyRelationship(sensor):
         stats_v = v_data[sensor.sensorname + "-val"].describe()
         std_v = stats_v["std"]
         mean_v = stats_v["mean"]
-        v_data = v_data[v_data[sensor.sensorname + "-val"] < ( mean_v + 6 * std_v )]
-        v_data = v_data[v_data[sensor.sensorname + "-val"] > ( mean_v - 6 * std_v )]
+        v_data = v_data[v_data[sensor.sensorname + "-val"] < ( mean_v + 3 * std_v )]
+        v_data = v_data[v_data[sensor.sensorname + "-val"] > ( mean_v - 3 * std_v )]
         sensor.std = std_v / ( max(v_data[sensor.sensorname + "-val"]) - min(v_data[sensor.sensorname + "-val"]) ) # normalize it
 
         data_train = pd.concat([o_data,v_data], join="outer")
@@ -126,7 +140,7 @@ def BuildVacancyRelationship(sensor):
         clf = linear_model.LogisticRegression(C=1e5, solver='lbfgs')
         clf.fit(feature, labels)
 
-        GetCumulativeDist(sensor, feature)
+        #GetCumulativeDist(sensor, feature)
 
         x_plot = np.linspace(min(feature), max(feature), 300)
         sensor.vrparam1 = clf.coef_[0][0]

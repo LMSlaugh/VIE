@@ -11,24 +11,25 @@ import math as math
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-labs = 9 # figure label size
-legs = "medium"
+titlesz = 16
+labs = 12 # figure label size
+legs = 12
 
 def PlotIns(data, in_type, sufx, hrtx):
     fig, ax = plt.subplots(figsize=(20,10))
     # plot inputs
-    if (in_type=="elec"):
-        ax.plot(data["fused-proba-dt"], data["elec-val"], "g", linewidth="1", label="Elec (W)")
-    elif (in_type=="wifi"):
-        ax.plot(data["fused-proba-dt"], data["wifi-val"], "b", linewidth="1", label="Wifi (counts)")
-    elif (in_type=="co2"):
-        ax.plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+    if (in_type=="Elec"):
+        ax.plot(data["fused-proba-dt"], data["Elec-val"], "g", linewidth="1", label="Elec (W)")
+    elif (in_type=="WiFi"):
+        ax.plot(data["fused-proba-dt"], data["WiFi-val"], "b", linewidth="1", label="Wifi (counts)")
+    elif (in_type=="CO2"):
+        ax.plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec-val-s"] = data["elec-val"]*0.01
-        ax.plot(data["fused-proba-dt"], data["elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
-        data["wifi-val-s"] = data["wifi-val"]*10
-        ax.plot(data["fused-proba-dt"], data["wifi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
-        ax.plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+        data["Elec-val-s"] = data["Elec-val"]*0.01
+        ax.plot(data["fused-proba-dt"], data["Elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
+        data["WiFi-val-s"] = data["WiFi-val"]*10
+        ax.plot(data["fused-proba-dt"], data["WiFi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
+        ax.plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     ax.legend(loc="upper right", fontsize=legs)
     ax.set_ylabel("Sensor Value", fontsize=labs)
     ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
@@ -37,7 +38,7 @@ def PlotIns(data, in_type, sufx, hrtx):
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.autofmt_xdate()
-    fig.suptitle("Raw Sensor Input: " + in_type, fontsize=18, fontweight="bold")
+    fig.suptitle("Raw Sensor Input: " + in_type, fontsize=titlesz, fontweight="bold")
     fig.savefig("Figures\\Input-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
@@ -45,18 +46,18 @@ def PlotIns(data, in_type, sufx, hrtx):
 def PlotInsNMids(data, in_type, sufx, hrtx, params):
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
     # plot inputs
-    if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec-val"], "g", linewidth="1", label="Elec (W)")
-    elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi-val"], "b", linewidth="1", label="Wifi (counts)")
-    elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+    if (in_type=="Elec"):
+        ax[0].plot(data["fused-proba-dt"], data["Elec-val"], "g", linewidth="1", label="Elec (W)")
+    elif (in_type=="WiFi"):
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-val"], "b", linewidth="1", label="Wifi (counts)")
+    elif (in_type=="CO2"):
+        ax[0].plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec-val-s"] = data["elec-val"]*0.01
-        ax[0].plot(data["fused-proba-dt"], data["elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
-        data["wifi-val-s"] = data["wifi-val"]*10
-        ax[0].plot(data["fused-proba-dt"], data["wifi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
-        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+        data["Elec-val-s"] = data["Elec-val"]*0.01
+        ax[0].plot(data["fused-proba-dt"], data["Elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
+        data["WiFi-val-s"] = data["WiFi-val"]*10
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
+        ax[0].plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     ax[0].legend(loc="upper right", fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -66,16 +67,16 @@ def PlotInsNMids(data, in_type, sufx, hrtx, params):
     ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     # plot intermediates
-    if (in_type=="elec"):
-        ax[1].plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (W)")
-    elif (in_type=="wifi"):
-        ax[1].plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (counts)")
-    elif (in_type=="co2"):
-        ax[1].plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (ppm)")
+    if (in_type=="Elec"):
+        ax[1].plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (W)")
+    elif (in_type=="WiFi"):
+        ax[1].plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (counts)")
+    elif (in_type=="CO2"):
+        ax[1].plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        ax[1].plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-        ax[1].plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-        ax[1].plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+        ax[1].plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+        ax[1].plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+        ax[1].plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     ax[1].set_ylim([0,1.2])
     ax[1].legend(loc="upper right", fontsize=legs)
     ax[1].set_title("Intermediate Probability of Vacancy")
@@ -86,7 +87,7 @@ def PlotInsNMids(data, in_type, sufx, hrtx, params):
     ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.autofmt_xdate()
-    fig.suptitle("Raw Sensor Input vs Intermediate Probability of Vacancy: " + in_type, fontsize=18, fontweight="bold")
+    fig.suptitle("Raw Sensor Input vs Intermediate Probability of Vacancy: " + in_type, fontsize=titlesz, fontweight="bold")
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\Intermediates vs Inputs-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
@@ -94,16 +95,16 @@ def PlotInsNMids(data, in_type, sufx, hrtx, params):
 def PlotMidsNOut(data, in_type, sufx, hrtx, params):
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
     # plot intermediates
-    if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-    elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-    elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+    if (in_type=="Elec"):
+        ax[0].plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+    elif (in_type=="WiFi"):
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+    elif (in_type=="CO2"):
+        ax[0].plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     elif (in_type=="comp"):
-        ax[0].plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-        ax[0].plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-        ax[0].plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+        ax[0].plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+        ax[0].plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     plt.ylim([0,1.2])
     ax[0].legend(loc="upper right", fontsize=legs)
     ax[0].set_title("Intermediate Probability of Vacancy: " + in_type)
@@ -125,7 +126,7 @@ def PlotMidsNOut(data, in_type, sufx, hrtx, params):
     ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.autofmt_xdate()
-    fig.suptitle("Intermediate Probability of Vacancy vs. Fused Probability of Vacancy", fontsize=18, fontweight="bold")
+    fig.suptitle("Intermediate Probability of Vacancy vs. Fused Probability of Vacancy", fontsize=titlesz, fontweight="bold")
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Intermediates vs Output-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
@@ -133,18 +134,18 @@ def PlotMidsNOut(data, in_type, sufx, hrtx, params):
 def PlotInsNOut(data, in_type, sufx, hrtx, params):
     # plot inputs
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
-    if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec-val"], "g", linewidth="1", label="Elec (W)")
-    elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi-val"], "b", linewidth="1", label="Wifi (counts)")
-    elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+    if (in_type=="Elec"):
+        ax[0].plot(data["fused-proba-dt"], data["Elec-val"], "g", linewidth="1", label="Elec (W)")
+    elif (in_type=="WiFi"):
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-val"], "b", linewidth="1", label="Wifi (counts)")
+    elif (in_type=="CO2"):
+        ax[0].plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec-val-s"] = data["elec-val"]*0.01
-        ax[0].plot(data["fused-proba-dt"], data["elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
-        data["wifi-val-s"] = data["wifi-val"]*10
-        ax[0].plot(data["fused-proba-dt"], data["wifi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
-        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+        data["Elec-val-s"] = data["Elec-val"]*0.01
+        ax[0].plot(data["fused-proba-dt"], data["Elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
+        data["WiFi-val-s"] = data["WiFi-val"]*10
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
+        ax[0].plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     ax[0].legend(loc="upper right", fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -165,7 +166,7 @@ def PlotInsNOut(data, in_type, sufx, hrtx, params):
     ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.autofmt_xdate()
-    fig.suptitle("Raw Sensor Input vs Fused Probability of Vacancy", fontsize=18, fontweight="bold")
+    fig.suptitle("Raw Sensor Input vs Fused Probability of Vacancy", fontsize=titlesz, fontweight="bold")
     fig.savefig("Figures\\" + params.fusetype + "\\" + params.buildtype + "\\" + params.traintype + "\\Output vs. Inputs-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
@@ -173,18 +174,18 @@ def PlotInsNOut(data, in_type, sufx, hrtx, params):
 def PlotInsNTruth_2plots(data, in_type, sufx, hrtx, params):
     # plot inputs
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
-    if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec-val"], "g", linewidth="1", label="Elec (W)")
-    elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi-val"], "b", linewidth="1", label="Wifi (counts)")
-    elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+    if (in_type=="Elec"):
+        ax[0].plot(data["fused-proba-dt"], data["Elec-val"], "g", linewidth="1", label="Elec (W)")
+    elif (in_type=="WiFi"):
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-val"], "b", linewidth="1", label="Wifi (counts)")
+    elif (in_type=="CO2"):
+        ax[0].plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec-val-s"] = data["elec-val"]*0.01
-        ax[0].plot(data["fused-proba-dt"], data["elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
-        data["wifi-val-s"] = data["wifi-val"]*10
-        ax[0].plot(data["fused-proba-dt"], data["wifi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
-        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+        data["Elec-val-s"] = data["Elec-val"]*0.01
+        ax[0].plot(data["fused-proba-dt"], data["Elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
+        data["WiFi-val-s"] = data["WiFi-val"]*10
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
+        ax[0].plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     ax[0].legend(loc="upper right", fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -212,18 +213,18 @@ def PlotInsNTruth_2plots(data, in_type, sufx, hrtx, params):
 def PlotInsNTruth_1plot(data, in_type, sufx, hrtx, params):
     # plot inputs
     fig, ax = plt.subplots(figsize=(20,10))
-    if (in_type=="elec"):
-        ax.plot(data["fused-proba-dt"], data["elec-val"], "g", linewidth="1", label="Elec (W)")
-    elif (in_type=="wifi"):
-        ax.plot(data["fused-proba-dt"], data["wifi-val"], "b", linewidth="1", label="Wifi (counts)")
-    elif (in_type=="co2"):
-        ax.plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+    if (in_type=="Elec"):
+        ax.plot(data["fused-proba-dt"], data["Elec-val"], "g", linewidth="1", label="Elec (W)")
+    elif (in_type=="WiFi"):
+        ax.plot(data["fused-proba-dt"], data["WiFi-val"], "b", linewidth="1", label="Wifi (counts)")
+    elif (in_type=="CO2"):
+        ax.plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec-val-s"] = data["elec-val"]*0.01
-        ax.plot(data["fused-proba-dt"], data["elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
-        data["wifi-val-s"] = data["wifi-val"]*10
-        ax.plot(data["fused-proba-dt"], data["wifi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
-        ax.plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+        data["Elec-val-s"] = data["Elec-val"]*0.01
+        ax.plot(data["fused-proba-dt"], data["Elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
+        data["WiFi-val-s"] = data["WiFi-val"]*10
+        ax.plot(data["fused-proba-dt"], data["WiFi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
+        ax.plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     # plot ground truth
     ax.plot(data["fused-proba-dt"], data["truth-val"], "k", linewidth="1", label="Truth: high=vac, low=occ ")
     ax.legend(loc="upper right", fontsize=legs)
@@ -241,21 +242,21 @@ def PlotInsNTruth_1plot(data, in_type, sufx, hrtx, params):
 def PlotMidsNTruth_1plot(data, in_type, sufx, hrtx, params):
     fig, ax = plt.subplots(figsize=(20,10))
     # plot intermediates
-    if (in_type=="elec"):
-        ax.plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-    elif (in_type=="wifi"):
-        ax.plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-    elif (in_type=="co2"):
-        ax.plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+    if (in_type=="Elec"):
+        ax.plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+    elif (in_type=="WiFi"):
+        ax.plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+    elif (in_type=="CO2"):
+        ax.plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     elif (in_type=="comp"):
-        ax.plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-        ax.plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-        ax.plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+        ax.plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+        ax.plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+        ax.plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     # plot ground truth
     ax.plot(data["fused-proba-dt"], data["truth-val"], "k", linewidth="1", label="Truth: 1=vac, 0=occ ")
     ax.set_ylim([0,1.2])
     ax.legend(loc="upper right", fontsize=legs)
-    ax.set_title("Intermediate Probability of Vacancy vs. Ground Truth")
+    ax.set_title("Intermediate Probability of Vacancy vs. Ground Truth", fontsize=titlesz, fontweight="bold")
     ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
     ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
@@ -270,16 +271,16 @@ def PlotMidsNTruth_1plot(data, in_type, sufx, hrtx, params):
 def PlotMidsNTruth_2plots(data, in_type, sufx, hrtx, params):
     # plot inputs
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(20,10))
-    if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-    elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-    elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+    if (in_type=="Elec"):
+        ax[0].plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+    elif (in_type=="WiFi"):
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+    elif (in_type=="CO2"):
+        ax[0].plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     elif (in_type=="comp"):
-        ax[0].plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-        ax[0].plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-        ax[0].plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+        ax[0].plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+        ax[0].plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     ax[0].legend(loc="upper right", fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -312,7 +313,7 @@ def PlotOutNTruth(data, sufx, hrtx, params):
     ax.plot(data["fused-proba-dt"], data["truth-val"], "k", linewidth="1", label="Truth: 1=vac, 0=occ ")
     ax.set_ylim([0,1.2])
     ax.legend(loc="upper right", fontsize=legs)
-    ax.set_title("Fused Probability of Vacancy vs. Ground Truth")
+    ax.set_title("Fused Probability of Vacancy vs. Ground Truth", fontsize=titlesz, fontweight="bold")
     ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
     ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
@@ -327,18 +328,18 @@ def PlotOutNTruth(data, sufx, hrtx, params):
 def PlotInsNMidsNOutNTruth(data, in_type, sufx, hrtx, params):
     fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(20,10))
     # plot inputs
-    if (in_type=="elec"):
-        ax[0].plot(data["fused-proba-dt"], data["elec-val"], "g", linewidth="1", label="Elec (W)")
-    elif (in_type=="wifi"):
-        ax[0].plot(data["fused-proba-dt"], data["wifi-val"], "b", linewidth="1", label="Wifi (counts)")
-    elif (in_type=="co2"):
-        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+    if (in_type=="Elec"):
+        ax[0].plot(data["fused-proba-dt"], data["Elec-val"]/1000, "g", linewidth="1", label="Elec (kW)")
+    elif (in_type=="WiFi"):
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-val"], "b", linewidth="1", label="Wifi (counts)")
+    elif (in_type=="CO2"):
+        ax[0].plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     elif (in_type=="comp"):
-        data["elec-val-s"] = data["elec-val"]*0.01
-        ax[0].plot(data["fused-proba-dt"], data["elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
-        data["wifi-val-s"] = data["wifi-val"]*10
-        ax[0].plot(data["fused-proba-dt"], data["wifi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
-        ax[0].plot(data["fused-proba-dt"], data["co2-val"], "r", linewidth="1", label="CO2 (ppm)")
+        data["Elec-val-s"] = data["Elec-val"]*0.01
+        ax[0].plot(data["fused-proba-dt"], data["Elec-val-s"], "g", linewidth="1", label="Elec (W*.01)")
+        data["WiFi-val-s"] = data["WiFi-val"]*10
+        ax[0].plot(data["fused-proba-dt"], data["WiFi-val-s"], "b", linewidth="1", label="Wifi (counts*10)")
+        ax[0].plot(data["fused-proba-dt"], data["CO2-val"], "r", linewidth="1", label="CO2 (ppm)")
     ax[0].legend(loc="upper right", fontsize=legs)
     ax[0].set_title("Raw Sensor Input: " + in_type)
     ax[0].set_ylabel("Sensor Value", fontsize=labs)
@@ -348,16 +349,16 @@ def PlotInsNMidsNOutNTruth(data, in_type, sufx, hrtx, params):
     ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     # plot intermediates
-    if (in_type=="elec"):
-        ax[1].plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-    elif (in_type=="wifi"):
-        ax[1].plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-    elif (in_type=="co2"):
-        ax[1].plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+    if (in_type=="Elec"):
+        ax[1].plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+    elif (in_type=="WiFi"):
+        ax[1].plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+    elif (in_type=="CO2"):
+        ax[1].plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     elif (in_type=="comp"):
-        ax[1].plot(data["fused-proba-dt"], data["elec-proba"], "g", linewidth="1", label="Elec (%)")
-        ax[1].plot(data["fused-proba-dt"], data["wifi-proba"], "b", linewidth="1", label="Wifi (%)")
-        ax[1].plot(data["fused-proba-dt"], data["co2-proba"], "r", linewidth="1", label="CO2 (%)")
+        ax[1].plot(data["fused-proba-dt"], data["Elec-proba"], "g", linewidth="1", label="Elec (%)")
+        ax[1].plot(data["fused-proba-dt"], data["WiFi-proba"], "b", linewidth="1", label="Wifi (%)")
+        ax[1].plot(data["fused-proba-dt"], data["CO2-proba"], "r", linewidth="1", label="CO2 (%)")
     
     ax[1].set_ylim([0,1.2])
     ax[1].legend(loc="upper right", fontsize=legs)
@@ -382,81 +383,103 @@ def PlotInsNMidsNOutNTruth(data, in_type, sufx, hrtx, params):
     ax[2].yaxis.set_tick_params(labelsize=labs)
     ax[2].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.autofmt_xdate()
-    fig.suptitle("Inputs, Intermediate Probability of Vacancy, and Fused Probability of Vacancy vs. Ground Truth", fontsize=18, fontweight="bold")
+    fig.suptitle("Inputs, Intermediate Probability of Vacancy, and Fused Probability of Vacancy vs. Ground Truth", fontsize=titlesz, fontweight="bold")
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Ins-Mids-Out&GroundTruth_" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
 def PlotSigmoids(sensor, sensorvals, rawprobas, fitprobas):  
-    fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(sensorvals, rawprobas, label="Raw")
-    ax.plot(sensorvals, fitprobas, label="Generated")
+    fig, ax = plt.subplots(figsize=(16,8))
+    if sensor.sensortype=="Elec":  
+        sensorvals = sensorvals*.001
+        ax.plot(sensorvals, rawprobas, "r-", label="Raw")
+        ax.plot(sensorvals,fitprobas, "g-", label="Generated")
+    else:
+        ax.plot(sensorvals, rawprobas, label="Raw")
+        ax.plot(sensorvals, fitprobas, label="Generated")
     ax.legend(loc="upper right", fontsize=legs)
     ax.set_ylim([0,1.2])
     ax.set_xlim([min(sensorvals),max(sensorvals)])
     ax.xaxis.set_major_locator(plt.MaxNLocator(20))
     ax.xaxis.set_tick_params(labelsize=labs)
     ax.yaxis.set_tick_params(labelsize=labs)
-    ax.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
+    ax.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=titlesz, fontweight="bold")
     ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
-    ax.set_xlabel("Raw Sensor Value", fontsize=labs)
+    if sensor.sensortype=="WiFi":
+        ax.set_xlabel("Raw Sensor Value (counts)", fontsize=labs)
+    elif sensor.sensortype=="Elec":
+        ax.set_xlabel("Raw Sensor Value (kW)", fontsize=labs)
+    elif sensor.sensortype=="CO2":
+        ax.set_xlabel("Raw Sensor Value (ppm)", fontsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\sigmoid-comparison-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
     plt.close(fig)
     return
 
 def PlotExpit(sensor, x, y, train_data):
-    fig, ax = plt.subplots(figsize=(10,5))
-    ax.plot(x, y, "b-", label="Expit Fit")
-    ax.plot(train_data[sensor.sensorname + "-val"],train_data["truth-val"], "r.", label="Training Data")
+    fig, ax = plt.subplots(figsize=(12,6))
+    if sensor.sensortype=="electricity demand":
+        x = x*.001
+        x_raw = train_data[sensor.sensorname + "-val"]*.001
+        ax.plot(x, y, "b-", label="Expit Fit")
+        ax.plot(x_raw,train_data["truth-val"], "r.", label="Training Data")
+        ax.set_xlim([0,max(train_data[sensor.sensorname + "-val"]/1000)])
+    else:
+        ax.plot(x, y, "b-", label="Expit Fit")
+        ax.plot(train_data[sensor.sensorname + "-val"],train_data["truth-val"], "r.", label="Training Data")
+        ax.set_xlim([0,max(train_data[sensor.sensorname + "-val"])])
     ax.legend(loc="upper right", fontsize=legs)
     ax.set_ylim([0,1.2])
-    ax.set_xlim([0,max(train_data[sensor.sensorname + "-val"])])
     ax.xaxis.set_major_locator(plt.MaxNLocator(20))
     ax.xaxis.set_tick_params(labelsize=labs)
     ax.yaxis.set_tick_params(labelsize=labs)
-    ax.set_title("Logistic Function Fit for Sensor: " + sensor.sensorname, fontsize=18, fontweight="bold")
+    ax.set_title("Logistic Function Fit for Sensor: " + sensor.sensorname, fontsize=titlesz, fontweight="bold")
     ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
-    ax.set_xlabel("Raw Sensor Value", fontsize=labs)
+    if sensor.sensortype=="wifi connections":
+        ax.set_xlabel("Raw Sensor Value (counts)", fontsize=labs)
+    elif sensor.sensortype=="electricity demand":
+        ax.set_xlabel("Raw Sensor Value (kW)", fontsize=labs)
+    elif sensor.sensortype=="carbon dioxide":
+        ax.set_xlabel("Raw Sensor Value (ppm)", fontsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\Logistic-Fit-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
     plt.close(fig)
     return
 
 def PlotInsNIns(data, sufx):
-    # plot elec vs wifi
+    # plot Elec vs WiFi
     fig, ax = plt.subplots(figsize=(20,10))
-    ax.plot(data["wifi-val"], data["elec-val"], ".")
+    ax.plot(data["WiFi-val"], data["Elec-val"], ".")
     ax.set_ylabel("Electricity Demand (W)", fontsize=labs)
     ax.set_xlabel("WiFi Connection Count", fontsize=labs)
     ax.xaxis.set_tick_params(labelsize=labs)
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-    fig.suptitle("Independence Test: WiFi Connection Count vs. Electricity Demand", fontsize=18, fontweight="bold")
+    fig.suptitle("Independence Test: WiFi Connection Count vs. Electricity Demand", fontsize=titlesz, fontweight="bold")
     fig.savefig("Figures\\Indep-Test_wifi_elec_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
 
-    # plot elec vs co2
+    # plot Elec vs CO2
     fig, ax = plt.subplots(figsize=(20,10))
-    ax.plot(data["co2-val"], data["elec-val"], ".")
+    ax.plot(data["CO2-val"], data["Elec-val"], ".")
     ax.set_ylabel("Electricity Demand (W)", fontsize=labs)
     ax.set_xlabel("Carbon Dioxide Concentration (ppm)", fontsize=labs)
     ax.xaxis.set_tick_params(labelsize=labs)
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-    fig.suptitle("Independence Test: Carbon Dioxide Concentration vs. Electricity Demand", fontsize=18, fontweight="bold")
+    fig.suptitle("Independence Test: Carbon Dioxide Concentration vs. Electricity Demand", fontsize=titlesz, fontweight="bold")
     fig.savefig("Figures\\Indep-Test_co2_elec_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
 
-    # plot wifi vs co2
+    # plot WiFi vs CO2
     fig, ax = plt.subplots(figsize=(20,10))
-    ax.plot(data["wifi-val"], data["co2-val"], ".")
+    ax.plot(data["WiFi-val"], data["CO2-val"], ".")
     ax.set_ylabel("Carbon Dioxide Concentration (ppm)", fontsize=labs)
     ax.set_xlabel("WiFi Connection Count", fontsize=labs)
     ax.xaxis.set_tick_params(labelsize=labs)
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-    fig.suptitle("Independence Test: WiFi Connection Count vs. Carbon Dioxide Concentration", fontsize=18, fontweight="bold")
+    fig.suptitle("Independence Test: WiFi Connection Count vs. Carbon Dioxide Concentration", fontsize=titlesz, fontweight="bold")
     fig.savefig("Figures\\Indep-Test_wifi_co2_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
@@ -478,7 +501,7 @@ def PlotMain(in_type, start, end, save_suffix, params):
     #PlotMidsNTruth_1plot(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNTruth_2plots(historicaldata, in_type, save_suffix, tick_hrs, params) # not working for some reason
     PlotOutNTruth(historicaldata, save_suffix, tick_hrs, params)
-    #PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutputDistribution(historicaldata, save_suffix, tick_hrs, params)
     return
 
@@ -489,7 +512,7 @@ def IndependenceTest():
     trainingdata_c.index = trainingdata_c["timestamp"]
     trainingdata_w = pd.read_csv("DataFiles\\Logistic\\Cherry\\Training_Data_wifi.csv", parse_dates=["timestamp"])
     trainingdata_w.index = trainingdata_w["timestamp"]
-    trainingdata = pd.concat([trainingdata_e["elec-val"],trainingdata_c["co2-val"],trainingdata_w["wifi-val"]], axis=1, join="inner", sort=True)
+    trainingdata = pd.concat([trainingdata_e["Elec-val"],trainingdata_c["CO2-val"],trainingdata_w["WiFi-val"]], axis=1, join="inner", sort=True)
     PlotInsNIns(trainingdata,"Cherry")
 
     trainingdata_e = pd.read_csv("DataFiles\\Logistic\\Full\\Training_Data_elec.csv", parse_dates=["timestamp"])
@@ -498,18 +521,18 @@ def IndependenceTest():
     trainingdata_c.index = trainingdata_c["timestamp"]
     trainingdata_w = pd.read_csv("DataFiles\\Logistic\\Full\\Training_Data_wifi.csv", parse_dates=["timestamp"])
     trainingdata_w.index = trainingdata_w["timestamp"]
-    trainingdata = pd.concat([trainingdata_e["elec-val"],trainingdata_c["co2-val"],trainingdata_w["wifi-val"]], axis=1, join="inner", sort=True)
+    trainingdata = pd.concat([trainingdata_e["Elec-val"],trainingdata_c["CO2-val"],trainingdata_w["WiFi-val"]], axis=1, join="inner", sort=True)
     PlotInsNIns(trainingdata,"Full")
     return
 
 def PlotOutcomeExplanation():
     # Generate the fake data
-    data = pd.read_csv("DataFiles\\outcome-illustration.csv", parse_dates=["timestamp"])
+    data = pd.read_csv("DataFiles\\Outcome-illustration.csv", parse_dates=["timestamp"])
     data.index = data["timestamp"]
     hrtx = [0,2,4,6,8,10,12,14,16,18,20,22]
     fig, ax = plt.subplots(figsize=(20,10))
-    ax.plot(data["timestamp"], data["fused-val"] + 1.5, color="xkcd:pumpkin", linewidth="2", label="VIE Output")
-    ax.plot(data["timestamp"], data["truth-val"], "k", linewidth="2", label="Ground Truth")
+    ax.plot(data["timestamp"], data["fused-val"] + 1.5, color="xkcd:pumpkin", linewidth=2, label="VIE Output")
+    ax.plot(data["timestamp"], data["truth-val"], "k", linewidth=2, label="Ground Truth")
     #ax.legend(loc="upper right", fontsize=legs)
     ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
@@ -518,28 +541,23 @@ def PlotOutcomeExplanation():
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     ax.yaxis.grid(False)
     fig.autofmt_xdate()
-    fig.savefig("Figures\\Outcomes-Illustration.png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\Outcome-Illustration.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
 def CMCExplanation():
     # Generate the fake data
     data = pd.read_csv("DataFiles\\CMC-illustration.csv")
-    fig, ax = plt.subplots(nrows=1, ncols=2,figsize=(12,5))
-    ax[0].plot(data["MOR"], data["COR"], "k", linewidth="2", label="Perfect Model")
-    ax[0].xaxis.set_tick_params(labelsize=labs)
-    ax[0].yaxis.set_tick_params(labelsize=labs)
-    ax[0].set_xlabel("False Negative Rate: FN/(TP + FN)")
-    ax[0].set_ylabel("False Positive Rate: FP/(FP + TN)")
-    ax[0].set_title("CMC Example: Perfect Model")
-    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-    ax[1].plot(data["random"], 1-data["random"], "k", linewidth="2", label="Random Chance")
-    ax[1].xaxis.set_tick_params(labelsize=labs)
-    ax[1].yaxis.set_tick_params(labelsize=labs)
-    ax[1].set_xlabel("False Negative Rate: FN/(TP + FN)")
-    ax[1].set_ylabel("False Positive Rate: FP/(FP + TN)")
-    ax[1].set_title("CMC Example: Random Chance")
-    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    fig, ax = plt.subplots(figsize=(10,6))
+    ax.plot(data["MOR"], data["COR"], "xkcd:pumpkin", linewidth=2, label="Perfect Model")
+    ax.plot(data["random"], 1-data["random"], "b--", linewidth=2, label="Random Chance")
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.set_xlabel("False Negative Rate: FN/(TP + FN)", fontsize=labs)
+    ax.set_ylabel("False Positive Rate: FP/(FP + TN)", fontsize=labs)
+    ax.set_title("COR-MOR Characteristic (CMC) Curve: Extreme Examples", fontsize=titlesz)
+    ax.legend(loc="best", fontsize=legs)
+    ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\CMC-Illustration.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
@@ -547,98 +565,117 @@ def CMCExplanation():
 def ROCExplanation():
     # Generate the fake data
     data = pd.read_csv("DataFiles\\ROC-illustration.csv")
-    fig, ax = plt.subplots(nrows=1, ncols=2,figsize=(12,5))
-    ax[0].plot(data["COR"], data["VAD"], "k", linewidth="2", label="Perfect Model")
-    ax[0].xaxis.set_tick_params(labelsize=labs)
-    ax[0].yaxis.set_tick_params(labelsize=labs)
-    ax[0].set_xlabel("False Positive Rate: FP/(FP + TN)")
-    ax[0].set_ylabel("True Positive Rate: TP/(TP + FN)")
-    ax[0].set_title("ROC Example: Perfect Model")
-    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-    ax[1].plot(data["random"], data["random"], "k", linewidth="2", label="Random Chance")
-    ax[1].xaxis.set_tick_params(labelsize=labs)
-    ax[1].yaxis.set_tick_params(labelsize=labs)
-    ax[1].set_xlabel("False Positive Rate: FP/(FP + TN)")
-    ax[1].set_ylabel("True Positive Rate: TP/(TP + FN)")
-    ax[1].set_title("ROC Example: Random Chance")
-    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    fig, ax = plt.subplots(figsize=(10,6))
+    ax.plot(data["COR"], data["VAD"], "xkcd:pumpkin", linewidth=2, label="Perfect Model")
+    ax.plot(data["random"], data["random"], "b--", linewidth=2, label="Random Chance")
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.set_xlabel("False Positive Rate: FP/(FP + TN)", fontsize=labs)
+    ax.set_ylabel("True Positive Rate: TP/(TP + FN)", fontsize=labs)
+    ax.set_title("Receiver-Operator Characteristic (ROC) Curve: Extreme Examples", fontsize=titlesz)
+    ax.legend(loc="best", fontsize=legs)
+    ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\ROC-Illustration.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
 def PlotCampusDemand():
-    data = pd.read_csv("DataFiles\\elec_raw.csv", parse_dates=["timestamp"])
+    data = pd.read_csv("DataFiles\\Campus_elec_w.csv", parse_dates=["timestamp"])
     #data.index = data["timestamp"]
     hrtx = [0,12]
     fig, ax = plt.subplots(figsize=(16,8))
     x = data["timestamp"]
     #y = data["net"]/1000
-    y = data["elec"]
-    ax.plot(x, y, "k", linewidth="1")
+    y = data["Actual_Campus_Demand"]/1000
+    ax.plot(x, y, "k", linewidth=1)
     ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
     ax.xaxis.set_tick_params(labelsize=labs)
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     ax.yaxis.grid(False)
+    fig.autofmt_xdate()
     ax.set_ylim(bottom=0)
-    ax.set_ylabel("Electricity Demand (kW)")
-    ax.set_title("Roessler Hall Electricity Demand", fontsize=16)
+    ax.set_ylabel("Electricity Demand (MW)", fontsize=labs)
+    ax.set_title("UC Davis Campus-Wide Electricity Demand", fontsize=titlesz)
     #fig.autofmt_xdate()
-    fig.savefig("Campus-Energy.png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\Campus-Energy.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
+def PlotBuildingDemand():
+    data = pd.read_csv("DataFiles\\Building_elec_w.csv", parse_dates=["timestamp"])
+    #data.index = data["timestamp"]
+    hrtx = [0,12]
+    fig, ax = plt.subplots(figsize=(16,8))
+    x = data["timestamp"]
+    #y = data["net"]/1000
+    y = data["Haring_Hall_TOTAL/Electricity_Demand"]
+    ax.plot(x, y, "k", linewidth=1)
+    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax.xaxis.set_tick_params(labelsize=labs)
+    ax.yaxis.set_tick_params(labelsize=labs)
+    ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    ax.yaxis.grid(False)
+    fig.autofmt_xdate()
+    ax.set_ylim(bottom=0)
+    ax.set_ylabel("Electricity Demand (kW)", fontsize=labs)
+    ax.set_title("Haring Hall Electricity Demand", fontsize=titlesz)
+    #fig.autofmt_xdate()
+    fig.savefig("Figures\\Building-Energy.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
 def PlotInputsExample():
-    # plot co2
+    # plot CO2
     data = pd.read_csv("DataFiles\\WCEC-inputs-10min.csv", parse_dates=["timestamp"])
     data.index = data["timestamp"]
     data = data.loc["2019-07-08 00:00:00":"2019-07-16 00:00:00",:]
     hrtx = [0,8,17]
-
     fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(20,10))
-    ax[0].plot(data["timestamp"], data["co2"], "r", linewidth="1", label="CO2 (ppm)")
-    #ax[0].plot(data["timestamp"], data["hours"]*max(data["co2"])+min(data["co2"]), "k", linewidth="1", label="Business Hours")
-    ax[0].set_ylabel("Carbon Dioxide (ppm)", fontsize=labs)
+    ax[0].plot(data["timestamp"], data["CO2"], "r", linewidth=1, label="CO2 (ppm)")
+    #ax[0].plot(data["timestamp"], data["hours"]*max(data["CO2"])+min(data["CO2"]), "k", linewidth="1", label="Business Hours")
+    ax[0].set_ylabel("Carbon Dioxide (ppm)", fontsize=11)
     ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[0].xaxis.set_tick_params(labelsize=labs)
-    ax[0].yaxis.set_tick_params(labelsize=labs)
+    ax[0].xaxis.set_tick_params(labelsize=11)
+    ax[0].yaxis.set_tick_params(labelsize=11)
     ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
 
-    # plot elec    
-    ax[1].plot(data["timestamp"], data["wifi"], "b", linewidth="1", label="Wi-Fi connections")
-    #ax[1].plot(data["timestamp"], data["hours"]*max(data["elec"])+min(data["elec"]), "k", linewidth="1", label="Business Hours")
-    ax[1].set_ylabel("Wi-Fi Connections", fontsize=labs)
+    # plot Elec    
+    ax[1].plot(data["timestamp"], data["WiFi"], "b", linewidth=1, label="Wi-Fi connections")
+    #ax[1].plot(data["timestamp"], data["hours"]*max(data["Elec"])+min(data["Elec"]), "k", linewidth="1", label="Business Hours")
+    ax[1].set_ylabel("Wi-Fi Connections", fontsize=11)
     ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[1].xaxis.set_tick_params(labelsize=labs)
-    ax[1].yaxis.set_tick_params(labelsize=labs)
+    ax[1].xaxis.set_tick_params(labelsize=11)
+    ax[1].yaxis.set_tick_params(labelsize=11)
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
 
-    # plot wifi
-    ax[2].plot(data["timestamp"], data["temp"], "m", linewidth="1", label="Temperature (°F)")
-    #ax[2].plot(data["timestamp"], data["hours"]*max(data["wifi"])+min(data["wifi"]), "k", linewidth="1", label="Business Hours")
-    ax[2].set_ylabel("Temperature (°F)", fontsize=labs)
+    # plot WiFi
+    ax[2].plot(data["timestamp"], data["temp"], "m", linewidth=1, label="Temperature (°F)")
+    #ax[2].plot(data["timestamp"], data["hours"]*max(data["WiFi"])+min(data["WiFi"]), "k", linewidth="1", label="Business Hours")
+    ax[2].set_ylabel("Temperature (°F)", fontsize=11)
     ax[2].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[2].xaxis.set_tick_params(labelsize=labs)
-    ax[2].yaxis.set_tick_params(labelsize=labs)
+    ax[2].xaxis.set_tick_params(labelsize=11)
+    ax[2].yaxis.set_tick_params(labelsize=11)
     ax[2].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
 
     # plot temp
-    ax[3].plot(data["timestamp"], data["rh"], "c", linewidth="1", label="Relative Humidity (%)")
+    ax[3].plot(data["timestamp"], data["rh"], "c", linewidth=1, label="Relative Humidity (%)")
     #ax[3].plot(data["timestamp"], data["hours"]*max(data["temp"])-min(data["temp"]), "k", linewidth="1", label="Business Hours")
-    ax[3].set_ylabel("Relative Humidity (%)", fontsize=labs)
+    ax[3].set_ylabel("Relative Humidity (%)", fontsize=11)
     ax[3].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[3].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[3].xaxis.set_tick_params(labelsize=labs)
-    ax[3].yaxis.set_tick_params(labelsize=labs)
+    ax[3].xaxis.set_tick_params(labelsize=11)
+    ax[3].yaxis.set_tick_params(labelsize=11)
     ax[3].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     
     #fig.legend(loc="upper right", fontsize=legs)
     fig.autofmt_xdate()
-    fig.savefig("Inputs-Example.png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\Inputs-Example.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
@@ -648,4 +685,5 @@ def PlotInputsExample():
 #CMCExplanation()
 #ROCExplanation()
 #PlotCampusDemand()
-PlotInputsExample()
+#PlotBuildingDemand()
+#PlotInputsExample()
