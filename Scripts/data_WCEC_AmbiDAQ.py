@@ -24,6 +24,9 @@ meta = sa.MetaData(engine,reflect=True)
 #Get DAQ table
 table = meta.tables['DAQs']
 
+substitution_count = 0
+item_count = 0
+
 #daqnums = [1,2,3]
 daqnums = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
 desired_columns = ["PIR"] # Options are: "CO2", "RH", "T", "PIR"
@@ -54,10 +57,11 @@ for descol in desired_columns:
                df = pd.concat([df,df_temp], join="outer")
                i = i + 1
      # Group data according to desired timestamp resolution    
-     dt = df.groupby(pd.TimeGrouper(freq="1min"))
+     dt = df.groupby(pd.TimeGrouper(freq="5min"))
      header_flag = 1
      prev_df = pd.DataFrame()     # Capture previous row of data to handle missing values
-     for time, group in dt:
+     for time, group in dt: # foreach 5 minute segment
+          #Setting up the row
           new_cols = df.columns
           max_col = pd.Index(["Max_" + descol])
           avg_col = pd.Index(["Avg_" + descol])
@@ -66,15 +70,17 @@ for descol in desired_columns:
           df_row = pd.DataFrame(index=[time],columns=new_cols)
           df_row.index.name = "Timestamp"
           for col in df.columns:
+               item_count = item_count + 1
                temp_df = group[col].dropna()
                temp_df.sort_index(axis=0, ascending=True,inplace=True)
                if temp_df.empty:
                     if prev_df.empty:
                          continue
                     else:
-                     p = prev_df[col]
-                     df_row.loc[time,col] = p[0]
-                     t = df_row.loc[time,col]
+                         sustitution_count = substitution_count + 1
+                         p = prev_df[col]
+                         df_row.loc[time,col] = p[0]
+                         t = df_row.loc[time,col]
                else:
                     v = temp_df[0] # This takes the value closest to "time" (but is actually just a little after "time"). Will need to do something different for PIR
                     df_row.loc[time,col] = v
@@ -93,4 +99,9 @@ conn.close()
 #Workaround for SSH threading issue. Don't delete this:
 [t.close() for t in threading.enumerate() if t.__class__.__name__ == "Transport"]
 server.stop()
+
+substitution_count = substitution_count
+item_count = item_count
+
+
 stopgap = "thisisastopgap"

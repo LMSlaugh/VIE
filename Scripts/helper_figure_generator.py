@@ -8,6 +8,7 @@
 import pandas as pd
 import numpy as np
 import math as math
+import datetime as dt
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
@@ -16,10 +17,10 @@ labs = 12 # figure label size
 legs = 12
 
 def PlotIns(data, in_type, sufx, hrtx):
-    fig, ax = plt.subplots(figsize=(20,10))
+    fig, ax = plt.subplots(figsize=(16,5))
     # plot inputs
     if (in_type=="Elec"):
-        ax.plot(data["fused-proba-dt"], data["Elec-val"], "g", linewidth="1", label="Elec (W)")
+        ax.plot(data["fused-proba-dt"], data["Elec-val"]/1000, "g", linewidth="1", label="Elec (kW)")
     elif (in_type=="WiFi"):
         ax.plot(data["fused-proba-dt"], data["WiFi-val"], "b", linewidth="1", label="Wifi (counts)")
     elif (in_type=="CO2"):
@@ -390,13 +391,13 @@ def PlotInsNMidsNOutNTruth(data, in_type, sufx, hrtx, params):
 
 def PlotSigmoids(sensor, sensorvals, rawprobas, fitprobas):  
     fig, ax = plt.subplots(figsize=(16,8))
-    if sensor.sensortype=="Elec":  
+    if sensor.sensortype=="electricity demand":  
         sensorvals = sensorvals*.001
         ax.plot(sensorvals, rawprobas, "r-", label="Raw")
-        ax.plot(sensorvals,fitprobas, "g-", label="Generated")
+        ax.plot(sensorvals,fitprobas, "b-", label="Generated")
     else:
-        ax.plot(sensorvals, rawprobas, label="Raw")
-        ax.plot(sensorvals, fitprobas, label="Generated")
+        ax.plot(sensorvals, rawprobas, "r-", label="Raw")
+        ax.plot(sensorvals, fitprobas, "b-", label="Generated")
     ax.legend(loc="upper right", fontsize=legs)
     ax.set_ylim([0,1.2])
     ax.set_xlim([min(sensorvals),max(sensorvals)])
@@ -405,11 +406,11 @@ def PlotSigmoids(sensor, sensorvals, rawprobas, fitprobas):
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=titlesz, fontweight="bold")
     ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
-    if sensor.sensortype=="WiFi":
+    if sensor.sensortype=="wifi connections":
         ax.set_xlabel("Raw Sensor Value (counts)", fontsize=labs)
-    elif sensor.sensortype=="Elec":
+    elif sensor.sensortype=="electricity demand":
         ax.set_xlabel("Raw Sensor Value (kW)", fontsize=labs)
-    elif sensor.sensortype=="CO2":
+    elif sensor.sensortype=="carbon dioxide":
         ax.set_xlabel("Raw Sensor Value (ppm)", fontsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\sigmoid-comparison-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
@@ -492,7 +493,7 @@ def PlotMain(in_type, start, end, save_suffix, params):
     historicaldata = pd.read_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv", parse_dates=["fused-proba-dt"])
     historicaldata.index = historicaldata["fused-proba-dt"]
     historicaldata = historicaldata.loc[start:end,:]
-    #PlotIns(historicaldata, in_type, save_suffix, tick_hrs)
+    PlotIns(historicaldata, in_type, save_suffix, tick_hrs)
     #PlotInsNMids(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotInsNOut(historicaldata, in_type, save_suffix, tick_hrs, params)
@@ -501,7 +502,7 @@ def PlotMain(in_type, start, end, save_suffix, params):
     #PlotMidsNTruth_1plot(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotMidsNTruth_2plots(historicaldata, in_type, save_suffix, tick_hrs, params) # not working for some reason
     PlotOutNTruth(historicaldata, save_suffix, tick_hrs, params)
-    PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
+    #PlotInsNMidsNOutNTruth(historicaldata, in_type, save_suffix, tick_hrs, params)
     #PlotOutputDistribution(historicaldata, save_suffix, tick_hrs, params)
     return
 
@@ -679,6 +680,58 @@ def PlotInputsExample():
     plt.close(fig)
     return
 
+def PlotOccupancyStepData():
+    data = pd.read_csv("DataFiles\\VIE-historical-input_WCEC_10min.csv", parse_dates=["timestamp"])
+    data.index = data["timestamp"]
+    data = data.loc["2019-07-23 06:00:00":"2019-07-23 20:00:00",:]
+    hrtx = [0,2,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,22]
+    
+    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(20,10))
+    ax[0].plot(data["timestamp"], data["co21-val"], "r", linewidth=1, label="CO2 (ppm)")
+    #ax[0].plot(data["timestamp"], data["hours"]*max(data["CO2"])+min(data["CO2"]), "k", linewidth="1", label="Business Hours")
+    ax[0].set_ylabel("Carbon Dioxide (ppm)", fontsize=11)
+    ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[0].xaxis.set_tick_params(labelsize=11)
+    ax[0].yaxis.set_tick_params(labelsize=11)
+    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+
+    # plot Elec    
+    ax[1].plot(data["timestamp"], data["wifi1-val"], "b", linewidth=1, label="Wi-Fi connections")
+    #ax[1].plot(data["timestamp"], data["hours"]*max(data["Elec"])+min(data["Elec"]), "k", linewidth="1", label="Business Hours")
+    ax[1].set_ylabel("Wi-Fi Connections", fontsize=11)
+    ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[1].xaxis.set_tick_params(labelsize=11)
+    ax[1].yaxis.set_tick_params(labelsize=11)
+    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+
+    # plot WiFi
+    ax[2].plot(data["timestamp"], data["Max_T"], "m", linewidth=1, label="Temperature (°F)")
+    #ax[2].plot(data["timestamp"], data["hours"]*max(data["WiFi"])+min(data["WiFi"]), "k", linewidth="1", label="Business Hours")
+    ax[2].set_ylabel("Temperature (°F)", fontsize=11)
+    ax[2].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[2].xaxis.set_tick_params(labelsize=11)
+    ax[2].yaxis.set_tick_params(labelsize=11)
+    ax[2].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+
+    # plot temp
+    ax[3].plot(data["timestamp"], data["Max_RH"], "c", linewidth=1, label="Relative Humidity (%)")
+    #ax[3].plot(data["timestamp"], data["hours"]*max(data["temp"])-min(data["temp"]), "k", linewidth="1", label="Business Hours")
+    ax[3].set_ylabel("Relative Humidity (%)", fontsize=11)
+    ax[3].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[3].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[3].xaxis.set_tick_params(labelsize=11)
+    ax[3].yaxis.set_tick_params(labelsize=11)
+    ax[3].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    
+    #fig.legend(loc="upper right", fontsize=legs)
+    fig.autofmt_xdate()
+    fig.savefig("Figures\\Occupancy-Step-Example.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
 
 #IndependenceTest()
 #PlotOutcomeExplanation()
@@ -687,3 +740,4 @@ def PlotInputsExample():
 #PlotCampusDemand()
 #PlotBuildingDemand()
 #PlotInputsExample()
+#PlotOccupancyStepData()
