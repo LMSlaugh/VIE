@@ -176,9 +176,9 @@ def GeneratePlots(params):
 def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end):
     params = mp.ModelParameters(build_flag, train_start, train_end, test_start, test_end, train_type, build_type, fuse_type)
     sensors = CreateVirtualSensors(params)
-    #traindata, testdata = GetTrainTestData(params)
-    #for k,v in sensors.items():
-       #pa.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
+    traindata, testdata = GetTrainTestData(params)
+    for k,v in sensors.items():
+       pa.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
     #GenerateOutput(testdata, sensors, params)
     #ra.GenerateAnalytics(params)
     GeneratePlots(params)
@@ -188,7 +188,7 @@ def Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, 
 # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv.....Main Program 
 # for reference: Main(build_flag, build_type, train_type, fuse_type, train_start, train_end, test_start, test_end)
 
-#Main(True, "Logistic", "Full", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+Main(True, "Logistic", "Full", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main(False, "Logistic", "Cherry", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main(False, "Percentile", "Full", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main(True, "Percentile", "Cherry", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")

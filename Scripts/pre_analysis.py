@@ -3,6 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats as st
 
+def CorrelationAnalysis(traindata, build_type, train_set):
+    traindata = traindata.iloc[:,:-1]
+    corr_mtx = np.corrcoef([traindata.iloc[:,1], traindata.iloc[:,2], traindata.iloc[:,3]])
+    corr_mtx = pd.DataFrame(corr_mtx)
+    corr_mtx.to_csv("DataFiles\\" + build_type + "\\" + train_set + "\\CorrelationMatrix.csv", header=True, index=True)
+    import seaborn as sns
+    sns.set(style="ticks")
+    pairs = sns.pairplot(traindata)
+    pairs.savefig("Figures\\" + build_type + "\\" + train_set + "\\Pairs.png", format="png", bbox_inches="tight")
+    return
+
 def CumulativeDistributions_Vac_Occ(sensorname, traindata, build_type, train_set):
     vaccumsum = 0
     vacprobas = []
@@ -268,17 +279,18 @@ def GetBins(sensorname, alldata):
 
 def RunExploration(sensorname, td_full, build_type, train_set):
     #WhatsMyDistribution(sensorname, td_full)
-    bins = GetBins(sensorname, td_full)
-    if train_set=="Cherry":
-        td_cherry = pd.read_csv("DataFiles\\" + build_type + "\\" + train_set + "\\Training_Data_" + sensorname + ".csv", parse_dates=["timestamp"])
-        td_cherry.index = td_cherry["timestamp"]
-        Histograms_Vac_Occ(bins, sensorname, td_cherry, build_type, train_set)
-        CumulativeDistributions_Vac_Occ(sensorname, td_cherry, build_type, train_set)
-        CompareHistogramFits_Full_Cherry_Vac_Occ(bins,sensorname, td_full, td_cherry, build_type, train_set)
-        CompareHistogramsNFits_Full_Cherry_Vac(bins,sensorname, td_full, td_cherry, build_type, train_set)
-        CompareCumulativeDistributions_Full_Cherry_Vac_Occ(sensorname, td_full, td_cherry, build_type, train_set)
+    CorrelationAnalysis(td_full, build_type, train_set)
+    #bins = GetBins(sensorname, td_full)
+    #if train_set=="Cherry":
+        #td_cherry = pd.read_csv("DataFiles\\" + build_type + "\\" + train_set + "\\Training_Data_" + sensorname + ".csv", parse_dates=["timestamp"])
+        #td_cherry.index = td_cherry["timestamp"]
+        #Histograms_Vac_Occ(bins, sensorname, td_cherry, build_type, train_set)
+        #CumulativeDistributions_Vac_Occ(sensorname, td_cherry, build_type, train_set)
+        #CompareHistogramFits_Full_Cherry_Vac_Occ(bins,sensorname, td_full, td_cherry, build_type, train_set)
+        #CompareHistogramsNFits_Full_Cherry_Vac(bins,sensorname, td_full, td_cherry, build_type, train_set)
+        #CompareCumulativeDistributions_Full_Cherry_Vac_Occ(sensorname, td_full, td_cherry, build_type, train_set)
 
-    elif train_set=="Full":
-        Histograms_Vac_Occ(bins, sensorname, td_full, build_type, train_set)
-        CumulativeDistributions_Vac_Occ(sensorname, td_full, build_type, train_set)
+    #elif train_set=="Full":
+        #Histograms_Vac_Occ(bins, sensorname, td_full, build_type, train_set)
+        #CumulativeDistributions_Vac_Occ(sensorname, td_full, build_type, train_set)
     return

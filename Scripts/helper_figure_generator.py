@@ -573,7 +573,7 @@ def ROCExplanation():
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.set_xlabel("False Positive Rate: FP/(FP + TN)", fontsize=labs)
     ax.set_ylabel("True Positive Rate: TP/(TP + FN)", fontsize=labs)
-    ax.set_title("Receiver-Operator Characteristic (ROC) Curve: Extreme Examples", fontsize=titlesz)
+    ax.set_title("Receiver-Operating Characteristic (ROC) Curve: Extreme Examples", fontsize=titlesz)
     ax.legend(loc="best", fontsize=legs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\ROC-Illustration.png", format='png', bbox_inches='tight')
@@ -732,6 +732,66 @@ def PlotOccupancyStepData():
     plt.close(fig)
     return
 
+def PlotElecSolar():
+    data = pd.read_csv("DataFiles\\WCEC-Elec-my-way.csv", parse_dates=["Date"])
+    data.index = data["Date"]
+    data = data.loc["2019-03-11 00:00:00":"2019-03-12 00:00:00",:]
+    hrtx = [0,2,4,6,8,10,12,14,16,18,20,22]
+    
+    fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(16,8))
+    ax[0].plot(data["Date"], data["Total Demand (W)"]*.001, "g", linewidth=1)
+    ax[0].set_ylabel("Electricity Demand (kW)", fontsize=11)
+    ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[0].xaxis.set_tick_params(labelsize=11)
+    ax[0].yaxis.set_tick_params(labelsize=11)
+    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    ax[0].set_title("Total Demand (solar generation excluded)")
+
+
+    # plot Elec    
+    ax[1].plot(data["Date"], data["Net Demand (W)"]*0.001, "g", linewidth=1)
+    ax[1].set_ylabel("Electricity Demand (kW)", fontsize=11)
+    ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[1].xaxis.set_tick_params(labelsize=11)
+    ax[1].yaxis.set_tick_params(labelsize=11)
+    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    ax[1].set_title("Net Demand (solar generation included)")
+    fig.autofmt_xdate()
+    fig.savefig("Figures\\Feature-Engineering-Example.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
+
+def PlotElecHVAC():
+    data = pd.read_csv("DataFiles\\WCEC-Elec-my-way.csv", parse_dates=["Date"])
+    data.index = data["Date"]
+    data = data.loc["2019-03-11 00:00:00":"2019-04-08 00:00:00",:]
+    hrtx = [0,12]
+    
+    fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(16,8))
+    ax[0].plot(data["Date"], data["Total Demand (W)"]*.001, "g", linewidth=1)
+    ax[0].set_ylabel("Electricity Demand (kW)", fontsize=11)
+    ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[0].xaxis.set_tick_params(labelsize=11)
+    ax[0].yaxis.set_tick_params(labelsize=11)
+    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    ax[0].set_title("Total Demand, HVAC included")
+
+
+    ax[1].plot(data["Date"], (data["Total Demand (W)"] + data["hvac"])*0.001, "g", linewidth=1)
+    ax[1].set_ylabel("Electricity Demand (kW)", fontsize=11)
+    ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[1].xaxis.set_tick_params(labelsize=11)
+    ax[1].yaxis.set_tick_params(labelsize=11)
+    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    ax[1].set_title("Total Demand, HVAC excluded)")
+    fig.autofmt_xdate()
+    fig.savefig("Figures\\Elec-with-without-HVAC-Example.png", format='png', bbox_inches='tight')
+    plt.close(fig)
+    return
 
 #IndependenceTest()
 #PlotOutcomeExplanation()
@@ -741,3 +801,5 @@ def PlotOccupancyStepData():
 #PlotBuildingDemand()
 #PlotInputsExample()
 #PlotOccupancyStepData()
+#PlotElecSolar()
+PlotElecHVAC()
