@@ -1,4 +1,4 @@
-timestamp,co2-val,truth-val
+timestamp,CO2-val,truth-val
 2019-07-02 11:00:00,574,0
 2019-07-02 11:05:00,605,0
 2019-07-02 11:10:00,589,0

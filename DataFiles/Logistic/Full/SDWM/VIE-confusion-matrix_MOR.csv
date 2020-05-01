@@ -1,0 +1,11 @@
+,truth:Vacant(1),truth:Occupied(0)
+predicted:Vacant(1),3489,365
+predicted:Occupied(0),128,2063
+-,,
+True Vacancy Ratio,59.8%,
+Optimum Cutoff,45.5%,
+Accuracy: Overall,91.8%,
+Accuracy: Vacant,96.5%,
+Accuracy: Occupied,85.0%,
+Complaint Opportunity Rate,6.0%,
+Missed Opportunity Rate,2.1%,

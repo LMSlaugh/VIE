@@ -1,0 +1,4 @@
+Sensor-Name,Sensor-Type,Update-Frequency,Measurement-Units,Data-Access-Type,Vacancy-Relationship-Type,Training-Data-Set,Data-Retrieval-File-Name,Preprocessing-File-Name,Relationship-Builder-File-Name,Std-Dev,Parameter-1,Parameter-2,Parameter-3,Parameter-4
+Elec,electricity demand,1m,W,na,Logistic,Full,data_WCEC_elec,prep_WCEC_elec,bldr_sigmoid,0.2540106797311561,-4.6961134924450905e-05,2.1078896214370122e-08,,
+WiFi,wifi connections,10m,counts,na,Logistic,Full,data_WCEC_wifi,prep_WCEC_wifi,bldr_sigmoid,0.22368583210605372,-1.0023203840921326,2.935373349637931,,
+CO2,carbon dioxide,5m,ppm,na,Logistic,Full,data_WCEC_co2,prep_WCEC_co2,bldr_sigmoid,0.22856404260364843,-0.02157815694920921,2.368877750355523,,
