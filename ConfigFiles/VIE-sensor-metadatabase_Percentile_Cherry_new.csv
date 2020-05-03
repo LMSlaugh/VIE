@@ -1,4 +1,4 @@
 Sensor-Name,Sensor-Type,Update-Frequency,Measurement-Units,Data-Access-Type,Vacancy-Relationship-Type,Training-Data-Set,Data-Retrieval-File-Name,Preprocessing-File-Name,Relationship-Builder-File-Name,Std-Dev,Parameter-1,Parameter-2,Parameter-3,Parameter-4
-Elec,electricity demand,1m,W,na,Percentile,Cherry,data_WCEC_elec,prep_WCEC_elec,bldr_sigmoid,0.1362130858195458,7210.706737531813,736.630589963889,,
-WiFi,wifi connections,10m,counts,na,Percentile,Cherry,data_WCEC_wifi,prep_WCEC_wifi,bldr_sigmoid,0.22814212531114705,1.9866136600998299,0.6450651182737142,,
-CO2,carbon dioxide,5m,ppm,na,Percentile,Cherry,data_WCEC_co2,prep_WCEC_co2,bldr_sigmoid,0.20965667739646007,23.322685385042853,15.913736462338548,,
+Elec,electricity demand,1m,W,na,percentile,cherry,data_elec,prep_elec,builder_expit,0.1362130858195458,7210.706737531813,736.630589963889,,
+WiFi,wifi connections,10m,counts,na,percentile,cherry,data_wifi,prep_wifi,builder_expit,0.22814212531114705,1.9866136600998299,0.6450651182737142,,
+CO2,carbon dioxide,5m,ppm,na,percentile,cherry,data_co2,prep_co2,builder_expit,0.20965667739646007,23.322685385042853,15.913736462338548,,

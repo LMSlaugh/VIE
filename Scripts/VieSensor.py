@@ -1,46 +1,71 @@
 # Author: Lisa Slaughter <lisa.m.slaughter@gmail.com>
-# Last update: Jan 28 2019
+# Last update: November 19, 2019
 
-# This code determines the standard deviation and mean of a sensor data set. These values are passed
-# to VIE.py in order to create the logit-normal cumulative distribution function for that sensor. Input
-# data must only be for periods where vacancy is nearly 100% certain.
-# Currently, a sigmoid is assumed. Later, perhaps an entire function can be generated and provided to VIE.py, 
-# where it would be stored in a dictionary of sensors and their functions.
- 
+# This class represents an individual sensor. Metadata fields (denoted by MD below) are pre-defined in a .csv file, 
+# where each row defines an individual sensor. See "VIE-sensor-metdatabase.csv" for an example. 
+# Field definitions:
+#    | "sensorname": String. Name of sensor; Must be unique.
+#    | "sensortype": String. Defines what the sensor is measuring.
+#         | "carbon dioxide": Air concentration of carbon dioxide.
+#         | "wifi": Count of active Wi-Fi connections.
+#         | "elec": Electricity demand.
+#    | "frequency": String. Data sample rate in minutes (optional).
+#    | "units": String. Units attached to sensor measurement.
+#    | "dataaccesstype": String. Location information for data retrieval (optional).
+#    | "vacancyrelationship": String. Defines the modeling approach.
+#         | "logistic": Uses logistic regression to model vacancy.
+#         | "percentile": Uses the proposed percentile method to model vacancy.
+#    | "trainingdataset": Dictionary<Datetime, String>. Placeholder for the training data.
+#    | "histdata": Dictionary<Datetime, String>. Placeholder for the full data set (test + train).
+#    | "vachistdata": Dictionary<Datetime, String>. Placeholder for data (train + test) during times of expected vacancy.
+#    | "occhistdata": Dictionary<Datetime, String>. Placeholder for data (train + test) during times of expected ocupancy.
+#    | "datafilename": String. Name of data extraction file for this sensor (.py file; omit extension).
+#    | "prepfilename": String. Name of preprocessing file for this sensor (.py file; omit extension).
+#    | "bldrfilename": String. Name of percentile method training file for this sensor (.py file; omit extension).
+#    | "std": Float. Standard deviation of the training set.
+#    | "vrparam1": Object. Placeholder for a model coefficient (optional).
+#    | "vrparam2": Object. Placeholder for a model coefficient (optional).
+#    | "vrparam3": Object. Placeholder for a model coefficient (optional).
+#    | "vrparam4": Object. Placeholder for a model coefficient (optional).
+#    | "snapshotvalue": Float. Value corresponding to the current data point being processed.
+#    | "snapshottimestamp": Datetime. Timestamp corresponding to the current data point being processed.
+#    | "snapshotvacancyprobability": Float. Probability of vacancy corresponding to the current data point being processed.
+#    | "trainstart": Datetime. Defines the beginning of the training period.
+#    | "trainend": Datetime. Defines the end of the training period.
 
 # ----------------------------------------------------------------------------------------------------------
 import numpy as np
-import math as math
+import math
 import datetime as dt
-import PI_client_LMS as pc
 from scipy.special import expit
 
 class VieSensor:
     def __init__(self, sensorName, sensorType, frequency, measurementUnits, dataAccessType, vacancyRelationship, trainingDataSet, dataRetrievalFileName, preprocessingFileName, relationshipBuilderFileName, stdDev, vrParameter1, vrParameter2, vrParameter3, vrParameter4, trainStart, trainEnd, historicalData=[], vacantData=[], occupiedData=[]):       
-        self.sensorname = sensorName # Must be unique
+    # Initializes an instance of this class. Performs percentile-type training if needed. 
+        self.sensorname = sensorName
         self.sensortype = sensorType
-        self.frequency = frequency # frequency of new values being added (data sample rate) in minutes.
-        self.units = measurementUnits # units of sensor measurement
-        self.dataaccesstype = dataAccessType # tag for data stream in OSIsoft PI data historian.
-        self.vacancyrelationship = vacancyRelationship # encoded types, represented by an enumeration (0=percentile, 1=logistic regression...)
+        self.frequency = frequency 
+        self.units = measurementUnits
+        self.dataaccesstype = dataAccessType
+        self.vacancyrelationship = vacancyRelationship
         self.trainingdataset = trainingDataSet
         self.histdata = historicalData
         self.vachistdata = vacantData
         self.occhistdata = occupiedData
-        # TODO implement the following properties
-        #self.vacancystart = vacancyStart # implement this upstream
-        #self.vacancyend = vacancyEnd # implement this upstream
-        self.datafilename = dataRetrievalFileName # Namespace of .py file (without ".py") that retrieves data and preprocesses it for use. File must be present in root folder. Two tasks may be disaggregated into two separate files later.
-        self.prepfilename = preprocessingFileName # Namespace of .py file (without ".py") that retrieves data and preprocesses it for use. File must be present in root folder. Two tasks may be disaggregated into two separate files later.
-        self.bldrfilename = relationshipBuilderFileName # Namespace of .py file (without ".py") that retrieves data and preprocesses it for use. File must be present in root folder. Two tasks may be disaggregated into two separate files later.
+        # TODO implement the following properties upstream
+        #self.vacancystart = vacancyStart
+        #self.vacancyend = vacancyEnd
+        self.datafilename = dataRetrievalFileName
+        self.prepfilename = preprocessingFileName
+        self.bldrfilename = relationshipBuilderFileName
         self.std = stdDev
-        self.vrparam1 = vrParameter1 # mean for sigmoid, threshold for step
-        self.vrparam2 = vrParameter2 # std dev for sigmoid
-        self.vrparam3 = vrParameter3 # unused
-        self.vrparam4 = vrParameter4 # unused
-        self.snapshotvalue = -1 # value of most recent data update from this sensor: dummy value
-        self.snapshottimestamp = dt.datetime.now() # timestamp (datetime) of most recent data update from this sensor: dummy value
-        self.snapshotvacancyprobability = -1 # probability of vacancy corresponding to this sensor's snapshot value
+        self.vrparam1 = vrParameter1
+        self.vrparam2 = vrParameter2
+        self.vrparam3 = vrParameter3
+        self.vrparam4 = vrParameter4
+        self.snapshotvalue = -1
+        self.snapshottimestamp = dt.datetime.now()
+        self.snapshotvacancyprobability = -1
         self.trainstart = trainStart
         self.trainend = trainEnd
         if ( math.isnan(self.vrparam1) | math.isnan(self.vrparam2) | math.isnan(self.std)):
@@ -69,12 +94,11 @@ class VieSensor:
         return self
 
     def PredictVacancyProbability(self):
-        # This function is called by main.py to predict probability of vacancy.
-        # Applies the functional relationship between sensor data and vacancy to the sensor's snapshot value.
+        # Predicts the probability of vacancy by applying the functional relationship between sensor data and vacancy to the snapshot value.
 
-        if self.vacancyrelationship=="Percentile":
+        if self.vacancyrelationship=="percentile":
             self.snapshotvacancyprobability = 1 - 1/(1 + np.exp((self.vrparam1-self.snapshotvalue)/self.vrparam2))         
-        elif self.vacancyrelationship=="Logistic":
+        elif self.vacancyrelationship=="logistic":
             self.snapshotvacancyprobability = expit(self.snapshotvalue * self.vrparam1 + self.vrparam2)
 
         if self.snapshotvacancyprobability < 0.001:
