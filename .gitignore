@@ -1,3 +1,8 @@
-Figures
-DataFiles\Logistic
-DataFiles\Percentile
+# Untracked folders:
+**/HM/
+**/SM/
+**/RMS/
+**/SDWM/
+**/SDWRMS/
+*.png
+Scripts/__pycache__/
