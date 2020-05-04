@@ -1,7 +1,8 @@
 # Untracked folders:
-Figures/
-DataFiles/Logistic/Full/
-DataFiles/Logistic/Cherry/
-DataFiles/Percentile/Full/
-DataFiles/Percentile/Cherry/
+**/HM/
+**/SM/
+**/RMS/
+**/SDWM/
+**/SDWRMS/
+*.png
 Scripts/__pycache__/
