@@ -1,8 +1,8 @@
 # Author: Lisa Slaughter <lisa.m.slaughter@gmail.com>
 # Last update: May 02, 2019
 
-# This code contains methods for exploring the input data.
-
+# This code contains methods for exploring the statistical nature of the input data.
+# TODO: **This code needs to be cleaned up**
 # ----------------------------------------------------------------------------------------------------------
 
 import pandas as pd
@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from scipy import stats as st
 
 def CorrelationAnalysis(traindata, build_type, train_set):
+    #Generates the correlation coefficient matrix and pairs plot for the input sensor data
     traindata = traindata.iloc[:,:-1]
     corr_mtx = np.corrcoef([traindata.iloc[:,1], traindata.iloc[:,2], traindata.iloc[:,3]])
     corr_mtx = pd.DataFrame(corr_mtx)
@@ -31,8 +32,7 @@ def CumulativeDistributions_Vac_Occ(sensorname, traindata, build_type, train_set
     for datum in vacdata:
         vaccumsum = vaccumsum + datum
         vacprobas.append(vaccumsum/vacsum) 
-    
-    occcumsum = 0
+        occcumsum = 0
     occprobas = []
     occdata = traindata[traindata["truth-val"]==0]
     occdata = occdata[sensorname + "-val"]
@@ -42,7 +42,7 @@ def CumulativeDistributions_Vac_Occ(sensorname, traindata, build_type, train_set
         occcumsum = occcumsum + datum
         occprobas.append(occcumsum/occsum)
 
-    labs = 9 # figure label size
+    labs = 9
     legs = "medium"
     cumsumfig, axcs = plt.subplots(figsize=(11,5))
     axcs.plot(vacdata, vacprobas, label="Vacant")
@@ -67,7 +67,7 @@ def Histograms_Vac_Occ(bins, sensorname, traindata, build_type, train_set):
     occdata = traindata[traindata["truth-val"]==0]
     occdata = occdata[sensorname + "-val"]
 
-    labs = 9 # figure label size
+    labs = 9
     legs = "medium"
 
     histfig, ax = plt.subplots(figsize=(11,5))
@@ -99,7 +99,7 @@ def CompareHistogramsNFits_Full_Cherry_Vac(bins, sensorname, td_full, td_cherry,
     vacdata_full = td_full[td_full["truth-val"]==1]
     vacdata_full = vacdata_full[sensorname + "-val"]
     
-    labs = 9 # figure label size
+    labs = 9
     legs = "medium"
 
     histfig, ax = plt.subplots(figsize=(11,5))
@@ -135,7 +135,7 @@ def CompareHistogramFits_Full_Cherry_Vac_Occ(bins, sensorname, td_full, td_cherr
     occdata_full = td_full[td_full["truth-val"]==0]
     occdata_full = occdata_full[sensorname + "-val"]
 
-    labs = 9 # figure label size
+    labs = 9
     legs = "medium"
 
     histfig, ax = plt.subplots(figsize=(11,5))

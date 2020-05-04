@@ -1,21 +1,23 @@
 # Author: Lisa Slaughter <lisa.m.slaughter@gmail.com>
-# Last update: November 19, 2019
+# Last update: May 02, 2020
 
-# This class represents an individual sensor. Metadata fields (denoted by MD below) are pre-defined in a .csv file, 
-# where each row defines an individual sensor. See "VIE-sensor-metdatabase.csv" for an example. 
+# This class represents an individual sensor. Metadata fields are pre-defined in a .csv file, where 
+# each row defines an individual sensor. See "VIE-sensor-metdatabase.csv" for an example. 
 # Field definitions:
 #    | "sensorname": String. Name of sensor; Must be unique.
-#    | "sensortype": String. Defines what the sensor is measuring.
+#    | "sensortype": String. Defines what the sensor is measuring. Options:
 #         | "carbon dioxide": Air concentration of carbon dioxide.
 #         | "wifi": Count of active Wi-Fi connections.
 #         | "elec": Electricity demand.
 #    | "frequency": String. Data sample rate in minutes (optional).
 #    | "units": String. Units attached to sensor measurement.
 #    | "dataaccesstype": String. Location information for data retrieval (optional).
-#    | "vacancyrelationship": String. Defines the modeling approach.
+#    | "vacancyrelationship": String. Defines the modeling approach. Options:
 #         | "logistic": Uses logistic regression to model vacancy.
 #         | "percentile": Uses the proposed percentile method to model vacancy.
-#    | "trainingdataset": Dictionary<Datetime, String>. Placeholder for the training data.
+#    | "trainingdataset": Determines what parts of the training set is used. Options:
+#         | "full": Use the full training data set.
+#         | "cherry": Use only times of near-sure vacancy from the training set (between midnight and 4am).
 #    | "histdata": Dictionary<Datetime, String>. Placeholder for the full data set (test + train).
 #    | "vachistdata": Dictionary<Datetime, String>. Placeholder for data (train + test) during times of expected vacancy.
 #    | "occhistdata": Dictionary<Datetime, String>. Placeholder for data (train + test) during times of expected ocupancy.

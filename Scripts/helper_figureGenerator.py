@@ -176,7 +176,7 @@ def PlotInsNOut(data, in_type, sufx, hrtx, params):
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.autofmt_xdate()
     fig.suptitle("Raw Sensor Input vs Fused Probability of Vacancy", fontsize=titlesz, fontweight="bold")
-    fig.savefig("Figures\\" + params.fusetype + "\\" + params.buildtype + "\\" + params.traintype + "\\Output vs. Inputs-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\Output vs. Inputs-" + in_type + "_" + sufx + ".png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 

@@ -73,7 +73,7 @@ def GetCumulativeDist(sensor, data):
 
 def BuildVacancyRelationship(sensor):
     GetHistData(sensor)
-    if sensor.vacancyrelationship=="percentile":
+    if sensor.vacancyrelationship=="Percentile":
         import scipy.optimize as opt
         cumsum = 0
         rawprobas = []
@@ -107,7 +107,7 @@ def BuildVacancyRelationship(sensor):
         fitprobas = Sigmoid(sensorvals, sensor.vrparam1, sensor.vrparam2)
         figen.PlotSigmoids(sensor, sensorvals, rawprobas, fitprobas)
 
-    elif sensor.vacancyrelationship=="logistic":
+    elif sensor.vacancyrelationship=="Logistic":
         from sklearn import linear_model
         from scipy.special import expit
         o_data = sensor.occhistdata.copy()
@@ -152,7 +152,7 @@ def BuildVacancyRelationship(sensor):
        
 def GetHistData(sensor):
     sensor.GetHistoricalData()
-    if sensor.trainingdataset=="cherry":
+    if sensor.trainingdataset=="Cherry":
         # TODO implement expected vacancy start and end times
         # slice data for times of ~100% certain vacancy
         mask_vac = ( (sensor.histdata.index.hour >= 0 ) & (sensor.histdata.index.hour <= 4) )
@@ -161,7 +161,7 @@ def GetHistData(sensor):
         mask_occ = (((sensor.histdata.index.hour > 10) & (sensor.histdata.index.hour < 14 )) & (sensor.histdata.index.dayofweek < 5))
         data_o = sensor.histdata[mask_occ]
 
-    elif sensor.trainingdataset=="full":
+    elif sensor.trainingdataset=="Full":
         data_v = sensor.histdata[sensor.histdata["truth-val"]==1]
         data_o = sensor.histdata[sensor.histdata["truth-val"]==0]
     

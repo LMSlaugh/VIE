@@ -1,3 +1,7 @@
-Figures
-DataFiles\Logistic
-DataFiles\Percentile
+# Untracked folders:
+Figures/
+DataFiles/Logistic/Full/
+DataFiles/Logistic/Cherry/
+DataFiles/Percentile/Full/
+DataFiles/Percentile/Cherry/
+Scripts/__pycache__/

@@ -27,8 +27,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 class ModelParameters:
-    def __init__(self, buildFlag, trainStart, trainEnd, testStart, testEnd, trainType, buildType, fuseType):
-        self.buildflag = buildFlag
+    def __init__(self, trainStart, trainEnd, testStart, testEnd, trainType, buildType, fuseType):
         self.trainstart = trainStart
         self.trainend = trainEnd
         self.teststart = testStart
