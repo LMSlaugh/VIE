@@ -6,3 +6,4 @@
 **/SDWRMS/
 *.png
 Scripts/__pycache__/
+.vscode/
