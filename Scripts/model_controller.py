@@ -62,7 +62,7 @@ def HarmonicAverage(probas):
     return overallproba
 
 def CreateVirtualSensors(params):
-    path = "ConfigFiles\\VIE-sensor-metadatabase_" + params.buildtype + "_" + params.traintype + ".csv"
+    path = "ConfigFiles\\VIE-sensor-metadatabase_" + params.buildtype + "_" + params.traintype + "_new.csv"
     metadata = pd.read_csv(path)
     sensors = {}
     for index, row in metadata.iterrows():
@@ -168,10 +168,10 @@ def GeneratePlots(params):
 
     #figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
     figen.PlotMain("Elec", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
-    #figen.PlotMain("WiFi", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
-    #figen.PlotMain("CO2", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
+    figen.PlotMain("WiFi", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
+    figen.PlotMain("CO2", "2019-07-16 00:00:00", "2019-07-23 23:50:00", "1week", params)
     #figen.PlotMain("comp", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
-    #figen.PlotMain("Elec", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
-    #figen.PlotMain("WiFi", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
-    #figen.PlotMain("CO2", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    figen.PlotMain("Elec", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    figen.PlotMain("WiFi", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
+    figen.PlotMain("CO2", "2019-07-16 00:00:00", "2019-08-05 23:50:00", "3week", params)
     return

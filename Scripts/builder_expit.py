@@ -1,13 +1,14 @@
 # Author: Lisa Slaughter <lisa.m.slaughter@gmail.com>
 # Last update: May 02, 2019
 
-# This code generates the vacancy relationship for an individual sensor. The vacancy relationship maps the
-# raw sensor value to the probability of vacancy. 
+# This code generates the vacancy relationship for an individual sensor using the expit function. The vacancy 
+# relationship maps the raw sensor value to the probability of vacancy. 
 # ----------------------------------------------------------------------------------------------------------
 import pandas as pd
 import numpy as np
 import math
 import helper_figureGenerator as figen
+import matplotlib.pyplot as plt
 
 def Sigmoid(x, p1, p2):
     return 1-1/(1+np.exp((p1-x)/p2))
@@ -79,6 +80,18 @@ def BuildVacancyRelationship(sensor):
         rawprobas = []
         cols = sensor.vachistdata.columns
         sensorvals_raw = sensor.vachistdata[cols[0]]
+        
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(range(0,len(sensorvals_raw)), sensorvals_raw.sort_values(ascending=True))
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\1_sorted-raw-data-with-outliers-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(sensorvals_raw.sort_values(ascending=True), sensorvals_raw.sort_values(ascending=True))
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\1_raw-x_sorted-raw-data-with-outliers-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+
+
 
         # Remove outliers
         stats_pre = sensorvals_raw.describe()
@@ -86,17 +99,64 @@ def BuildVacancyRelationship(sensor):
         mean_pre = stats_pre["mean"]
         sensorvals = sensorvals_raw[sensorvals_raw.values < ( mean_pre + 3 * std_pre )]
         sensorvals = sensorvals[sensorvals.values > ( mean_pre - 3 * std_pre )]
+        
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(range(0,len(sensorvals)), sensorvals.sort_values(ascending=True))
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\2_sorted-raw-data-no-outliers-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
 
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(sensorvals.sort_values(ascending=True), sensorvals.sort_values(ascending=True))
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\2_raw-x_sorted-raw-data-no-outliers-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+        
         # Normalize (place values between zero and one)
         sensorvals_normed = ( sensorvals - min(sensorvals) ) / ( max(sensorvals) - min(sensorvals) )
         summation = sum(sensorvals_normed)
         
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(range(0,len(sensorvals_normed)), sensorvals_normed.sort_values(ascending=True))
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\3_sorted-raw-data-no-outliers-normed-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(sensorvals.sort_values(ascending=True), sensorvals_normed.sort_values(ascending=True))
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\3_raw-x_sorted-raw-data-no-outliers-normed-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+        
+
         sensorvals = sensorvals.sort_values(ascending=True)
         sensorvals_normed = sensorvals_normed.sort_values(ascending=True)
         for datum in sensorvals_normed:
             cumsum = cumsum + datum
             rawprobas.append(1-cumsum/summation) # dividing by the sum makes area under the curve equal to 1
         rawprobas = pd.Series(rawprobas)
+        
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(range(0,len(rawprobas)), rawprobas)
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\4_raw-probabilities-exaggerated-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(sensorvals, rawprobas)
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\4_raw-x_raw-probabilities-exaggerated-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+        
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(range(0,len(rawprobas)), rawprobas*summation)
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\5_raw-probabilities-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(sensorvals, rawprobas*summation)
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\5_raw-x_raw-probabilities-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(16,8))
+        ax.plot(sensorvals, rawprobas)
+        fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\6_empirical-inference-curve-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
+        plt.close(fig)
+
         stats_v = sensorvals_normed.describe()
         std = stats_v["std"] # starting value for parameter 2
         popt, pcov = opt.curve_fit(Sigmoid, sensorvals, rawprobas, p0=[mean_pre, std_pre])

@@ -34,39 +34,39 @@ import postanalysis
 def Main(build_type, train_type, fuse_type, train_start, train_end, test_start, test_end):
     params = mp.ModelParameters(train_start, train_end, test_start, test_end, train_type, build_type, fuse_type)
     sensors = mc.CreateVirtualSensors(params)
-    traindata, testdata = mc.GetTrainTestData(params)
-    for k,v in sensors.items():
-       preanalysis.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
-    mc.GenerateOutput(testdata, sensors, params)
+    #traindata, testdata = mc.GetTrainTestData(params)
+    #for k,v in sensors.items():
+       #preanalysis.RunExploration(v.sensorname, traindata, params.buildtype, params.traintype)
+    #mc.GenerateOutput(testdata, sensors, params)
     postanalysis.GenerateAnalytics(params)
-    mc.GeneratePlots(params)
+    #mc.GeneratePlots(params)
     return
 
 # --------- MAIN PROGRAM ----------
 
 # The following lines of code can be un/commented to in/exclude different model runs
 
-Main("Logistic", "Full", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main("Logistic", "Full", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Logistic", "Cherry", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Percentile", "Full", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main("Percentile", "Cherry", "SM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-Main("Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main("Logistic", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Logistic", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Percentile", "Full", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main("Percentile", "Cherry", "RMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-Main("Logistic", "Full", "SDWM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main("Logistic", "Full", "SDWM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Logistic", "Cherry", "SDWM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Percentile", "Full", "SDWM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main("Percentile", "Cherry", "SDWM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-Main("Logistic", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main("Logistic", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Logistic", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Percentile", "Full", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main("Percentile", "Cherry", "SDWRMS", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 
-Main("Logistic", "Full", "HM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
+#Main("Logistic", "Full", "HM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Logistic", "Cherry", "HM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 #Main("Percentile", "Full", "HM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")
 Main("Percentile", "Cherry", "HM", "2019-07-02 00:00:00", "2019-07-16 00:00:00", "2019-07-16 00:00:00", "2019-08-06 00:00:00")

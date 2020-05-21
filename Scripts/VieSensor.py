@@ -98,9 +98,9 @@ class VieSensor:
     def PredictVacancyProbability(self):
         # Predicts the probability of vacancy by applying the functional relationship between sensor data and vacancy to the snapshot value.
 
-        if self.vacancyrelationship=="percentile":
+        if self.vacancyrelationship=="Percentile":
             self.snapshotvacancyprobability = 1 - 1/(1 + np.exp((self.vrparam1-self.snapshotvalue)/self.vrparam2))         
-        elif self.vacancyrelationship=="logistic":
+        elif self.vacancyrelationship=="Logistic":
             self.snapshotvacancyprobability = expit(self.snapshotvalue * self.vrparam1 + self.vrparam2)
 
         if self.snapshotvacancyprobability < 0.001:
