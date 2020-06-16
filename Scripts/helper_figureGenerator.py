@@ -428,13 +428,13 @@ def PlotSigmoids(sensor, sensorvals, rawprobas, fitprobas):
     ax.xaxis.set_tick_params(labelsize=labs)
     ax.yaxis.set_tick_params(labelsize=labs)
     ax.set_title("Vacancy Relationship Accuracy for Sensor: " + sensor.sensorname, fontsize=titlesz, fontweight="bold")
-    ax.set_ylabel("Probability of Vacancy (%)", fontsize=labs)
+    ax.set_ylabel("Confidence of Vacancy (%)", fontsize=labs)
     if sensor.sensortype=="wifi connections":
-        ax.set_xlabel("Raw Sensor Value (counts)", fontsize=labs)
+        ax.set_xlabel("Raw Sensor Value: WiFi Connections (count)", fontsize=labs)
     elif sensor.sensortype=="electricity demand":
-        ax.set_xlabel("Raw Sensor Value (kW)", fontsize=labs)
+        ax.set_xlabel("Raw Sensor Value: Electricity Demand (kW)", fontsize=labs)
     elif sensor.sensortype=="carbon dioxide":
-        ax.set_xlabel("Raw Sensor Value (ppm)", fontsize=labs)
+        ax.set_xlabel("Raw Sensor Value: delta(CO2) (ppm)", fontsize=labs)
     ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     fig.savefig("Figures\\" + sensor.vacancyrelationship + "\\" + sensor.trainingdataset + "\\sigmoid-comparison-" + sensor.sensorname + ".png", format="png", bbox_inches="tight")
     plt.close(fig)
@@ -591,45 +591,71 @@ def ROCExplanation():
     return
 
 def PlotCampusDemand():
-    # Plots an example of electricity demand across the UC Davis campus
-    data = pd.read_csv("DataFiles\\Campus_elec_w.csv", parse_dates=["timestamp"])
+    # Plots an example of electricity demand and wifi cnxn count across the UC Davis campus
+    data = pd.read_csv("DataFiles\\Building_campus_elec_wifi.csv", parse_dates=["timestamp"])
     hrtx = [0,12]
-    fig, ax = plt.subplots(figsize=(16,8))
+    fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(16,8))
     x = data["timestamp"]
-    y = data["Actual_Campus_Demand"]/1000
-    ax.plot(x, y, "k", linewidth=1)
-    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax.xaxis.set_tick_params(labelsize=labs)
-    ax.yaxis.set_tick_params(labelsize=labs)
-    ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-    ax.yaxis.grid(False)
+    elec = data["Campus_Total_Electricity_Demand"]/1000
+    wifi = data["AP.Campus Wide WIFI Count"]/1000
+    ax[0].plot(x, elec, "g", linewidth=1, label="Demand (MW)")
+    ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
+    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    #ax[0].yaxis.grid(False)
+    ax[0].set_ylim(bottom=15)
+    ax[0].set_ylabel("Electricity Demand (MW)", fontsize=labs)
+    #ax[0].set_title("UC Davis Campus-Wide Electricity Demand", fontsize=titlesz)
+
+    ax[1].plot(x, wifi, "b", linewidth=1, label="WiFi (count)")
+    ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
+    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    #ax[1].yaxis.grid(False)
+    ax[1].set_ylim(bottom=0)
+    ax[1].set_ylabel("WiFi Connections (count x1000)", fontsize=labs)
+    fig.suptitle("UC Davis Campus-Wide Electricity Demand vs. WiFi Connections", fontsize=titlesz)
+    #fig.legend(loc="upper right", fontsize=legs)
     fig.autofmt_xdate()
-    ax.set_ylim(bottom=0)
-    ax.set_ylabel("Electricity Demand (MW)", fontsize=labs)
-    ax.set_title("UC Davis Campus-Wide Electricity Demand", fontsize=titlesz)
     fig.savefig("Figures\\Campus-Energy.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
 
 def PlotBuildingDemand():
     # Plots an example of electricity demand for a single building on the UC Davis campus
-    data = pd.read_csv("DataFiles\\Building_elec_w.csv", parse_dates=["timestamp"])
+    data = pd.read_csv("DataFiles\\Building_campus_elec_wifi.csv", parse_dates=["timestamp"])
     hrtx = [0,12]
-    fig, ax = plt.subplots(figsize=(16,8))
+    fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(16,8))
     x = data["timestamp"]
-    y = data["Haring_Hall_TOTAL/Electricity_Demand"]
-    ax.plot(x, y, "k", linewidth=1)
-    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax.xaxis.set_tick_params(labelsize=labs)
-    ax.yaxis.set_tick_params(labelsize=labs)
-    ax.grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-    ax.yaxis.grid(False)
+    elec = data["Haring_Hall_TOTAL/Electricity_Demand"]
+    wifi = data["AP.HARING_Total_Count"]
+    ax[0].plot(x, elec, "g", linewidth=1, label="Demand (MW)")
+    ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
+    ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    #ax[0].yaxis.grid(False)
+    ax[0].set_ylim(bottom=140)
+    ax[0].set_ylabel("Electricity Demand (kW)", fontsize=labs)
+    #ax[0].set_title("UC Davis Campus-Wide Electricity Demand", fontsize=titlesz)
+
+    ax[1].plot(x, wifi, "b", linewidth=1, label="WiFi (count)")
+    ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
+    ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+    #ax[1].yaxis.grid(False)
+    ax[1].set_ylim(bottom=0)
+    ax[1].set_ylabel("WiFi Connections (count)", fontsize=labs)
+    fig.suptitle("Haring Hall Electricity Demand vs. WiFi Connections", fontsize=titlesz)
+    #fig.legend(loc="upper right", fontsize=legs)
     fig.autofmt_xdate()
-    ax.set_ylim(bottom=0)
-    ax.set_ylabel("Electricity Demand (kW)", fontsize=labs)
-    ax.set_title("Haring Hall Electricity Demand", fontsize=titlesz)
     fig.savefig("Figures\\Building-Energy.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
@@ -640,47 +666,61 @@ def PlotInputsExample():
     #  Electricity demand
     #  Count of active wifi connections
     #  Air temperature
+    #  Relative humidity
 
     # plot CO2
-    data = pd.read_csv("DataFiles\\WCEC-inputs-10min.csv", parse_dates=["timestamp"])
+    data = pd.read_csv("DataFiles\\WCEC-inputs-10min_new.csv", parse_dates=["timestamp"])
+    #data = pd.read_csv("DataFiles\\truncated_2.csv", parse_dates=["timestamp"])
+    #data = pd.read_csv("DataFiles\\VIE-historical-input_WCEC.csv", parse_dates=["timestamp"])
     data.index = data["timestamp"]
-    data = data.loc["2019-07-08 00:00:00":"2019-07-16 00:00:00",:]
+    #data = data.loc["2019-07-08 00:00:00":"2019-07-16 00:00:00",:]
+    #data = data[data.index.minute%10==0]
+    #data.to_csv("DataFiles\\elecjunk.csv")
     hrtx = [0,8,17]
-    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(20,10))
-    ax[0].plot(data["timestamp"], data["CO2"], "r", linewidth=1, label="CO2 (ppm)")
-    ax[0].set_ylabel("Carbon Dioxide (ppm)", fontsize=11)
+    fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(20,13))
+    ax[0].plot(data["timestamp"], data["co2"], "r", linewidth=1, label="CO2 (ppm)")
+    ax[0].set_ylabel("Carbon Dioxide (ppm)", fontsize=labs)
     ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[0].xaxis.set_tick_params(labelsize=11)
-    ax[0].yaxis.set_tick_params(labelsize=11)
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
 
-    # plot Elec    
-    ax[1].plot(data["timestamp"], data["WiFi"], "b", linewidth=1, label="Wi-Fi connections")
-    ax[1].set_ylabel("Wi-Fi Connections", fontsize=11)
+    # plot Elec
+    ax[1].plot(data["timestamp"], data["elec_no_hvac"]/1000, "g", linewidth=1, label="Elec Demand (kW)")
+    ax[1].set_ylabel("Electricity Demand (kW)", fontsize=labs)
     ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[1].xaxis.set_tick_params(labelsize=11)
-    ax[1].yaxis.set_tick_params(labelsize=11)
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
 
-    # plot WiFi
-    ax[2].plot(data["timestamp"], data["temp"], "m", linewidth=1, label="Temperature (°F)")
-    ax[2].set_ylabel("Temperature (°F)", fontsize=11)
+    # plot Wifi
+    ax[2].plot(data["timestamp"], data["wifi"], "b", linewidth=1, label="Wi-Fi connections")
+    ax[2].set_ylabel("Wi-Fi Connections", fontsize=labs)
     ax[2].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[2].xaxis.set_tick_params(labelsize=11)
-    ax[2].yaxis.set_tick_params(labelsize=11)
+    ax[2].xaxis.set_tick_params(labelsize=labs)
+    ax[2].yaxis.set_tick_params(labelsize=labs)
     ax[2].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
 
     # plot temp
-    ax[3].plot(data["timestamp"], data["rh"], "c", linewidth=1, label="Relative Humidity (%)")
-    ax[3].set_ylabel("Relative Humidity (%)", fontsize=11)
+    ax[3].plot(data["timestamp"], data["temp"], "m", linewidth=1, label="Temperature (°F)")
+    ax[3].set_ylabel("Temperature (°F)", fontsize=labs)
     ax[3].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[3].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[3].xaxis.set_tick_params(labelsize=11)
-    ax[3].yaxis.set_tick_params(labelsize=11)
+    ax[3].xaxis.set_tick_params(labelsize=labs)
+    ax[3].yaxis.set_tick_params(labelsize=labs)
     ax[3].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+
+    # plot Rh
+    ax[4].plot(data["timestamp"], data["rh"], "c", linewidth=1, label="Relative Humidity (%)")
+    ax[4].set_ylabel("Relative Humidity (%)", fontsize=labs)
+    ax[4].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[4].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[4].xaxis.set_tick_params(labelsize=labs)
+    ax[4].yaxis.set_tick_params(labelsize=labs)
+    ax[4].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     
     fig.autofmt_xdate()
     fig.savefig("Figures\\Inputs-Example.png", format='png', bbox_inches='tight')
@@ -692,43 +732,52 @@ def PlotOccupancyStepData():
     data = pd.read_csv("DataFiles\\VIE-historical-input_WCEC_10min.csv", parse_dates=["timestamp"])
     data.index = data["timestamp"]
     data = data.loc["2019-07-23 06:00:00":"2019-07-23 20:00:00",:]
-    hrtx = [0,2,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,22]
+    hrtx = [0,2,4,6,8,10,12,14,16,18,20,22]
     
-    fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(20,10))
-    ax[0].plot(data["timestamp"], data["co21-val"], "r", linewidth=1, label="CO2 (ppm)")
-    ax[0].set_ylabel("Carbon Dioxide (ppm)", fontsize=11)
+    fig, ax = plt.subplots(nrows=5, ncols=1, figsize=(10,5))
+    ax[0].plot(data["timestamp"], data["CO2-val"], "r", linewidth=1, label="CO2 (ppm)")
+    ax[0].set_ylabel("Carbon\nDioxide (ppm)", fontsize=labs, multialignment="center")
     ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[0].xaxis.set_tick_params(labelsize=11)
-    ax[0].yaxis.set_tick_params(labelsize=11)
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
 
     # plot Elec    
-    ax[1].plot(data["timestamp"], data["wifi1-val"], "b", linewidth=1, label="Wi-Fi connections")
-    ax[1].set_ylabel("Wi-Fi Connections", fontsize=11)
+    ax[1].plot(data["timestamp"], data["Elec-val"]/1000, "g", linewidth=1, label="Wi-Fi connections")
+    ax[1].set_ylabel("Electricity\nDemand (kW)", fontsize=labs, multialignment="center")
     ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[1].xaxis.set_tick_params(labelsize=11)
-    ax[1].yaxis.set_tick_params(labelsize=11)
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
-
-    # plot WiFi
-    ax[2].plot(data["timestamp"], data["Max_T"], "m", linewidth=1, label="Temperature (°F)")
-    ax[2].set_ylabel("Temperature (°F)", fontsize=11)
+    
+    # plot WiFi    
+    ax[2].plot(data["timestamp"], data["WiFi-val"], "b", linewidth=1, label="Wi-Fi connections")
+    ax[2].set_ylabel("Wi-Fi\nConnections", fontsize=labs, multialignment="center")
     ax[2].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[2].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[2].xaxis.set_tick_params(labelsize=11)
-    ax[2].yaxis.set_tick_params(labelsize=11)
+    ax[2].xaxis.set_tick_params(labelsize=labs)
+    ax[2].yaxis.set_tick_params(labelsize=labs)
     ax[2].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
 
-    # plot temp
-    ax[3].plot(data["timestamp"], data["Max_RH"], "c", linewidth=1, label="Relative Humidity (%)")
-    ax[3].set_ylabel("Relative Humidity (%)", fontsize=11)
+    # plot Temp
+    ax[3].plot(data["timestamp"], data["Max_T"], "m", linewidth=1, label="Temperature (°F)")
+    ax[3].set_ylabel("Temperature (°F)", fontsize=labs, multialignment="center")
     ax[3].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[3].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[3].xaxis.set_tick_params(labelsize=11)
-    ax[3].yaxis.set_tick_params(labelsize=11)
+    ax[3].xaxis.set_tick_params(labelsize=labs)
+    ax[3].yaxis.set_tick_params(labelsize=labs)
     ax[3].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
+
+    # plot RH
+    ax[4].plot(data["timestamp"], data["Max_RH"], "c", linewidth=1, label="Relative Humidity (%)")
+    ax[4].set_ylabel("Relative\nHumidity (%)", fontsize=labs, multialignment="center")
+    ax[4].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
+    ax[4].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
+    ax[4].xaxis.set_tick_params(labelsize=labs)
+    ax[4].yaxis.set_tick_params(labelsize=labs)
+    ax[4].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     
     fig.autofmt_xdate()
     fig.savefig("Figures\\Occupancy-Step-Example.png", format='png', bbox_inches='tight')
@@ -745,22 +794,22 @@ def PlotElecSolar():
     # plot Elec, without solar
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(16,8))
     ax[0].plot(data["Date"], data["Total Demand (W)"]*.001, "g", linewidth=1)
-    ax[0].set_ylabel("Electricity Demand (kW)", fontsize=11)
+    ax[0].set_ylabel("Electricity Demand (kW)", fontsize=labs)
     ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[0].xaxis.set_tick_params(labelsize=11)
-    ax[0].yaxis.set_tick_params(labelsize=11)
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     ax[0].set_title("Total Demand (solar generation excluded)")
 
 
     # plot Elec, with solar
     ax[1].plot(data["Date"], data["Net Demand (W)"]*0.001, "g", linewidth=1)
-    ax[1].set_ylabel("Electricity Demand (kW)", fontsize=11)
+    ax[1].set_ylabel("Electricity Demand (kW)", fontsize=labs)
     ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[1].xaxis.set_tick_params(labelsize=11)
-    ax[1].yaxis.set_tick_params(labelsize=11)
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     ax[1].set_title("Net Demand (solar generation included)")
     fig.autofmt_xdate()
@@ -777,26 +826,144 @@ def PlotElecHVAC():
     
     fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(16,8))
     ax[0].plot(data["Date"], data["Total Demand (W)"]*.001, "g", linewidth=1)
-    ax[0].set_ylabel("Electricity Demand (kW)", fontsize=11)
+    ax[0].set_ylabel("Electricity Demand (kW)", fontsize=labs)
     ax[0].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[0].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[0].xaxis.set_tick_params(labelsize=11)
-    ax[0].yaxis.set_tick_params(labelsize=11)
+    ax[0].xaxis.set_tick_params(labelsize=labs)
+    ax[0].yaxis.set_tick_params(labelsize=labs)
     ax[0].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     ax[0].set_title("Total Demand, HVAC included")
 
     ax[1].plot(data["Date"], (data["Total Demand (W)"] + data["hvac"])*0.001, "g", linewidth=1)
-    ax[1].set_ylabel("Electricity Demand (kW)", fontsize=11)
+    ax[1].set_ylabel("Electricity Demand (kW)", fontsize=labs)
     ax[1].xaxis.set_major_locator(mdates.HourLocator(byhour=hrtx))
     ax[1].xaxis.set_major_formatter(mdates.DateFormatter("%a %H:%M"))
-    ax[1].xaxis.set_tick_params(labelsize=11)
-    ax[1].yaxis.set_tick_params(labelsize=11)
+    ax[1].xaxis.set_tick_params(labelsize=labs)
+    ax[1].yaxis.set_tick_params(labelsize=labs)
     ax[1].grid(b=True, which='major', color='#666666', linestyle=':', linewidth=1, alpha=0.8)
     ax[1].set_title("Total Demand, HVAC excluded)")
     fig.autofmt_xdate()
     fig.savefig("Figures\\Elec-with-without-HVAC-Example.png", format='png', bbox_inches='tight')
     plt.close(fig)
     return
+
+def PlotCOR_MORvsThreshComparison():
+    # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 1 ONLY
+    fig, ax = plt.subplots(figsize=(10,5))
+    data = pd.read_csv("DataFiles\\CMC_comparison_logistic_percentile.csv")
+    zmask = data["COR-MOR_percentile"]<=1
+
+    ax.plot(data["threshold"][zmask], data["COR-MOR_percentile"][zmask], "r", label="Proposed Method")
+    ax.plot(data["threshold"][zmask], data["COR-MOR_logistic"][zmask], "b", label="Logistic Regression")
+    ax.plot(data["threshold"][zmask], data["COR-MOR_perfect"][zmask], "k--", label="Perfect Model")
+    ax.set_title("COR/MOR < 1 vs. Threshold", fontsize=labs)
+    ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=labs)
+    ax.set_ylabel("COR/MOR: FP/FN", fontsize=labs)
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.minorticks_on()
+    ax.legend(loc="upper right", fontsize=legs)
+    plt.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    plt.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    fig.savefig("Figures\\COR_MOR_log_perc_comp-under_1.png", format="png", bbox_inches="tight")
+    plt.close(fig)
+    return
+
+def PlotROCComparison():
+    # Plot .......
+    fig, ax = plt.subplots(figsize=(10,5))
+    data = pd.read_csv("DataFiles\\CMC_comparison_logistic_percentile.csv")
+
+    COR_perc= data["ROC_x_percentile"]
+    vacant_acc_perc = data["ROC_y_percentile"]
+    ax.plot(COR_perc, vacant_acc_perc, "r", label="Proposed Method")
+    n = round(len(COR_perc)-1, 0)
+    step = int(round(n/10, 0))
+    callout_locs = range(0,n+1,step)
+    for val in callout_locs:
+        if val==0:
+            ax.plot(COR_perc.values[val], vacant_acc_perc.values[val], 'xr', label="Decision Thresholds")
+        else:
+            ax.plot(COR_perc.values[val], vacant_acc_perc.values[val], 'xr')
+        ax.text(COR_perc.values[val]+.05,vacant_acc_perc.values[val]-.05, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom', color='r')
+
+    COR_log= data["ROC_x_logistic"]
+    vacant_acc_log = data["ROC_y_logistic"]
+    ax.plot(COR_log, vacant_acc_log, "b", label="Logistic Regression")
+    n = round(len(COR_log)-1, 0)
+    step = int(round(n/10, 0))
+    callout_locs = range(0,n+1,step)
+    for val in callout_locs:
+        if val==0:
+            ax.plot(COR_log.values[val], vacant_acc_log.values[val], 'xb')
+        else:
+            ax.plot(COR_log.values[val], vacant_acc_log.values[val], 'xb')
+        ax.text(COR_log.values[val]+.05,vacant_acc_log.values[val]-.05, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom', color='b')
+    
+    ax.plot(data["ROC_x_perfect"], data["ROC_y_perfect"], "k--", label="Perfect Model")
+    ax.set_title("ROC Curve", fontsize=titlesz, fontweight="bold")
+    ax.set_xlabel("Complaint Opportunity Rate FP/(TN + FP) (%)", fontsize=labs)
+    ax.set_ylabel("Vacancy Detection Accuracy TP/(TP + FN) (%)", fontsize=labs)
+    
+    
+    ax.legend(loc="lower right", fontsize="medium")
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    fig.savefig("Figures\\ROC_log_perc_comp.png", format="png", bbox_inches="tight")
+    plt.close(fig)
+    return
+
+def PlotCMCComparison():
+    # Plot .......
+    fig, ax = plt.subplots(figsize=(10,5))
+    data = pd.read_csv("DataFiles\\CMC_comparison_logistic_percentile.csv")
+
+    MOR_perc= data["CMC_x_percentile"]
+    COR_perc = data["CMC_y_percentile"]
+    ax.plot(MOR_perc, COR_perc, "r", label="Proposed Method")
+    n = round(len(MOR_perc)-1, 0)
+    step = int(round(n/10, 0))
+    callout_locs = range(0,n+1,step)
+    for val in callout_locs:
+        if val==0:
+            ax.plot(MOR_perc.values[val], COR_perc.values[val], 'xr', label="Decision Thresholds")
+        else:
+            ax.plot(MOR_perc.values[val], COR_perc.values[val], 'xr')
+        ax.text(MOR_perc.values[val]+.05, COR_perc.values[val]+.004, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom', color='r')
+
+    MOR_log= data["CMC_x_logistic"]
+    COR_log = data["CMC_y_logistic"]
+    ax.plot(MOR_log, COR_log, "b", label="Logistic Regression")
+    n = round(len(MOR_log)-1, 0)
+    step = int(round(n/10, 0))
+    callout_locs = range(0,n+1,step)
+    for val in callout_locs:
+        if val==0:
+            ax.plot(MOR_log.values[val], COR_log.values[val], 'xb')
+        else:
+            ax.plot(MOR_log.values[val], COR_log.values[val], 'xb')
+        ax.text(MOR_log.values[val]+.05, COR_log.values[val]+.004, str(round(val/10)) + "%", horizontalalignment='right', verticalalignment='bottom', color='b')
+    
+    ax.plot(data["CMC_x_perfect"], data["CMC_y_perfect"], "k--", label="Perfect Model")
+    ax.set_title("CMC Curve", fontsize=titlesz, fontweight="bold")
+    ax.set_ylabel("Complaint Opportunity Rate FP/(TN + FP) (%)", fontsize=labs)
+    ax.set_xlabel("Missed Opportunity Rate FN/(TP + FN) (%)", fontsize=labs)
+    
+    ax.legend(loc="upper right", fontsize="medium")
+    ax.minorticks_on()
+    ax.xaxis.set_tick_params(labelsize=9)
+    ax.yaxis.set_tick_params(labelsize=9)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    fig.savefig("Figures\\CMC_log_perc_comp.png", format="png", bbox_inches="tight")
+    plt.close(fig)
+    return
+
 
 def PlotMain(in_type, start, end, save_suffix, params):
     # Controller for the plotting task - un/comment lines to in/exclude
@@ -828,3 +995,12 @@ def PlotMain(in_type, start, end, save_suffix, params):
     #PlotElecSolar()
     #PlotElecHVAC()
     return
+
+
+#PlotCampusDemand()
+#PlotBuildingDemand()
+#PlotInputsExample()
+PlotOccupancyStepData()
+#PlotCOR_MORvsThreshComparison()
+#PlotROCComparison()
+#PlotCMCComparison()

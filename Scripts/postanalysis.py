@@ -76,8 +76,8 @@ def GenerateConfusionMatrixNMetrics(data, params, threshold, sufx):
     confmtx.iloc[7,0] = str(round(oacc,3)*100) + "%"
     confmtx.iloc[8,0] = str(round(comp_rate,3)*100) + "%"
     confmtx.iloc[9,0] = str(round(miss_opp_rate,3)*100) + "%"
-    confmtx.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-confusion-matrix" + sufx + ".csv")
-    data.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\conf_matrix_one_thresh-" + str(threshold) + ".csv")
+    #confmtx.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-confusion-matrix" + sufx + ".csv")
+    #data.to_csv("DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\conf_matrix_one_thresh-" + str(threshold) + ".csv")
 
     return metrics, confmtx
     
@@ -221,6 +221,24 @@ def GenerateAccuracyCurves(metrics_vthresh, thresh, params):
     ax.set_xlabel("Missed Opportunity Rate: FN/(TP + FN) (%)", fontsize=labs)
     ax.set_ylabel("Complaint Opportunity Rate: FP/(FP + TN) (%)", fontsize=labs)
     fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\CMC.png", format="png", bbox_inches="tight")
+    plt.close(fig)
+
+    # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 1 ONLY
+    fig, ax = plt.subplots(figsize=(10,5))
+    ratio = COR/MOR
+    zmask_1 = ratio<=1
+
+    ax.plot(thresh[zmask_1], ratio[zmask_1])
+    ax.set_title("COR/MOR < 1 vs. Threshold", fontsize=12)
+    ax.set_xlabel("Threshold for Vacancy/Occupancy Determination (%)", fontsize=labs)
+    ax.xaxis.set_tick_params(labelsize=ticksz)
+    ax.yaxis.set_tick_params(labelsize=ticksz)
+    ax.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    ax.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    ax.minorticks_on()
+    plt.grid(b=True, which='major', color='#666666', linestyle='-', linewidth=1, alpha=0.7)
+    plt.grid(b=True, which='minor', color='#999999', linestyle='-', linewidth=1, alpha=0.2)
+    fig.savefig("Figures\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\COR-MOR-Ratio-under-1.png", format="png", bbox_inches="tight")
     plt.close(fig)
 
     # Plot (complaint opportunity rate) / (missed opportunity rate) against threshold ZOOMED <= 100
@@ -466,12 +484,12 @@ def GenerateAnalytics(params):
     # Controller for the post-analysis task. Un/comment to in/exclude methods.
     outputcsvlocation = "DataFiles\\" + params.buildtype + "\\" + params.traintype + "\\" + params.fusetype + "\\VIE-historical-output.csv"
     output = pd.read_csv(outputcsvlocation, parse_dates=["fused-proba-dt"])
-    metsarr, cm = GenerateConfusionMatrixNMetrics(output, params, 0.5, "")    
-    metsarr, cm = GenerateConfusionMatrixNMetrics(output, params, 0, "")    
-    metsarr, cm = GenerateConfusionMatrixNMetrics(output, params, 1, "")    
-    #metrics_vthresh, thresholds = GenerateMetricsForAllThresholds(output.copy(), params)
-    #mor_opt, mof_opt, roc_opt = GetOptimalValues(metrics_vthresh, thresholds, params)
-    #GenerateAccuracyCurves(metrics_vthresh, thresholds, params)
+    #metsarr, cm = GenerateConfusionMatrixNMetrics(output, params, 0.5, "")    
+    #metsarr, cm = GenerateConfusionMatrixNMetrics(output, params, 0, "")    
+    #metsarr, cm = GenerateConfusionMatrixNMetrics(output, params, 1, "")    
+    metrics_vthresh, thresholds = GenerateMetricsForAllThresholds(output.copy(), params)
+    mor_opt, mof_opt, roc_opt = GetOptimalValues(metrics_vthresh, thresholds, params)
+    GenerateAccuracyCurves(metrics_vthresh, thresholds, params)
     #GenerateConfusionMatrixNMetrics(output.copy(), params, mor_opt, "_MOR")
     #GenerateConfusionMatrixNMetrics(output.copy(), params, mof_opt, "_MOF")
     #GenerateConfusionMatrixNMetrics(output.copy(), params, roc_opt, "_ROC")
