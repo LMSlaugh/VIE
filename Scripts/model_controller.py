@@ -63,6 +63,7 @@ def HarmonicAverage(probas):
 
 def CreateVirtualSensors(params):
     path = "ConfigFiles\\VIE-sensor-metadatabase_" + params.buildtype + "_" + params.traintype + "_new.csv"
+    #path = "ConfigFiles\\VIE-sensor-metadatabase_" + params.buildtype + "_" + params.traintype + ".csv"
     metadata = pd.read_csv(path)
     sensors = {}
     for index, row in metadata.iterrows():

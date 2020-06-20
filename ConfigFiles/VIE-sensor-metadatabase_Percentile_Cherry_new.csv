@@ -1,0 +1,4 @@
+Sensor-Name,Sensor-Type,Update-Frequency,Measurement-Units,Data-Access-Type,Vacancy-Relationship-Type,Training-Data-Set,Data-Retrieval-File-Name,Preprocessing-File-Name,Relationship-Builder-File-Name,Std-Dev,Parameter-1,Parameter-2,Parameter-3,Parameter-4
+Elec,electricity demand,1m,W,na,Percentile,Cherry,data_elec,prep_elec,builder_expit,0.20366489638788496,378.46582615034805,37.471531072863655,,
+WiFi,wifi connections,10m,counts,na,Percentile,Cherry,data_wifi,prep_wifi,builder_expit,0.2281421253111465,1.9866136597170456,0.6450651174657349,,
+CO2,carbon dioxide,5m,ppm,na,Percentile,Cherry,data_co2,prep_co2,builder_expit,0.20965667739646035,23.32268536103482,15.913736445576145,,
